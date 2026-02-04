@@ -1,58 +1,4 @@
-// AAMVA Driver License/ID Data Structure and US States
-
-export const US_STATES = [
-  { code: "AL", name: "Alabama", iin: "636033" },
-  { code: "AK", name: "Alaska", iin: "636059" },
-  { code: "AZ", name: "Arizona", iin: "636026" },
-  { code: "AR", name: "Arkansas", iin: "636021" },
-  { code: "CA", name: "California", iin: "636014" },
-  { code: "CO", name: "Colorado", iin: "636020" },
-  { code: "CT", name: "Connecticut", iin: "636006" },
-  { code: "DE", name: "Delaware", iin: "636011" },
-  { code: "DC", name: "District of Columbia", iin: "636043" },
-  { code: "FL", name: "Florida", iin: "636010" },
-  { code: "GA", name: "Georgia", iin: "636055" },
-  { code: "HI", name: "Hawaii", iin: "636047" },
-  { code: "ID", name: "Idaho", iin: "636050" },
-  { code: "IL", name: "Illinois", iin: "636035" },
-  { code: "IN", name: "Indiana", iin: "636037" },
-  { code: "IA", name: "Iowa", iin: "636018" },
-  { code: "KS", name: "Kansas", iin: "636022" },
-  { code: "KY", name: "Kentucky", iin: "636046" },
-  { code: "LA", name: "Louisiana", iin: "636007" },
-  { code: "ME", name: "Maine", iin: "636041" },
-  { code: "MD", name: "Maryland", iin: "636003" },
-  { code: "MA", name: "Massachusetts", iin: "636002" },
-  { code: "MI", name: "Michigan", iin: "636032" },
-  { code: "MN", name: "Minnesota", iin: "636038" },
-  { code: "MS", name: "Mississippi", iin: "636051" },
-  { code: "MO", name: "Missouri", iin: "636030" },
-  { code: "MT", name: "Montana", iin: "636008" },
-  { code: "NE", name: "Nebraska", iin: "636054" },
-  { code: "NV", name: "Nevada", iin: "636049" },
-  { code: "NH", name: "New Hampshire", iin: "636039" },
-  { code: "NJ", name: "New Jersey", iin: "636036" },
-  { code: "NM", name: "New Mexico", iin: "636009" },
-  { code: "NY", name: "New York", iin: "636001" },
-  { code: "NC", name: "North Carolina", iin: "636004" },
-  { code: "ND", name: "North Dakota", iin: "636034" },
-  { code: "OH", name: "Ohio", iin: "636023" },
-  { code: "OK", name: "Oklahoma", iin: "636058" },
-  { code: "OR", name: "Oregon", iin: "636029" },
-  { code: "PA", name: "Pennsylvania", iin: "636025" },
-  { code: "RI", name: "Rhode Island", iin: "636052" },
-  { code: "SC", name: "South Carolina", iin: "636005" },
-  { code: "SD", name: "South Dakota", iin: "636042" },
-  { code: "TN", name: "Tennessee", iin: "636053" },
-  { code: "TX", name: "Texas", iin: "636015" },
-  { code: "UT", name: "Utah", iin: "636040" },
-  { code: "VT", name: "Vermont", iin: "636024" },
-  { code: "VA", name: "Virginia", iin: "636000" },
-  { code: "WA", name: "Washington", iin: "636045" },
-  { code: "WV", name: "West Virginia", iin: "636061" },
-  { code: "WI", name: "Wisconsin", iin: "636031" },
-  { code: "WY", name: "Wyoming", iin: "636060" },
-] as const;
+// AAMVA Driver License/ID Data Structure
 
 export const EYE_COLORS = [
   { code: "BLK", name: "Black" },
@@ -64,6 +10,19 @@ export const EYE_COLORS = [
   { code: "MAR", name: "Maroon" },
   { code: "PNK", name: "Pink" },
   { code: "DIC", name: "Dichromatic" },
+  { code: "UNK", name: "Unknown" },
+] as const;
+
+export const EYE_COLORS_ON_DL = [
+  { code: "BLK", name: "Black" },
+  { code: "BLU", name: "Blue" },
+  { code: "BRN", name: "Brown" },
+  { code: "GRN", name: "Green" },
+  { code: "GRY", name: "Gray" },
+  { code: "HAZ", name: "Hazel" },
+  { code: "MAR", name: "Maroon" },
+  { code: "MUL", name: "Multicolored" },
+  { code: "PNK", name: "Pink" },
   { code: "UNK", name: "Unknown" },
 ] as const;
 
@@ -79,26 +38,68 @@ export const HAIR_COLORS = [
   { code: "UNK", name: "Unknown" },
 ] as const;
 
+export const HAIR_COLORS_ON_DL = [
+  { code: "BLK", name: "Black" },
+  { code: "BLN", name: "Blond" },
+  { code: "BRN", name: "Brown" },
+  { code: "DBR", name: "Dark Brown" },
+  { code: "GRY", name: "Gray" },
+  { code: "LBR", name: "Light Brown" },
+  { code: "RED", name: "Red/Auburn" },
+  { code: "SDY", name: "Sandy" },
+  { code: "WHI", name: "White" },
+  { code: "UNK", name: "Unknown/Bald" },
+] as const;
+
 export const GENDER_OPTIONS = [
-  { code: "1", name: "Male" },
-  { code: "2", name: "Female" },
+  { code: "1", name: "Male", short: "M" },
+  { code: "2", name: "Female", short: "F" },
+] as const;
+
+export const RACE_OPTIONS = [
+  { code: "AI", name: "Alaskan or American Indian" },
+  { code: "AP", name: "Asian or Pacific Islander" },
+  { code: "BK", name: "Black" },
+  { code: "H", name: "Hispanic Origin" },
+  { code: "O", name: "Non-hispanic" },
+  { code: "U", name: "Unknown" },
+  { code: "W", name: "White" },
+] as const;
+
+export const NAME_SUFFIXES = [
+  { code: "", name: "NONE" },
+  { code: "JR", name: "JR (Junior)" },
+  { code: "SR", name: "SR (Senior)" },
+  { code: "I", name: "1ST or I (First)" },
+  { code: "II", name: "2ND or II (Second)" },
+  { code: "III", name: "3RD or III (Third)" },
+  { code: "IV", name: "4TH or IV (Fourth)" },
+  { code: "V", name: "5TH or V (Fifth)" },
+  { code: "VI", name: "6TH or VI (Sixth)" },
+] as const;
+
+export const DL_CLASSES = [
+  { code: "A", name: "Class A" },
+  { code: "B", name: "Class B" },
+  { code: "C", name: "Class C" },
+  { code: "D", name: "Class D" },
+  { code: "M", name: "Class M (Motorcycle)" },
 ] as const;
 
 export interface AAMVAData {
-  // Header info
-  state: string;
-  aamvaVersion: string;
-  jurisdictionVersion: string;
+  // State/Revision info
+  stateCode: string;
+  revisionId: string;
   
   // Personal info
   firstName: string;
   middleName: string;
   lastName: string;
+  firstMiddleName: string; // For NY-style combined field
   nameSuffix: string;
   
   // Address
   streetAddress: string;
-  streetAddress2: string;
   city: string;
   postalCode: string;
   
@@ -106,61 +107,81 @@ export interface AAMVAData {
   dateOfBirth: string;
   gender: string;
   eyeColor: string;
+  eyeColorOnDL: string;
   hairColor: string;
-  heightFeet: string;
-  heightInches: string;
+  hairColorOnDL: string;
+  height: string;
   weight: string;
+  race: string;
   
   // Document info
   licenseNumber: string;
+  dlClass: string;
   issueDate: string;
   expirationDate: string;
   documentDiscriminator: string;
   inventoryControlNumber: string;
+  restrictions: string;
+  endorsement: string;
   
-  // Compliance
-  complianceType: string;
+  // Additional
+  donor: string;
+  safeDriver: string;
+  revisionDate: string;
 }
 
 export const DEFAULT_AAMVA_DATA: AAMVAData = {
-  state: "CA",
-  aamvaVersion: "10",
-  jurisdictionVersion: "05",
+  stateCode: "CA",
+  revisionId: "CA_2017",
   
   firstName: "JOHN",
   middleName: "MICHAEL",
   lastName: "DOE",
+  firstMiddleName: "JOHN,MICHAEL",
   nameSuffix: "",
   
   streetAddress: "123 MAIN ST",
-  streetAddress2: "",
   city: "LOS ANGELES",
   postalCode: "900010000",
   
-  dateOfBirth: "01011990",
+  dateOfBirth: "01151970",
   gender: "1",
   eyeColor: "BRO",
+  eyeColorOnDL: "BRN",
   hairColor: "BRO",
-  heightFeet: "5",
-  heightInches: "10",
-  weight: "180",
+  hairColorOnDL: "BRN",
+  height: "69",
+  weight: "169",
+  race: "",
   
   licenseNumber: "D1234567",
-  issueDate: "01012020",
-  expirationDate: "01012030",
-  documentDiscriminator: "12345678901234567890123456789012",
-  inventoryControlNumber: "1234567890",
+  dlClass: "C",
+  issueDate: "08262021",
+  expirationDate: "01152026",
+  documentDiscriminator: "08/25/202165508/AAFD/26",
+  inventoryControlNumber: "21237D12345670401",
+  restrictions: "NONE",
+  endorsement: "NONE",
   
-  complianceType: "F",
+  donor: "N",
+  safeDriver: "Y",
+  revisionDate: "",
 };
 
 // Generate random data for testing
-export function generateRandomData(): Partial<AAMVAData> {
+export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const firstNames = ["JAMES", "JOHN", "ROBERT", "MICHAEL", "WILLIAM", "DAVID", "RICHARD", "JOSEPH", "MARY", "PATRICIA", "JENNIFER", "LINDA", "ELIZABETH", "BARBARA", "SUSAN", "JESSICA"];
   const middleNames = ["ALLEN", "BRIAN", "CHARLES", "DANIEL", "EDWARD", "FRANK", "GEORGE", "HENRY", "ANN", "BETH", "CLAIRE", "DIANE", "EVE", "GRACE", "HELEN", "IRIS"];
   const lastNames = ["SMITH", "JOHNSON", "WILLIAMS", "BROWN", "JONES", "GARCIA", "MILLER", "DAVIS", "RODRIGUEZ", "MARTINEZ", "HERNANDEZ", "LOPEZ", "GONZALEZ", "WILSON", "ANDERSON", "THOMAS"];
   const streets = ["MAIN ST", "OAK AVE", "MAPLE DR", "PARK BLVD", "CEDAR LN", "ELM ST", "PINE RD", "WASHINGTON AVE", "LINCOLN BLVD", "SUNSET DR"];
-  const cities = ["LOS ANGELES", "SAN DIEGO", "SAN JOSE", "SAN FRANCISCO", "FRESNO", "SACRAMENTO", "LONG BEACH", "OAKLAND", "BAKERSFIELD", "ANAHEIM"];
+  
+  const citiesByState: Record<string, string[]> = {
+    CA: ["LOS ANGELES", "SAN DIEGO", "SAN JOSE", "SAN FRANCISCO", "FRESNO", "SACRAMENTO"],
+    TX: ["HOUSTON", "SAN ANTONIO", "DALLAS", "AUSTIN", "FORT WORTH", "EL PASO"],
+    FL: ["JACKSONVILLE", "MIAMI", "TAMPA", "ORLANDO", "ST PETERSBURG", "HIALEAH"],
+    NY: ["NEW YORK", "BUFFALO", "ROCHESTER", "YONKERS", "SYRACUSE", "ALBANY"],
+    default: ["SPRINGFIELD", "RIVERSIDE", "FRANKLIN", "CLINTON", "MADISON", "GEORGETOWN"],
+  };
   
   const randomChoice = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
   const randomNum = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -176,26 +197,71 @@ export function generateRandomData(): Partial<AAMVAData> {
   
   const expYear = issueYear + randomNum(4, 8);
   
+  const firstName = randomChoice(firstNames);
+  const middleName = randomChoice(middleNames);
+  const cities = citiesByState[stateCode] || citiesByState.default;
+  
+  // State-specific license number formats
+  const generateLicenseNumber = (state: string): string => {
+    switch (state) {
+      case "CA":
+        return `D${randomNum(1000000, 9999999)}`;
+      case "TX":
+        return `${randomNum(10000000, 99999999)}`;
+      case "FL":
+        return `H${randomNum(100000000000, 999999999999)}`;
+      case "NY":
+        return `${randomNum(100000000, 999999999)}`;
+      default:
+        return `${randomNum(10000000, 99999999)}`;
+    }
+  };
+
   return {
-    firstName: randomChoice(firstNames),
-    middleName: randomChoice(middleNames),
+    firstName,
+    middleName,
     lastName: randomChoice(lastNames),
+    firstMiddleName: `${firstName},${middleName}`,
     streetAddress: `${randomNum(100, 9999)} ${randomChoice(streets)}`,
     city: randomChoice(cities),
-    postalCode: `${randomNum(90001, 96162)}0000`,
+    postalCode: `${randomNum(10000, 99999)}${randomNum(1000, 9999)}`,
     dateOfBirth: `${birthMonth}${birthDay}${birthYear}`,
     gender: randomChoice(GENDER_OPTIONS).code,
     eyeColor: randomChoice(EYE_COLORS).code,
+    eyeColorOnDL: randomChoice(EYE_COLORS_ON_DL).code,
     hairColor: randomChoice(HAIR_COLORS).code,
-    heightFeet: randomNum(5, 6).toString(),
-    heightInches: padZero(randomNum(0, 11), 2),
+    hairColorOnDL: randomChoice(HAIR_COLORS_ON_DL).code,
+    height: randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
-    licenseNumber: `D${randomNum(1000000, 9999999)}`,
+    licenseNumber: generateLicenseNumber(stateCode),
     issueDate: `${issueMonth}${issueDay}${issueYear}`,
     expirationDate: `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: Array.from({ length: 32 }, () => randomNum(0, 9)).join(""),
-    inventoryControlNumber: Array.from({ length: 10 }, () => randomNum(0, 9)).join(""),
+    documentDiscriminator: generateDocumentDiscriminator(stateCode),
+    inventoryControlNumber: generateInventoryControlNumber(),
   };
+}
+
+export function generateDocumentDiscriminator(stateCode: string): string {
+  const now = new Date();
+  const dateStr = `${padZero(now.getMonth() + 1)}/${padZero(now.getDate())}/${now.getFullYear()}`;
+  const randomPart = Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)).join("");
+  const suffix = Array.from({ length: 4 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join("");
+  return `${dateStr}${randomPart}/${suffix}/${randomNum(10, 99)}`;
+}
+
+export function generateInventoryControlNumber(): string {
+  const prefix = Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)).join("");
+  const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  const suffix = Array.from({ length: 11 }, () => Math.floor(Math.random() * 10)).join("");
+  return `${prefix}${letter}${suffix}`;
+}
+
+function padZero(num: number, len: number = 2): string {
+  return num.toString().padStart(len, "0");
+}
+
+function randomNum(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // Convert MMDDYYYY to YYYYMMDD for AAMVA format
@@ -208,82 +274,117 @@ function formatDateToAAMVA(mmddyyyy: string): string {
 }
 
 // Encode data to AAMVA PDF417 format
-export function encodeAAMVA(data: AAMVAData): string {
-  const state = US_STATES.find(s => s.code === data.state);
-  const iin = state?.iin || "636014";
+export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, jurisdictionVersion: string): string {
+  // Calculate header sizes based on AAMVA version
+  const version = aamvaVersion.padStart(2, "0");
+  const jurVersion = jurisdictionVersion.padStart(2, "0");
   
-  // AAMVA Version
-  const version = data.aamvaVersion.padStart(2, "0");
-  
-  // Height in format: feet'inches" (e.g., "510" for 5'10")
-  const height = `${data.heightFeet}${data.heightInches.padStart(2, "0")} in`;
+  // Height format
+  const heightInches = parseInt(data.height) || 69;
+  const heightStr = `${Math.floor(heightInches / 12)}${padZero(heightInches % 12)} in`;
   
   // Build the barcode data string following AAMVA CDS format
   let barcodeData = "";
   
-  // Compliance Indicator
+  // Compliance Indicator and Header
   barcodeData += "@\n";
-  
-  // Data Element Separator and Header
-  barcodeData += "\x1e\r"; // RS + CR
-  barcodeData += `ANSI ${iin}${version}0102DL00410288ZA03290015DL`;
-  
-  // Subfile designators
-  barcodeData += "\r"; // CR after header
+  barcodeData += "\x1e\r";
+  barcodeData += `ANSI ${iin}${version}${jurVersion}DL00410288ZA03290015DL`;
+  barcodeData += "\n";
   
   // Mandatory Data Elements
-  barcodeData += `DAQ${data.licenseNumber}\n`; // Customer ID Number
-  barcodeData += `DCS${data.lastName}\n`; // Customer Family Name
-  barcodeData += `DDEN\n`; // Family Name Truncation
-  barcodeData += `DAC${data.firstName}\n`; // Customer First Name
-  barcodeData += `DDFN\n`; // First Name Truncation
-  barcodeData += `DAD${data.middleName}\n`; // Customer Middle Name
-  barcodeData += `DDGN\n`; // Middle Name Truncation
+  barcodeData += `DAQ${data.licenseNumber}\n`;
+  barcodeData += `DCS${data.lastName}\n`;
+  barcodeData += `DDEN\n`;
   
-  // Document info
-  barcodeData += `DBD${formatDateToAAMVA(data.issueDate)}\n`; // Document Issue Date
-  barcodeData += `DBB${formatDateToAAMVA(data.dateOfBirth)}\n`; // Date of Birth
-  barcodeData += `DBA${formatDateToAAMVA(data.expirationDate)}\n`; // Document Expiration Date
-  barcodeData += `DBC${data.gender}\n`; // Sex
+  // Handle name fields based on state format
+  if (data.firstMiddleName && !data.firstName) {
+    // NY-style combined first & middle name
+    barcodeData += `DCT${data.firstMiddleName}\n`;
+  } else {
+    barcodeData += `DAC${data.firstName}\n`;
+    barcodeData += `DDFN\n`;
+    if (data.middleName) {
+      barcodeData += `DAD${data.middleName}\n`;
+      barcodeData += `DDGN\n`;
+    }
+  }
+  
+  // Name suffix
+  if (data.nameSuffix) {
+    barcodeData += `DCU${data.nameSuffix}\n`;
+  }
+  
+  // Document dates
+  barcodeData += `DBD${formatDateToAAMVA(data.issueDate)}\n`;
+  barcodeData += `DBB${formatDateToAAMVA(data.dateOfBirth)}\n`;
+  barcodeData += `DBA${formatDateToAAMVA(data.expirationDate)}\n`;
+  
+  // Sex
+  barcodeData += `DBC${data.gender}\n`;
   
   // Physical description
-  barcodeData += `DAY${data.eyeColor}\n`; // Eye Color
-  barcodeData += `DAU${height}\n`; // Height
+  barcodeData += `DAY${data.eyeColor}\n`;
+  barcodeData += `DAU${heightStr}\n`;
   
   // Address
-  barcodeData += `DAG${data.streetAddress}\n`; // Street Address 1
-  if (data.streetAddress2) {
-    barcodeData += `DAH${data.streetAddress2}\n`; // Street Address 2
-  }
-  barcodeData += `DAI${data.city}\n`; // City
-  barcodeData += `DAJ${data.state}\n`; // State
-  barcodeData += `DAK${data.postalCode}\n`; // Postal Code
+  barcodeData += `DAG${data.streetAddress}\n`;
+  barcodeData += `DAI${data.city}\n`;
+  barcodeData += `DAJ${data.stateCode}\n`;
+  barcodeData += `DAK${data.postalCode}\n`;
   
-  // Additional elements
-  barcodeData += `DCF${data.documentDiscriminator}\n`; // Document Discriminator
-  barcodeData += `DCGUSA\n`; // Country
+  // Document info
+  if (data.documentDiscriminator) {
+    barcodeData += `DCF${data.documentDiscriminator}\n`;
+  }
+  barcodeData += `DCGUSA\n`;
   
   // Optional elements
   if (data.hairColor) {
-    barcodeData += `DAZ${data.hairColor}\n`; // Hair Color
+    barcodeData += `DAZ${data.hairColor}\n`;
   }
   if (data.weight) {
-    barcodeData += `DAW${data.weight}\n`; // Weight (lbs)
+    barcodeData += `DAW${data.weight}\n`;
   }
-  if (data.nameSuffix) {
-    barcodeData += `DCU${data.nameSuffix}\n`; // Name Suffix
+  if (data.race) {
+    barcodeData += `DCL${data.race}\n`;
+  }
+  
+  // DL Class
+  if (data.dlClass) {
+    barcodeData += `DCA${data.dlClass}\n`;
+  }
+  
+  // Restrictions and Endorsements
+  if (data.restrictions && data.restrictions !== "NONE") {
+    barcodeData += `DCB${data.restrictions}\n`;
+  }
+  if (data.endorsement && data.endorsement !== "NONE") {
+    barcodeData += `DCD${data.endorsement}\n`;
   }
   
   // Inventory Control Number
-  barcodeData += `DCK${data.inventoryControlNumber}\n`;
+  if (data.inventoryControlNumber) {
+    barcodeData += `DCK${data.inventoryControlNumber}\n`;
+  }
   
-  // Compliance Type (F = Full Compliance, N = Non-Compliant)
-  barcodeData += `DDA${data.complianceType}\n`;
+  // Donor indicator
+  if (data.donor) {
+    barcodeData += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
+  }
   
-  // Jurisdiction-specific data (California example)
-  barcodeData += `ZCA${data.state}\n`;
-  barcodeData += `ZCB\n`;
-  barcodeData += `ZCC\n`;
+  // Jurisdiction-specific data
+  barcodeData += `ZC${data.stateCode}A${data.stateCode}\n`;
+  barcodeData += `ZC${data.stateCode}B\n`;
   
   return barcodeData;
+}
+
+// Height conversion helpers
+export function inchesToCm(inches: number): number {
+  return Math.round(inches * 2.54);
+}
+
+export function lbsToKg(lbs: number): number {
+  return Math.round(lbs * 0.453592);
 }

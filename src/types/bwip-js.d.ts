@@ -20,9 +20,8 @@ declare module 'bwip-js' {
     textcolor?: string;
   }
 
-  function toCanvas(canvas: HTMLCanvasElement, options: BwipOptions): Promise<void>;
-  function toBuffer(options: BwipOptions): Promise<Buffer>;
+  export function toCanvas(canvas: HTMLCanvasElement, options: BwipOptions): Promise<void>;
+  export function toBuffer(options: BwipOptions): Promise<Buffer>;
   
-  export { toCanvas, toBuffer, BwipOptions };
-  export default { toCanvas, toBuffer };
+  export { BwipOptions };
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import bwipjs from "bwip-js";
+import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, RefreshCw, CheckCircle } from "lucide-react";

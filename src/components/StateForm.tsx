@@ -16,11 +16,10 @@ import {
   DL_CLASSES,
   AAMVAData, 
   generateRandomData,
-  generateDocumentDiscriminator,
-  generateInventoryControlNumber,
   inchesToCm,
   lbsToKg,
 } from "@/lib/aamvaData";
+import { generateDD, generateICN } from "@/lib/documentGenerators";
 import { STATE_CONFIGS, StateConfig, StateRevision, getStateConfig } from "@/lib/stateConfigs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -86,11 +85,11 @@ export function StateForm({ data, onChange }: StateFormProps) {
   };
 
   const handleGenerateDD = () => {
-    updateField("documentDiscriminator", generateDocumentDiscriminator(data.stateCode));
+    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate));
   };
 
   const handleGenerateICN = () => {
-    updateField("inventoryControlNumber", generateInventoryControlNumber());
+    updateField("inventoryControlNumber", generateICN(data.stateCode, data.licenseNumber, data.issueDate));
   };
 
   const handleCalcDLNumber = () => {

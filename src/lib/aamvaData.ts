@@ -1,4 +1,5 @@
 // AAMVA Driver License/ID Data Structure
+import { generateDD, generateICN } from "./documentGenerators";
 
 export const EYE_COLORS = [
   { code: "BLK", name: "Black" },
@@ -236,8 +237,8 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     licenseNumber: generateLicenseNumber(stateCode),
     issueDate: `${issueMonth}${issueDay}${issueYear}`,
     expirationDate: `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: generateDocumentDiscriminator(stateCode),
-    inventoryControlNumber: generateInventoryControlNumber(),
+    documentDiscriminator: generateDD(stateCode, `${issueMonth}${issueDay}${issueYear}`),
+    inventoryControlNumber: generateICN(stateCode, generateLicenseNumber(stateCode), `${issueMonth}${issueDay}${issueYear}`),
   };
 }
 

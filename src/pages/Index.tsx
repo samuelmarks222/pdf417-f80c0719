@@ -6,7 +6,8 @@ import { BarcodePreview } from "@/components/BarcodePreview";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code } from "lucide-react";
-import { AAMVAData, DEFAULT_AAMVA_DATA, encodeAAMVA } from "@/lib/aamvaData";
+import { AAMVAData, DEFAULT_AAMVA_DATA } from "@/lib/aamvaData";
+import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
 import { useSearchParams } from "react-router-dom";
 

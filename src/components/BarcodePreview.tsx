@@ -31,13 +31,12 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
       await bwipjs.toCanvas(canvasRef.current, {
         bcid: "pdf417",
         text: data,
-        scale: 2,
-        height: 15,
+        scale: 3,
+        height: 12,
         includetext: false,
-        textxalign: "center",
-        columns: 10,
-        rowmult: 2,
-        eclevel: 5,
+        columns: 8,
+        rowmult: 3,
+        eclevel: 4,
       });
       
       setGenerated(true);

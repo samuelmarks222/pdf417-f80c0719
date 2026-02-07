@@ -151,10 +151,15 @@ export function generateDLNumber(stateCode: string): string {
 
 // ===================== DATE CALCULATORS =====================
 
-// Get today's date in MMDDYYYY format
+// Generate a random issue date between 2021 and current year
 export function calculateIssueDate(): string {
-  const now = new Date();
-  return `${padZero(now.getMonth() + 1)}${padZero(now.getDate())}${now.getFullYear()}`;
+  const currentYear = new Date().getFullYear();
+  const minYear = 2021;
+  const maxYear = Math.min(currentYear, 2026);
+  const year = randomNum(minYear, maxYear);
+  const month = randomNum(1, 12);
+  const day = randomNum(1, 28);
+  return `${padZero(month)}${padZero(day)}${year}`;
 }
 
 // Calculate expiry date based on issue date and state rules

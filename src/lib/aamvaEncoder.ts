@@ -56,15 +56,8 @@ function buildDLSubfile(data: {
   const feet = Math.floor(heightInches / 12);
   const inches = heightInches % 12;
   
-  // Use proper height format based on version
-  let heightStr: string;
-  if (aamvaVersion >= 9) {
-    // Version 9+: format as "FII in" (feet, inches padded to 2, space, "in")
-    heightStr = `${feet}${padZero(inches)} in`;
-  } else {
-    // Older versions: just the total inches padded to 3
-    heightStr = padZero(heightInches, 3);
-  }
+  // AAMVA spec: DAU is total inches zero-padded to 3 digits + " in"
+  const heightStr = padZero(heightInches, 3) + " in";
 
   // Mandatory elements (order matters for scannability)
   fields.push({ id: "DCS", value: data.lastName });

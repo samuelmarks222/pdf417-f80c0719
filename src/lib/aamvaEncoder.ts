@@ -79,7 +79,7 @@ function buildDLSubfile(data: {
   fields.push({ id: "DDG", value: "N" }); // Middle name truncation
 
   // Name suffix
-  if (data.nameSuffix) {
+  if (data.nameSuffix && data.nameSuffix !== "NONE") {
     fields.push({ id: "DCU", value: data.nameSuffix });
   }
 

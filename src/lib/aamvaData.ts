@@ -68,7 +68,7 @@ export const RACE_OPTIONS = [
 ] as const;
 
 export const NAME_SUFFIXES = [
-  { code: "", name: "NONE" },
+  { code: "NONE", name: "NONE" },
   { code: "JR", name: "JR (Junior)" },
   { code: "SR", name: "SR (Senior)" },
   { code: "I", name: "1ST or I (First)" },
@@ -312,7 +312,7 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   }
   
   // Name suffix
-  if (data.nameSuffix) {
+  if (data.nameSuffix && data.nameSuffix !== "NONE") {
     barcodeData += `DCU${data.nameSuffix}\n`;
   }
   

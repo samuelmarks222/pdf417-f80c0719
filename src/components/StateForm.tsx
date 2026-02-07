@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { Shuffle, Wand2, Calculator, Info } from "lucide-react";
+import { Shuffle, Calculator, Info } from "lucide-react";
 import { 
   EYE_COLORS, 
   EYE_COLORS_ON_DL,
@@ -23,6 +23,15 @@ import {
 } from "@/lib/aamvaData";
 import { STATE_CONFIGS, StateConfig, StateRevision, getStateConfig } from "@/lib/stateConfigs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  generateDLNumber,
+  generateFirstName,
+  generateMiddleName,
+  generateLastName,
+  generateFirstMiddleName,
+  calculateIssueDate,
+  calculateExpiryDate,
+} from "@/lib/calculators";
 
 interface StateFormProps {
   data: AAMVAData;
@@ -82,6 +91,41 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
   const handleGenerateICN = () => {
     updateField("inventoryControlNumber", generateInventoryControlNumber());
+  };
+
+  const handleCalcDLNumber = () => {
+    updateField("licenseNumber", generateDLNumber(data.stateCode));
+  };
+
+  const handleCalcFirstName = () => {
+    updateField("firstName", generateFirstName(data.gender));
+  };
+
+  const handleCalcMiddleName = () => {
+    updateField("middleName", generateMiddleName(data.gender));
+  };
+
+  const handleCalcLastName = () => {
+    updateField("lastName", generateLastName());
+  };
+
+  const handleCalcFirstMiddleName = () => {
+    updateField("firstMiddleName", generateFirstMiddleName(data.gender));
+  };
+
+  const handleCalcIssueDate = () => {
+    const issueDate = calculateIssueDate();
+    onChange({ 
+      ...data, 
+      issueDate,
+      expirationDate: calculateExpiryDate(issueDate, data.stateCode, data.dateOfBirth),
+    });
+  };
+
+  const handleCalcExpiryDate = () => {
+    if (data.issueDate.length === 8) {
+      updateField("expirationDate", calculateExpiryDate(data.issueDate, data.stateCode, data.dateOfBirth));
+    }
   };
 
   const fields = revision?.fields;
@@ -157,9 +201,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 <TooltipTrigger asChild>
                   <Info className="h-3 w-3 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>Driver License Number</TooltipContent>
+                <TooltipContent>Generate state-specific DL number</TooltipContent>
               </Tooltip>
-              <Button variant="ghost" size="icon" className="h-5 w-5 ml-1" onClick={() => {}}>
+              <Button variant="ghost" size="icon" className="h-5 w-5 ml-1" onClick={handleCalcDLNumber}>
                 <Calculator className="h-3 w-3" />
               </Button>
             </Label>
@@ -173,7 +217,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
           {fields?.hasFirstMiddleCombined ? (
             <>
               <div>
-                <Label>Last name</Label>
+                <Label className="flex items-center gap-1">
+                  Last name
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcLastName}>
+                    <Calculator className="h-3 w-3" />
+                  </Button>
+                </Label>
                 <Input
                   value={data.lastName}
                   onChange={(e) => updateField("lastName", e.target.value.toUpperCase())}
@@ -183,7 +232,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               <div className="col-span-2">
                 <Label className="flex items-center gap-1">
                   First & Middle name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => {}}>
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcFirstMiddleName}>
                     <Calculator className="h-3 w-3" />
                   </Button>
                 </Label>
@@ -199,7 +248,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               <div>
                 <Label className="flex items-center gap-1">
                   First name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => {}}>
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcFirstName}>
                     <Calculator className="h-3 w-3" />
                   </Button>
                 </Label>
@@ -210,7 +259,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 />
               </div>
               <div>
-                <Label>Last name</Label>
+                <Label className="flex items-center gap-1">
+                  Last name
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcLastName}>
+                    <Calculator className="h-3 w-3" />
+                  </Button>
+                </Label>
                 <Input
                   value={data.lastName}
                   onChange={(e) => updateField("lastName", e.target.value.toUpperCase())}
@@ -221,7 +275,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 <div>
                   <Label className="flex items-center gap-1">
                     Middle name
-                    <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => {}}>
+                    <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcMiddleName}>
                       <Calculator className="h-3 w-3" />
                     </Button>
                   </Label>
@@ -343,8 +397,11 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 <TooltipTrigger asChild>
                   <Info className="h-3 w-3 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>MMDDYYYY format</TooltipContent>
+                <TooltipContent>Click calculator to set today's date</TooltipContent>
               </Tooltip>
+              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcIssueDate}>
+                <Calculator className="h-3 w-3" />
+              </Button>
             </Label>
             <Input
               value={data.issueDate}
@@ -360,8 +417,11 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 <TooltipTrigger asChild>
                   <Info className="h-3 w-3 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>MMDDYYYY format</TooltipContent>
+                <TooltipContent>Auto-calculate from issue date + state validity period</TooltipContent>
               </Tooltip>
+              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcExpiryDate}>
+                <Calculator className="h-3 w-3" />
+              </Button>
             </Label>
             <Input
               value={data.expirationDate}

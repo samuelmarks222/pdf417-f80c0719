@@ -85,10 +85,34 @@ export function StateForm({ data, onChange }: StateFormProps) {
   };
 
   const handleGenerateDD = () => {
+    if (!data.firstName && !data.firstMiddleName) {
+      alert("Please enter First Name before generating DD.");
+      return;
+    }
+    if (!data.lastName) {
+      alert("Please enter Last Name before generating DD.");
+      return;
+    }
+    if (!data.licenseNumber) {
+      alert("Please enter DL Number before generating DD.");
+      return;
+    }
     updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate));
   };
 
   const handleGenerateICN = () => {
+    if (!data.firstName && !data.firstMiddleName) {
+      alert("Please enter First Name before generating ICN.");
+      return;
+    }
+    if (!data.lastName) {
+      alert("Please enter Last Name before generating ICN.");
+      return;
+    }
+    if (!data.licenseNumber) {
+      alert("Please enter DL Number before generating ICN.");
+      return;
+    }
     updateField("inventoryControlNumber", generateICN(data.stateCode, data.licenseNumber, data.issueDate));
   };
 

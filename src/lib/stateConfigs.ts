@@ -1,4 +1,5 @@
 // Complete US States with AAMVA versions and revisions
+// Revision dates and version codes sourced from pdf417.pro reference
 
 export interface StateRevision {
   id: string;
@@ -13,7 +14,7 @@ export interface StateRevision {
 
 export interface StateFieldConfig {
   hasMiddleName: boolean;
-  hasFirstMiddleCombined: boolean; // NY style: "First & Middle name"
+  hasFirstMiddleCombined: boolean;
   hasDLClass: boolean;
   hasDonor: boolean;
   hasDD: boolean;
@@ -22,14 +23,14 @@ export interface StateFieldConfig {
   hasEndorsement: boolean;
   hasWeight: boolean;
   hasEyeColor: boolean;
-  hasEyeColorOnDL: boolean; // California has both "as on DL" and "ANSI D-20"
+  hasEyeColorOnDL: boolean;
   hasHairColor: boolean;
   hasHairColorOnDL: boolean;
   hasRace: boolean;
   hasNameSuffix: boolean;
-  hasSafeDriver: boolean; // Florida
-  hasRevisionDate: boolean; // Florida has revision date selector
-  revisionDates?: string[]; // For Florida-style revision selector
+  hasSafeDriver: boolean;
+  hasRevisionDate: boolean;
+  revisionDates?: string[];
 }
 
 export interface StateConfig {
@@ -67,21 +68,21 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "AL_2014",
-        name: "Alabama (2014)",
+        name: "Alabama (Rev. 11/01/2014)",
         year: "2014",
-        revisionDate: "01/01/2014",
-        aamvaVersion: "08",
-        jurisdictionVersion: "00",
+        revisionDate: "11/01/2014",
+        aamvaVersion: "04",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
       {
         id: "AL_2022",
-        name: "Alabama (2022)",
+        name: "Alabama (Rev. 26/04/2022)",
         year: "2022",
-        revisionDate: "01/01/2022",
-        aamvaVersion: "10",
-        jurisdictionVersion: "01",
+        revisionDate: "04/26/2022",
+        aamvaVersion: "04",
+        jurisdictionVersion: "03",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -111,21 +112,11 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "AZ_2014",
-        name: "Arizona (2014)",
+        name: "Arizona (Rev. 02/14/2014)",
         year: "2014",
-        revisionDate: "01/01/2014",
-        aamvaVersion: "08",
-        jurisdictionVersion: "02",
-        realIdCompliant: true,
-        fields: { ...defaultFields, hasHairColor: true },
-      },
-      {
-        id: "AZ_2023",
-        name: "Arizona (2023)",
-        year: "2023",
-        revisionDate: "01/01/2023",
-        aamvaVersion: "10",
-        jurisdictionVersion: "05",
+        revisionDate: "02/14/2014",
+        aamvaVersion: "07",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields, hasHairColor: true },
       },
@@ -138,9 +129,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "AR",
-        name: "Arkansas",
-        year: "2016",
-        revisionDate: "01/01/2016",
+        name: "Arkansas (Rev. 03/01/2018)",
+        year: "2018",
+        revisionDate: "03/01/2018",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -155,7 +146,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "CA_2017",
-        name: "California (2017)",
+        name: "California (Rev. 08/29/2017)",
         year: "2017",
         revisionDate: "08/29/2017",
         aamvaVersion: "09",
@@ -170,11 +161,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "CA_2024",
-        name: "California (2024)",
+        name: "California (Rev. 2024)",
         year: "2024",
         revisionDate: "01/01/2024",
         aamvaVersion: "10",
-        jurisdictionVersion: "03",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { 
           ...defaultFields, 
@@ -192,9 +183,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "CO_2015",
-        name: "Colorado (2015)",
+        name: "Colorado (Rev. 10/30/2015)",
         year: "2015",
-        revisionDate: "01/01/2015",
+        revisionDate: "10/30/2015",
         aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -202,11 +193,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "CO_2022",
-        name: "Colorado (2022)",
+        name: "Colorado (Rev. 02/28/2022)",
         year: "2022",
-        revisionDate: "01/01/2022",
+        revisionDate: "02/28/2022",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { ...defaultFields, hasHairColor: true },
       },
@@ -219,9 +210,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "CT",
-        name: "Connecticut",
+        name: "Connecticut (Rev. 02/10/2017)",
         year: "2017",
-        revisionDate: "01/01/2017",
+        revisionDate: "02/10/2017",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -236,9 +227,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "DE",
-        name: "Delaware",
-        year: "2018",
-        revisionDate: "01/01/2018",
+        name: "Delaware (Rev. 08/02/2017)",
+        year: "2017",
+        revisionDate: "08/02/2017",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -270,7 +261,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "FL",
-        name: "Florida",
+        name: "Florida (Rev. 03/16/2017 & 05/01/2019 & 03/01/2020)",
         year: "2017",
         revisionDate: "03/16/2017",
         aamvaVersion: "09",
@@ -292,9 +283,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "GA_2015",
-        name: "Georgia (2015)",
+        name: "Georgia (Rev. 07/01/2015)",
         year: "2015",
-        revisionDate: "01/01/2015",
+        revisionDate: "07/01/2015",
         aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -302,11 +293,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "GA_2019",
-        name: "Georgia (2019)",
+        name: "Georgia (Rev. 01/02/2019)",
         year: "2019",
-        revisionDate: "01/01/2019",
+        revisionDate: "01/02/2019",
         aamvaVersion: "09",
-        jurisdictionVersion: "01",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -336,21 +327,21 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "ID_2016",
-        name: "Idaho (2016)",
+        name: "Idaho (Rev. 09/05/2016)",
         year: "2016",
-        revisionDate: "01/01/2016",
-        aamvaVersion: "09",
+        revisionDate: "09/05/2016",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
       {
         id: "ID_2023",
-        name: "Idaho (2023)",
+        name: "Idaho (Rev. 01/31/2023)",
         year: "2023",
-        revisionDate: "01/01/2023",
+        revisionDate: "01/31/2023",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "09",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -363,10 +354,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "IL",
-        name: "Illinois",
-        year: "2016",
-        revisionDate: "01/01/2016",
-        aamvaVersion: "09",
+        name: "Illinois (Rev. 09/17/2015)",
+        year: "2015",
+        revisionDate: "09/17/2015",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -380,9 +371,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "IN",
-        name: "Indiana",
-        year: "2017",
-        revisionDate: "01/01/2017",
+        name: "Indiana (Rev. 07/24/2018)",
+        year: "2018",
+        revisionDate: "07/24/2018",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -396,22 +387,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636018",
     revisions: [
       {
-        id: "IA_2011",
-        name: "Iowa (2011)",
-        year: "2011",
-        revisionDate: "01/01/2011",
-        aamvaVersion: "07",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "IA_2017",
-        name: "Iowa (2017)",
+        id: "IA",
+        name: "Iowa (Rev. 06/29/2017)",
         year: "2017",
-        revisionDate: "01/01/2017",
+        revisionDate: "06/29/2017",
         aamvaVersion: "09",
-        jurisdictionVersion: "01",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -424,9 +405,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "KS",
-        name: "Kansas",
+        name: "Kansas (Rev. 02/24/2017)",
         year: "2017",
-        revisionDate: "01/01/2017",
+        revisionDate: "02/24/2017",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: false,
@@ -441,9 +422,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "KY_2012",
-        name: "Kentucky (2012)",
+        name: "Kentucky (Rev. 03/16/2012)",
         year: "2012",
-        revisionDate: "01/01/2012",
+        revisionDate: "03/16/2012",
         aamvaVersion: "07",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -451,11 +432,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "KY_2018",
-        name: "Kentucky (2018)",
+        name: "Kentucky (Rev. 08/31/2018)",
         year: "2018",
-        revisionDate: "01/01/2018",
+        revisionDate: "08/31/2018",
         aamvaVersion: "09",
-        jurisdictionVersion: "01",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -468,10 +449,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "LA",
-        name: "Louisiana",
-        year: "2017",
-        revisionDate: "01/01/2017",
-        aamvaVersion: "09",
+        name: "Louisiana (Rev. 02/10/2015)",
+        year: "2015",
+        revisionDate: "02/10/2015",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: false,
         fields: { ...defaultFields },
@@ -485,9 +466,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "ME",
-        name: "Maine",
+        name: "Maine (Rev. 01/04/2019)",
         year: "2019",
-        revisionDate: "01/01/2019",
+        revisionDate: "01/04/2019",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -502,9 +483,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MD_2016",
-        name: "Maryland (2016 & 2019)",
+        name: "Maryland (Rev. 06/20/2016 & 08/26/2019)",
         year: "2016",
-        revisionDate: "01/01/2016",
+        revisionDate: "06/20/2016",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -512,11 +493,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "MD_2021",
-        name: "Maryland (2021)",
+        name: "Maryland (Rev. 12/05/2021)",
         year: "2021",
-        revisionDate: "01/01/2021",
-        aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        revisionDate: "12/05/2021",
+        aamvaVersion: "09",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -529,10 +510,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MA",
-        name: "Massachusetts",
-        year: "2018",
-        revisionDate: "01/01/2018",
-        aamvaVersion: "09",
+        name: "Massachusetts (Rev. 02/22/2016)",
+        year: "2016",
+        revisionDate: "02/22/2016",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -546,9 +527,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MI_2011",
-        name: "Michigan (2011, 2021)",
+        name: "Michigan (Rev. 01/21/2011 & 08/16/2021)",
         year: "2011",
-        revisionDate: "01/01/2011",
+        revisionDate: "01/21/2011",
         aamvaVersion: "07",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -556,11 +537,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "MI_2024",
-        name: "Michigan (2024)",
+        name: "Michigan (Rev. 01/02/2024)",
         year: "2024",
-        revisionDate: "01/01/2024",
+        revisionDate: "01/02/2024",
         aamvaVersion: "10",
-        jurisdictionVersion: "03",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -573,9 +554,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MN",
-        name: "Minnesota",
-        year: "2018",
-        revisionDate: "01/01/2018",
+        name: "Minnesota (Rev. 10/23/2017)",
+        year: "2017",
+        revisionDate: "10/23/2017",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -590,21 +571,21 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MS_2016",
-        name: "Mississippi (2016, 2021)",
+        name: "Mississippi (Rev. 02/22/2016 & 05/14/2021)",
         year: "2016",
-        revisionDate: "01/01/2016",
-        aamvaVersion: "09",
+        revisionDate: "02/22/2016",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
       {
         id: "MS_2023",
-        name: "Mississippi (2023)",
+        name: "Mississippi (Rev. 09/15/2023)",
         year: "2023",
-        revisionDate: "01/01/2023",
+        revisionDate: "09/15/2023",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -616,22 +597,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636030",
     revisions: [
       {
-        id: "MO_2012",
-        name: "Missouri (2012)",
-        year: "2012",
-        revisionDate: "01/01/2012",
-        aamvaVersion: "07",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "MO_2020",
-        name: "Missouri (2020)",
+        id: "MO",
+        name: "Missouri (Rev. 01/27/2020)",
         year: "2020",
-        revisionDate: "01/01/2020",
-        aamvaVersion: "10",
-        jurisdictionVersion: "01",
+        revisionDate: "01/27/2020",
+        aamvaVersion: "09",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -644,10 +615,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "MT",
-        name: "Montana",
-        year: "2017",
-        revisionDate: "01/01/2017",
-        aamvaVersion: "09",
+        name: "Montana (Rev. 10/07/2015)",
+        year: "2015",
+        revisionDate: "10/07/2015",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -660,22 +631,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636054",
     revisions: [
       {
-        id: "NE_2017",
-        name: "Nebraska (2017)",
-        year: "2017",
-        revisionDate: "01/01/2017",
-        aamvaVersion: "09",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "NE_2021",
-        name: "Nebraska (2021)",
+        id: "NE",
+        name: "Nebraska (Rev. 04/05/2021)",
         year: "2021",
-        revisionDate: "01/01/2021",
+        revisionDate: "04/05/2021",
         aamvaVersion: "10",
-        jurisdictionVersion: "01",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -687,22 +648,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636049",
     revisions: [
       {
-        id: "NV_2008",
-        name: "Nevada (2008)",
-        year: "2008",
-        revisionDate: "01/01/2008",
-        aamvaVersion: "06",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "NV_2021",
-        name: "Nevada (2021)",
+        id: "NV",
+        name: "Nevada (Rev. 05/24/2021)",
         year: "2021",
-        revisionDate: "01/01/2021",
+        revisionDate: "05/24/2021",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -714,22 +665,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636039",
     revisions: [
       {
-        id: "NH_2016",
-        name: "New Hampshire (2016)",
-        year: "2016",
-        revisionDate: "01/01/2016",
-        aamvaVersion: "09",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "NH_2024",
-        name: "New Hampshire (2024)",
+        id: "NH",
+        name: "New Hampshire (Rev. 08/30/2024)",
         year: "2024",
-        revisionDate: "01/01/2024",
+        revisionDate: "08/30/2024",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -741,12 +682,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636036",
     revisions: [
       {
-        id: "NJ_2020",
-        name: "New Jersey (2020)",
+        id: "NJ",
+        name: "New Jersey (Rev. 01/08/2020)",
         year: "2020",
-        revisionDate: "01/01/2020",
-        aamvaVersion: "10",
-        jurisdictionVersion: "00",
+        revisionDate: "01/08/2020",
+        aamvaVersion: "04",
+        jurisdictionVersion: "02",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -759,10 +700,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "NM",
-        name: "New Mexico",
-        year: "2018",
-        revisionDate: "01/01/2018",
-        aamvaVersion: "09",
+        name: "New Mexico (Rev. 08/23/2019)",
+        year: "2019",
+        revisionDate: "08/23/2019",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -776,7 +717,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "NY_2017",
-        name: "New York (2017)",
+        name: "New York (Rev. 09/28/2017)",
         year: "2017",
         revisionDate: "09/28/2017",
         aamvaVersion: "03",
@@ -793,11 +734,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "NY_2022",
-        name: "New York (2022)",
+        name: "New York (Rev. 03/07/2022)",
         year: "2022",
-        revisionDate: "01/01/2022",
+        revisionDate: "03/07/2022",
         aamvaVersion: "10",
-        jurisdictionVersion: "05",
+        jurisdictionVersion: "04",
         realIdCompliant: true,
         fields: { 
           ...defaultFields, 
@@ -817,10 +758,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "NC",
-        name: "North Carolina",
-        year: "2017",
-        revisionDate: "01/01/2017",
-        aamvaVersion: "09",
+        name: "North Carolina (Rev. 10/24/2014)",
+        year: "2014",
+        revisionDate: "10/24/2014",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -833,22 +774,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636034",
     revisions: [
       {
-        id: "ND_2008",
-        name: "North Dakota (2008)",
-        year: "2008",
-        revisionDate: "01/01/2008",
-        aamvaVersion: "06",
-        jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "ND_2023",
-        name: "North Dakota (2023)",
+        id: "ND",
+        name: "North Dakota (Rev. 03/10/2023)",
         year: "2023",
-        revisionDate: "01/01/2023",
+        revisionDate: "03/10/2023",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -861,11 +792,11 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "OH",
-        name: "Ohio",
+        name: "Ohio (Rev. 07/01/2018)",
         year: "2018",
-        revisionDate: "01/01/2018",
+        revisionDate: "07/01/2018",
         aamvaVersion: "09",
-        jurisdictionVersion: "00",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -878,9 +809,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "OK",
-        name: "Oklahoma",
-        year: "2019",
-        revisionDate: "01/01/2019",
+        name: "Oklahoma (Rev. 01/13/2020)",
+        year: "2020",
+        revisionDate: "01/13/2020",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -895,9 +826,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "OR",
-        name: "Oregon",
+        name: "Oregon (Rev. 07/09/2018)",
         year: "2018",
-        revisionDate: "01/01/2018",
+        revisionDate: "07/09/2018",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: false,
@@ -912,9 +843,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "PA_2016",
-        name: "Pennsylvania (2016)",
+        name: "Pennsylvania (Rev. 06/07/2016)",
         year: "2016",
-        revisionDate: "01/01/2016",
+        revisionDate: "06/07/2016",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -922,11 +853,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "PA_2022",
-        name: "Pennsylvania (2022)",
+        name: "Pennsylvania (Rev. 03/25/2022)",
         year: "2022",
-        revisionDate: "01/01/2022",
+        revisionDate: "03/25/2022",
         aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -939,9 +870,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "RI_2016",
-        name: "Rhode Island (2016)",
+        name: "Rhode Island (Rev. 01/26/2016)",
         year: "2016",
-        revisionDate: "01/01/2016",
+        revisionDate: "01/26/2016",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -949,11 +880,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "RI_2022",
-        name: "Rhode Island (2022)",
+        name: "Rhode Island (Rev. 03/01/2022)",
         year: "2022",
-        revisionDate: "01/01/2022",
-        aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        revisionDate: "03/01/2022",
+        aamvaVersion: "08",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -966,7 +897,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "SC",
-        name: "South Carolina",
+        name: "South Carolina (Rev. 01/01/2018)",
         year: "2018",
         revisionDate: "01/01/2018",
         aamvaVersion: "09",
@@ -983,9 +914,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "SD",
-        name: "South Dakota",
+        name: "South Dakota (Rev. 06/29/2017)",
         year: "2017",
-        revisionDate: "01/01/2017",
+        revisionDate: "06/29/2017",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: false,
@@ -1000,10 +931,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "TN",
-        name: "Tennessee",
-        year: "2019",
-        revisionDate: "01/01/2019",
-        aamvaVersion: "09",
+        name: "Tennessee (Rev. 12/02/2011)",
+        year: "2011",
+        revisionDate: "12/02/2011",
+        aamvaVersion: "06",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -1017,7 +948,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "TX_2016",
-        name: "Texas (2016)",
+        name: "Texas (Rev. 10/10/2016)",
         year: "2016",
         revisionDate: "10/10/2016",
         aamvaVersion: "08",
@@ -1032,11 +963,11 @@ export const STATE_CONFIGS: StateConfig[] = [
       },
       {
         id: "TX_2020",
-        name: "Texas (2022)",
+        name: "Texas (Rev. 02/23/2020)",
         year: "2020",
-        revisionDate: "01/01/2020",
-        aamvaVersion: "10",
-        jurisdictionVersion: "02",
+        revisionDate: "02/23/2020",
+        aamvaVersion: "09",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { 
           ...defaultFields, 
@@ -1054,21 +985,21 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "UT_2016",
-        name: "Utah (2016)",
+        name: "Utah (Rev. 04/15/2016)",
         year: "2016",
-        revisionDate: "01/01/2016",
-        aamvaVersion: "09",
+        revisionDate: "04/15/2016",
+        aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
       {
         id: "UT_2021",
-        name: "Utah (2021)",
+        name: "Utah (Rev. 06/01/2021)",
         year: "2021",
-        revisionDate: "01/01/2021",
+        revisionDate: "06/01/2021",
         aamvaVersion: "10",
-        jurisdictionVersion: "01",
+        jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -1081,11 +1012,11 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "VT",
-        name: "Vermont",
-        year: "2017",
-        revisionDate: "01/01/2017",
+        name: "Vermont (Rev. 10/16/2018)",
+        year: "2018",
+        revisionDate: "10/16/2018",
         aamvaVersion: "09",
-        jurisdictionVersion: "00",
+        jurisdictionVersion: "02",
         realIdCompliant: false,
         fields: { ...defaultFields },
       },
@@ -1098,10 +1029,10 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "VA",
-        name: "Virginia",
-        year: "2018",
-        revisionDate: "01/01/2018",
-        aamvaVersion: "09",
+        name: "Virginia (Rev. 12/10/2008)",
+        year: "2008",
+        revisionDate: "12/10/2008",
+        aamvaVersion: "03",
         jurisdictionVersion: "00",
         realIdCompliant: true,
         fields: { ...defaultFields },
@@ -1114,22 +1045,12 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "636045",
     revisions: [
       {
-        id: "WA_2019",
-        name: "Washington (2019)",
+        id: "WA",
+        name: "Washington",
         year: "2019",
         revisionDate: "01/01/2019",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
-        realIdCompliant: true,
-        fields: { ...defaultFields },
-      },
-      {
-        id: "WA_2025",
-        name: "Washington (2025)",
-        year: "2025",
-        revisionDate: "01/01/2025",
-        aamvaVersion: "10",
-        jurisdictionVersion: "03",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
@@ -1142,9 +1063,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "WV",
-        name: "West Virginia",
+        name: "West Virginia (Rev. 06/04/2019)",
         year: "2019",
-        revisionDate: "01/01/2019",
+        revisionDate: "06/04/2019",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,
@@ -1159,19 +1080,19 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "WI_2015",
-        name: "Wisconsin (2015)",
+        name: "Wisconsin (Rev. 09/01/2015)",
         year: "2015",
-        revisionDate: "01/01/2015",
+        revisionDate: "09/01/2015",
         aamvaVersion: "08",
-        jurisdictionVersion: "00",
+        jurisdictionVersion: "01",
         realIdCompliant: true,
         fields: { ...defaultFields },
       },
       {
         id: "WI_2023",
-        name: "Wisconsin (2023)",
+        name: "Wisconsin (Rev. 06/01/2023)",
         year: "2023",
-        revisionDate: "01/01/2023",
+        revisionDate: "06/01/2023",
         aamvaVersion: "10",
         jurisdictionVersion: "02",
         realIdCompliant: true,
@@ -1186,9 +1107,9 @@ export const STATE_CONFIGS: StateConfig[] = [
     revisions: [
       {
         id: "WY",
-        name: "Wyoming",
+        name: "Wyoming (Rev. 11/14/2018)",
         year: "2018",
-        revisionDate: "01/01/2018",
+        revisionDate: "11/14/2018",
         aamvaVersion: "09",
         jurisdictionVersion: "00",
         realIdCompliant: true,

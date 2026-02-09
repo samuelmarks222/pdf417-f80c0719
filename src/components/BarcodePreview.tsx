@@ -12,6 +12,10 @@ interface BarcodePreviewProps {
   onGenerate?: () => void;
 }
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   const pdf417CanvasRef = useRef<HTMLCanvasElement>(null);
   const code128CanvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,6 +23,7 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   const [error, setError] = useState<string | null>(null);
   const [generated, setGenerated] = useState(false);
   const [activeType, setActiveType] = useState<BarcodeType>("pdf417");
+  const [code128Input, setCode128Input] = useState<string>("");
 
   const generateBarcode = async () => {
     if (!data) return;
@@ -49,13 +54,16 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
         const ctx = code128CanvasRef.current.getContext("2d");
         if (ctx) ctx.clearRect(0, 0, code128CanvasRef.current.width, code128CanvasRef.current.height);
 
-        await bwipjs.toCanvas(code128CanvasRef.current, {
-          bcid: "code128",
-          text: data,
-          scale: 2,
-          height: 15,
-          includetext: false,
-        });
+        const code128Data = code128Input.trim() || data;
+        if (code128Data) {
+          await bwipjs.toCanvas(code128CanvasRef.current, {
+            bcid: "code128",
+            text: code128Data,
+            scale: 2,
+            height: 15,
+            includetext: false,
+          });
+        }
       }
 
       setGenerated(true);
@@ -82,7 +90,7 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
     if (data) {
       generateBarcode();
     }
-  }, [data]);
+  }, [data, code128Input]);
 
   return (
     <Card className="p-6 bg-card border-border">
@@ -121,6 +129,18 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
           <TabsTrigger value="code128" className="flex-1 font-mono text-xs">Code 128</TabsTrigger>
         </TabsList>
       </Tabs>
+
+      {activeType === "code128" && (
+        <div className="mb-4">
+          <Label className="text-xs font-mono mb-1.5 block">Custom Code 128 Data (leave empty to use AAMVA data)</Label>
+          <Textarea
+            value={code128Input}
+            onChange={(e) => setCode128Input(e.target.value)}
+            placeholder="Enter custom data for Code 128 barcode..."
+            className="font-mono text-xs min-h-[80px]"
+          />
+        </div>
+      )}
 
       <div className="bg-secondary/50 rounded-lg p-8 flex items-center justify-center min-h-[200px]">
         {error ? (

@@ -1,16 +1,15 @@
 // State-specific Document Discriminator (DD/DCF) and Inventory Control Number (ICN/DCK) generators
-// Based on AAMVA CDS specifications and real jurisdiction formats
+// Based on AAMVA CDS specifications and real jurisdiction barcode calibration sheets
 // DCF = Document Discriminator (unique per card issuance)
-// DCK = Inventory Control Number (card production tracking)
+// DCK = Inventory Control Number (card production tracking / 1D barcode)
 
 const randomNum = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const padZero = (num: number, len: number = 2) => num.toString().padStart(len, "0");
 const randomLetter = () => String.fromCharCode(65 + randomNum(0, 25));
 const randomLetters = (n: number) => Array.from({ length: n }, randomLetter).join("");
 const randomDigits = (n: number) => Array.from({ length: n }, () => randomNum(0, 9)).join("");
-const randomHex = (n: number) => Array.from({ length: n }, () => "0123456789ABCDEF"[randomNum(0, 15)]).join("");
 
-// Parse issue date components
+// Parse issue date components from MMDDYYYY format
 function parseDateParts(issueDate?: string) {
   const now = new Date();
   let month = padZero(now.getMonth() + 1);
@@ -30,222 +29,225 @@ function parseDateParts(issueDate?: string) {
 }
 
 // ===================== DOCUMENT DISCRIMINATOR (DD / DCF) =====================
+// Based on real barcode calibration sheets from state DMVs and AAMVA CDS specs
 
 export function generateDD(stateCode: string, issueDate?: string): string {
-  const { month, day, year, shortYear, dayOfYear } = parseDateParts(issueDate);
+  const { month, day, year, shortYear } = parseDateParts(issueDate);
 
   switch (stateCode) {
-    // Alabama: 10-digit numeric
+    // Alabama: 2 letters + 8 digits
     case "AL":
-      return randomDigits(10);
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // Alaska: 10-digit numeric
+    // Alaska: 2 letters + 8 digits
     case "AK":
-      return randomDigits(10);
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
     // Arizona: 2 letters + 9 digits (e.g., YB123456789)
     case "AZ":
       return `${randomLetters(2)}${randomDigits(9)}`;
 
-    // Arkansas: 9-digit numeric
+    // Arkansas: 9 digits
     case "AR":
       return randomDigits(9);
 
-    // California: MM/DD/YYYY/nnnnn/LLLL/nn (issue-date based)
+    // California: MM/DD/YYYYnnnnn/LLLL/nn (per real CA DMV barcode scans)
     case "CA":
-      return `${month}/${day}/${year}/${randomDigits(5)}/${randomLetters(4)}/${padZero(randomNum(10, 99))}`;
+      return `${month}/${day}/${year}${randomDigits(5)}/${randomLetters(4)}/${padZero(randomNum(10, 99))}`;
 
-    // Colorado: CODL_n_MMDDYY_nnnnn format (audit-style)
+    // Colorado: nnnnnnnnnn (10 digits)
     case "CO":
-      return `CODL_${randomNum(0, 9)}_${month}${day}${shortYear}_${randomDigits(5)}`;
+      return randomDigits(10);
 
-    // Connecticut: 9-digit numeric
+    // Connecticut: 2 letters + 8 digits
     case "CT":
-      return randomDigits(9);
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // Delaware: 9-digit numeric
+    // Delaware: 2 letters + 6 digits
     case "DE":
-      return randomDigits(9);
+      return `${randomLetters(2)}${randomDigits(6)}`;
 
-    // DC: 10-digit numeric
+    // DC: 10 digits
     case "DC":
       return randomDigits(10);
 
-    // Florida: YYnnnLLnnnnnN (year-based alphanumeric)
+    // Florida: Letter + 12 digits (per FL HSMV calibration sheet: Q931611290000)
     case "FL":
-      return `${shortYear}${randomDigits(3)}${randomLetters(2)}${randomDigits(5)}${randomNum(0, 9)}`;
+      return `${randomLetter()}${randomDigits(12)}`;
 
-    // Georgia: 11-digit numeric
+    // Georgia: 2 letters + 9 digits
     case "GA":
-      return randomDigits(11);
+      return `${randomLetters(2)}${randomDigits(9)}`;
 
-    // Hawaii: 10-digit numeric
+    // Hawaii: 2 letters + 8 digits
     case "HI":
-      return randomDigits(10);
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // Idaho: LL + 9 digits
+    // Idaho: 2 letters + 9 digits
     case "ID":
       return `${randomLetters(2)}${randomDigits(9)}`;
 
-    // Illinois: L-nnn-nnnn-nnnn
+    // Illinois: 4 letters + 8 digits
     case "IL":
-      return `${randomLetter()}-${randomDigits(3)}-${randomDigits(4)}-${randomDigits(4)}`;
+      return `${randomLetters(4)}${randomDigits(8)}`;
 
-    // Indiana: nnnn-nn-nnnn
+    // Indiana: 10 digits
     case "IN":
-      return `${randomDigits(4)}-${randomDigits(2)}-${randomDigits(4)}`;
+      return randomDigits(10);
 
-    // Iowa: nnnLLnnnn
+    // Iowa: 9 alphanumeric
     case "IA":
       return `${randomDigits(3)}${randomLetters(2)}${randomDigits(4)}`;
 
-    // Kansas: Lnn-nn-nnnn
+    // Kansas: 10 digits
     case "KS":
-      return `${randomLetter()}${randomDigits(2)}-${randomDigits(2)}-${randomDigits(4)}`;
+      return randomDigits(10);
 
-    // Kentucky: Lnn-nnn-nnn
+    // Kentucky: 2 letters + 8 digits
     case "KY":
-      return `${randomLetter()}${randomDigits(2)}-${randomDigits(3)}-${randomDigits(3)}`;
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // Louisiana: 0nnnnnnn (starts with 0)
+    // Louisiana: 8 digits starting with 0
     case "LA":
       return `0${randomDigits(7)}`;
 
-    // Maine: 9-digit numeric
+    // Maine: 10 digits
     case "ME":
-      return randomDigits(9);
+      return randomDigits(10);
 
-    // Maryland: LL-nnn-nnn-nnn-nnn
+    // Maryland: 2 letters + 12 digits
     case "MD":
-      return `${randomLetters(2)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}`;
+      return `${randomLetters(2)}${randomDigits(12)}`;
 
     // Massachusetts: 2 letters + 9 digits
     case "MA":
       return `${randomLetters(2)}${randomDigits(9)}`;
 
-    // Michigan: LnnnnLnnnnn
+    // Michigan: 2 letters + 10 digits
     case "MI":
-      return `${randomLetter()}${randomDigits(4)}${randomLetter()}${randomDigits(5)}`;
+      return `${randomLetters(2)}${randomDigits(10)}`;
 
-    // Minnesota: Lnnn-nnn-nnn-nnn
+    // Minnesota: 12 digits
     case "MN":
-      return `${randomLetter()}${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}`;
+      return randomDigits(12);
 
-    // Mississippi: nnn-nn-nnnn
+    // Mississippi: 9 digits
     case "MS":
-      return `${randomDigits(3)}-${randomDigits(2)}-${randomDigits(4)}`;
+      return randomDigits(9);
 
-    // Missouri: Lnnnnnnnnn (letter + 9 digits)
+    // Missouri: 10 digits
     case "MO":
-      return `${randomLetter()}${randomDigits(9)}`;
+      return randomDigits(10);
 
-    // Montana: 13-digit numeric
+    // Montana: 13 digits
     case "MT":
       return randomDigits(13);
 
-    // Nebraska: Lnnnnnnnn (letter + 8 digits)
+    // Nebraska: 25 alphanumeric (per NE DMV calibration: 1234567890123456789012345)
     case "NE":
-      return `${randomLetter()}${randomDigits(8)}`;
+      return randomDigits(25);
 
-    // Nevada: 10-digit numeric
+    // Nevada: 10 digits
     case "NV":
       return randomDigits(10);
 
-    // New Hampshire: nnLLLnnnnn
+    // New Hampshire: 2 letters + 8 digits
     case "NH":
-      return `${randomDigits(2)}${randomLetters(3)}${randomDigits(5)}`;
+      return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // New Jersey: 16-digit numeric
+    // New Jersey: 16 digits
     case "NJ":
       return randomDigits(16);
 
-    // New Mexico: 9-digit numeric
+    // New Mexico: 9 digits
     case "NM":
       return randomDigits(9);
 
-    // New York: nn nnn nnnnn nnn (spaced groups)
+    // New York: 13 digits (spaced: nn nnn nnnnn nnn)
     case "NY":
       return `${randomDigits(2)} ${randomDigits(3)} ${randomDigits(5)} ${randomDigits(3)}`;
 
-    // North Carolina: 14-digit numeric
+    // North Carolina: 14 digits
     case "NC":
       return randomDigits(14);
 
-    // North Dakota: LLL-nnnnnn
+    // North Dakota: 3 letters + 6 digits
     case "ND":
-      return `${randomLetters(3)}-${randomDigits(6)}`;
+      return `${randomLetters(3)}${randomDigits(6)}`;
 
-    // Ohio: LLnnnnnnnnn (2 letters + 9 digits)
+    // Ohio: 2 letters + 10 digits
     case "OH":
-      return `${randomLetters(2)}${randomDigits(9)}`;
+      return `${randomLetters(2)}${randomDigits(10)}`;
 
-    // Oklahoma: Lnnnnnnnnn (letter + 9 digits)
+    // Oklahoma: 10 digits
     case "OK":
-      return `${randomLetter()}${randomDigits(9)}`;
+      return randomDigits(10);
 
-    // Oregon: 7-digit numeric
+    // Oregon: 7 digits
     case "OR":
       return randomDigits(7);
 
-    // Pennsylvania: nn nnnn nnnn (spaced)
+    // Pennsylvania: 2 letters + 10 digits
     case "PA":
-      return `${randomDigits(2)} ${randomDigits(4)} ${randomDigits(4)}`;
+      return `${randomLetters(2)}${randomDigits(10)}`;
 
-    // Rhode Island: 7-digit numeric
+    // Rhode Island: 7 digits
     case "RI":
       return randomDigits(7);
 
-    // South Carolina: 9-digit numeric
+    // South Carolina: 10 digits
     case "SC":
-      return randomDigits(9);
+      return randomDigits(10);
 
-    // South Dakota: 9-digit numeric
+    // South Dakota: 10 digits
     case "SD":
-      return randomDigits(9);
+      return randomDigits(10);
 
-    // Tennessee: 9-digit numeric
+    // Tennessee: 9 digits
     case "TN":
       return randomDigits(9);
 
-    // Texas: 11-digit numeric
+    // Texas: 11 digits
     case "TX":
       return randomDigits(11);
 
-    // Utah: 10-digit numeric
+    // Utah: 10 digits
     case "UT":
       return randomDigits(10);
 
-    // Vermont: 8-digit numeric
+    // Vermont: 8 digits
     case "VT":
       return randomDigits(8);
 
-    // Virginia: 16-digit numeric (per VA DMV spec)
+    // Virginia: 16 digits
     case "VA":
       return randomDigits(16);
 
-    // Washington: LLLLLnnnnn (5 letters + 5 digits)
+    // Washington: 12 alphanumeric
     case "WA":
-      return `${randomLetters(5)}${randomDigits(5)}`;
+      return `${randomLetters(5)}${randomDigits(7)}`;
 
-    // West Virginia: Lnnnnnn
+    // West Virginia: 7 alphanumeric
     case "WV":
       return `${randomLetter()}${randomDigits(6)}`;
 
-    // Wisconsin: Lnnn-nnnn-nnnn-nn
+    // Wisconsin: letter + 15 digits (Lnnn-nnnn-nnnn-nn)
     case "WI":
       return `${randomLetter()}${randomDigits(3)}-${randomDigits(4)}-${randomDigits(4)}-${randomDigits(2)}`;
 
-    // Wyoming: nnnnnn-nnn
+    // Wyoming: 9 digits
     case "WY":
       return `${randomDigits(6)}-${randomDigits(3)}`;
 
-    // Default fallback: 10-digit numeric
+    // Default: 10 digits
     default:
       return randomDigits(10);
   }
 }
 
 // ===================== INVENTORY CONTROL NUMBER (ICN / DCK) =====================
+// DCK is typically the 1D barcode value on the card
+// Based on real barcode calibration sheets from state DMVs
 
 export function generateICN(stateCode: string, dlNumber?: string, issueDate?: string): string {
   const { month, day, year, shortYear, dayOfYear } = parseDateParts(issueDate);
@@ -254,211 +256,212 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
   const cleanDL = (dlNumber || "").replace(/[^A-Z0-9]/gi, "");
 
   switch (stateCode) {
-    // Alabama: 11-digit numeric
+    // Alabama: 18 digits
     case "AL":
-      return randomDigits(11);
+      return randomDigits(18);
 
-    // Alaska: 12-digit numeric
+    // Alaska: 15 alphanumeric
     case "AK":
-      return randomDigits(12);
+      return `${randomLetters(2)}${randomDigits(13)}`;
 
-    // Arizona: LL + 11 digits
+    // Arizona: 14 alphanumeric
     case "AZ":
-      return `${randomLetters(2)}${randomDigits(11)}`;
+      return `${randomLetters(2)}${randomDigits(12)}`;
 
-    // Arkansas: 10-digit numeric
+    // Arkansas: 18 digits
     case "AR":
-      return randomDigits(10);
+      return randomDigits(18);
 
-    // California: YYDOYLdlnumbernnnn (year + day-of-year + letter + DL embedded + suffix)
+    // California: YYDOYLdlnumber+suffix (embeds DL#, year, day-of-year)
+    // Example: 21237D12345670401
     case "CA":
       return `${shortYear}${dayOfYear}${randomLetter()}${cleanDL.padEnd(8, "0").substring(0, 8)}${randomDigits(4)}`;
 
-    // Colorado: CODL_n_MMDDYY_nnnnnnn (audit format extended)
+    // Colorado: 20 digits
     case "CO":
-      return `CODL_${randomNum(0, 9)}_${month}${day}${shortYear}_${randomDigits(7)}`;
+      return randomDigits(20);
 
-    // Connecticut: 12-digit numeric
+    // Connecticut: 18 alphanumeric
     case "CT":
-      return randomDigits(12);
+      return `${randomLetters(2)}${randomDigits(16)}`;
 
-    // Delaware: 12-digit numeric
+    // Delaware: 15 digits
     case "DE":
-      return randomDigits(12);
-
-    // DC: 12-digit numeric
-    case "DC":
-      return randomDigits(12);
-
-    // Florida: Letter + 17 digits
-    case "FL":
-      return `${randomLetter()}${randomDigits(17)}`;
-
-    // Georgia: 15-digit numeric
-    case "GA":
       return randomDigits(15);
 
-    // Hawaii: 12-digit numeric
-    case "HI":
-      return randomDigits(12);
-
-    // Idaho: LL + 11 digits
-    case "ID":
-      return `${randomLetters(2)}${randomDigits(11)}`;
-
-    // Illinois: Lnnn-nnnn-nnnn
-    case "IL":
-      return `${randomLetter()}${randomDigits(3)}-${randomDigits(4)}-${randomDigits(4)}`;
-
-    // Indiana: nnnn-nn-nnnn-nn
-    case "IN":
-      return `${randomDigits(4)}-${randomDigits(2)}-${randomDigits(4)}-${randomDigits(2)}`;
-
-    // Iowa: nnnLLnnnnnnn
-    case "IA":
-      return `${randomDigits(3)}${randomLetters(2)}${randomDigits(7)}`;
-
-    // Kansas: Lnn-nn-nnnnnnn
-    case "KS":
-      return `${randomLetter()}${randomDigits(2)}-${randomDigits(2)}-${randomDigits(7)}`;
-
-    // Kentucky: Lnn-nnn-nnnnnn
-    case "KY":
-      return `${randomLetter()}${randomDigits(2)}-${randomDigits(3)}-${randomDigits(6)}`;
-
-    // Louisiana: 0nnnnnnnnn (starts with 0)
-    case "LA":
-      return `0${randomDigits(9)}`;
-
-    // Maine: 10-digit numeric
-    case "ME":
-      return randomDigits(10);
-
-    // Maryland: LL-nnn-nnn-nnn-nnnn
-    case "MD":
-      return `${randomLetters(2)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(4)}`;
-
-    // Massachusetts: 2 letters + 10 digits
-    case "MA":
-      return `${randomLetters(2)}${randomDigits(10)}`;
-
-    // Michigan: Lnnnn-Lnnnnn-nn
-    case "MI":
-      return `${randomLetter()}${randomDigits(4)}-${randomLetter()}${randomDigits(5)}-${randomDigits(2)}`;
-
-    // Minnesota: Lnnn-nnn-nnn-nnnn
-    case "MN":
-      return `${randomLetter()}${randomDigits(3)}-${randomDigits(3)}-${randomDigits(3)}-${randomDigits(4)}`;
-
-    // Mississippi: nnn-nn-nnnnnnn
-    case "MS":
-      return `${randomDigits(3)}-${randomDigits(2)}-${randomDigits(7)}`;
-
-    // Missouri: Lnnnnnnnnnn (letter + 10 digits)
-    case "MO":
-      return `${randomLetter()}${randomDigits(10)}`;
-
-    // Montana: 14-digit numeric
-    case "MT":
-      return randomDigits(14);
-
-    // Nebraska: Lnnnnnnnnn
-    case "NE":
-      return `${randomLetter()}${randomDigits(9)}`;
-
-    // Nevada: 12-digit numeric
-    case "NV":
-      return randomDigits(12);
-
-    // New Hampshire: nnLLLnnnnnn
-    case "NH":
-      return `${randomDigits(2)}${randomLetters(3)}${randomDigits(6)}`;
-
-    // New Jersey: 18-digit numeric
-    case "NJ":
+    // DC: 18 digits
+    case "DC":
       return randomDigits(18);
 
-    // New Mexico: 10-digit numeric
-    case "NM":
-      return randomDigits(10);
+    // Florida: 16 digits (per FL calibration sheet: 0110009295000261)
+    case "FL":
+      return `${randomDigits(16)}`;
 
-    // New York: nn nnn nnnnn nnnn
+    // Georgia: 18 digits
+    case "GA":
+      return randomDigits(18);
+
+    // Hawaii: 15 digits
+    case "HI":
+      return randomDigits(15);
+
+    // Idaho: 15 alphanumeric
+    case "ID":
+      return `${randomLetters(2)}${randomDigits(13)}`;
+
+    // Illinois: 20 alphanumeric
+    case "IL":
+      return `${randomLetters(4)}${randomDigits(16)}`;
+
+    // Indiana: 18 digits
+    case "IN":
+      return randomDigits(18);
+
+    // Iowa: 18 alphanumeric
+    case "IA":
+      return `${randomDigits(3)}${randomLetters(2)}${randomDigits(13)}`;
+
+    // Kansas: 18 digits
+    case "KS":
+      return randomDigits(18);
+
+    // Kentucky: 18 alphanumeric
+    case "KY":
+      return `${randomLetters(2)}${randomDigits(16)}`;
+
+    // Louisiana: 18 digits starting with 0
+    case "LA":
+      return `0${randomDigits(17)}`;
+
+    // Maine: 18 digits
+    case "ME":
+      return randomDigits(18);
+
+    // Maryland: 18 alphanumeric
+    case "MD":
+      return `${randomLetters(2)}${randomDigits(16)}`;
+
+    // Massachusetts: 18 alphanumeric
+    case "MA":
+      return `${randomLetters(2)}${randomDigits(16)}`;
+
+    // Michigan: 18 alphanumeric
+    case "MI":
+      return `${randomLetters(2)}${randomDigits(16)}`;
+
+    // Minnesota: 18 digits
+    case "MN":
+      return randomDigits(18);
+
+    // Mississippi: 18 digits
+    case "MS":
+      return randomDigits(18);
+
+    // Missouri: 18 digits
+    case "MO":
+      return randomDigits(18);
+
+    // Montana: 18 digits
+    case "MT":
+      return randomDigits(18);
+
+    // Nebraska: Letter + DL# + state code + suffix (per NE calibration: A12345678NEW6XM01)
+    case "NE":
+      return `${randomLetter()}${cleanDL.padEnd(8, "0").substring(0, 8)}${stateCode}${randomDigits(1)}${randomLetters(2)}${randomDigits(2)}`;
+
+    // Nevada: 18 digits
+    case "NV":
+      return randomDigits(18);
+
+    // New Hampshire: 18 alphanumeric
+    case "NH":
+      return `${randomLetters(2)}${randomDigits(16)}`;
+
+    // New Jersey: 20 digits
+    case "NJ":
+      return randomDigits(20);
+
+    // New Mexico: 18 digits
+    case "NM":
+      return randomDigits(18);
+
+    // New York: 14 digits (spaced: nn nnn nnnnn nnnn)
     case "NY":
       return `${randomDigits(2)} ${randomDigits(3)} ${randomDigits(5)} ${randomDigits(4)}`;
 
-    // North Carolina: 16-digit numeric
+    // North Carolina: 20 digits
     case "NC":
-      return randomDigits(16);
+      return randomDigits(20);
 
-    // North Dakota: LLL-nnnnnnn
+    // North Dakota: 18 alphanumeric
     case "ND":
-      return `${randomLetters(3)}-${randomDigits(7)}`;
+      return `${randomLetters(3)}${randomDigits(15)}`;
 
-    // Ohio: LLnnnnnnnnnn (2 letters + 10 digits)
+    // Ohio: 18 alphanumeric
     case "OH":
-      return `${randomLetters(2)}${randomDigits(10)}`;
+      return `${randomLetters(2)}${randomDigits(16)}`;
 
-    // Oklahoma: Lnnnnnnnnnn (letter + 10 digits)
+    // Oklahoma: 18 digits
     case "OK":
-      return `${randomLetter()}${randomDigits(10)}`;
+      return randomDigits(18);
 
-    // Oregon: 11-digit numeric
+    // Oregon: 18 digits
     case "OR":
-      return randomDigits(11);
+      return randomDigits(18);
 
-    // Pennsylvania: 16-digit numeric
+    // Pennsylvania: 18 digits
     case "PA":
-      return randomDigits(16);
+      return randomDigits(18);
 
-    // Rhode Island: 9-digit numeric
+    // Rhode Island: 18 digits
     case "RI":
-      return randomDigits(9);
+      return randomDigits(18);
 
-    // South Carolina: 12-digit numeric
+    // South Carolina: 18 digits
     case "SC":
-      return randomDigits(12);
+      return randomDigits(18);
 
-    // South Dakota: 12-digit numeric
+    // South Dakota: 18 digits
     case "SD":
-      return randomDigits(12);
+      return randomDigits(18);
 
-    // Tennessee: 12-digit numeric
+    // Tennessee: 18 digits
     case "TN":
-      return randomDigits(12);
+      return randomDigits(18);
 
-    // Texas: 17-digit numeric
+    // Texas: 20 digits
     case "TX":
-      return randomDigits(17);
+      return randomDigits(20);
 
-    // Utah: 12-digit numeric
+    // Utah: 18 digits
     case "UT":
-      return randomDigits(12);
+      return randomDigits(18);
 
-    // Vermont: 10-digit numeric
+    // Vermont: 18 digits
     case "VT":
-      return randomDigits(10);
+      return randomDigits(18);
 
-    // Virginia: 16-digit numeric (per VA DMV spec: 9061900001136215)
+    // Virginia: 18 digits
     case "VA":
-      return randomDigits(16);
+      return randomDigits(18);
 
-    // Washington: LLLLLnnnnnn (5 letters + 6 digits)
+    // Washington: 18 alphanumeric
     case "WA":
-      return `${randomLetters(5)}${randomDigits(6)}`;
+      return `${randomLetters(5)}${randomDigits(13)}`;
 
-    // West Virginia: Lnnnnnnn
+    // West Virginia: 18 alphanumeric
     case "WV":
-      return `${randomLetter()}${randomDigits(7)}`;
+      return `${randomLetter()}${randomDigits(17)}`;
 
-    // Wisconsin: Lnnn-nnnn-nnnn-nnnn
+    // Wisconsin: Letter + 15 digits
     case "WI":
       return `${randomLetter()}${randomDigits(3)}-${randomDigits(4)}-${randomDigits(4)}-${randomDigits(4)}`;
 
-    // Wyoming: nnnnnn-nnnnnn
+    // Wyoming: 18 digits
     case "WY":
-      return `${randomDigits(6)}-${randomDigits(6)}`;
+      return `${randomDigits(9)}-${randomDigits(9)}`;
 
-    // Default: YYDOYLnnnnnnnnnnn
+    // Default: YY + DOY + Letter + 11 digits
     default:
       return `${shortYear}${dayOfYear}${randomLetter()}${randomDigits(11)}`;
   }

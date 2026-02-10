@@ -352,16 +352,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
             {fields?.hasDLClass && (
               <div>
                 <Label>DL Class</Label>
-                <Select value={data.dlClass} onValueChange={(v) => updateField("dlClass", v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DL_CLASSES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>{c.code}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  value={data.dlClass}
+                  onChange={(e) => updateField("dlClass", e.target.value.toUpperCase())}
+                  placeholder="e.g. C, D, M"
+                  maxLength={5}
+                />
               </div>
             )}
             <div>

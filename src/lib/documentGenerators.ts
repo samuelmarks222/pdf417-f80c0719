@@ -163,9 +163,9 @@ export function generateDD(stateCode: string, issueDate?: string): string {
     case "NM":
       return randomDigits(9);
 
-    // New York: 13 digits (spaced: nn nnn nnnnn nnn)
+    // New York: 10 digits (no spaces in barcode data)
     case "NY":
-      return `${randomDigits(2)} ${randomDigits(3)} ${randomDigits(5)} ${randomDigits(3)}`;
+      return randomDigits(10);
 
     // North Carolina: 14 digits
     case "NC":
@@ -207,9 +207,9 @@ export function generateDD(stateCode: string, issueDate?: string): string {
     case "TN":
       return randomDigits(9);
 
-    // Texas: 11 digits
+    // Texas: 20 digits (e.g., 00629380085007284213)
     case "TX":
-      return randomDigits(11);
+      return randomDigits(20);
 
     // Utah: 10 digits
     case "UT":
@@ -219,9 +219,9 @@ export function generateDD(stateCode: string, issueDate?: string): string {
     case "VT":
       return randomDigits(8);
 
-    // Virginia: 16 digits
+    // Virginia: 9 digits (e.g., 071536360)
     case "VA":
-      return randomDigits(16);
+      return randomDigits(9);
 
     // Washington: 12 alphanumeric
     case "WA":
@@ -385,9 +385,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "NM":
       return randomDigits(18);
 
-    // New York: 14 digits (spaced: nn nnn nnnnn nnnn)
+    // New York: 14 digits (no spaces)
     case "NY":
-      return `${randomDigits(2)} ${randomDigits(3)} ${randomDigits(5)} ${randomDigits(4)}`;
+      return randomDigits(14);
 
     // North Carolina: 20 digits
     case "NC":
@@ -429,9 +429,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "TN":
       return randomDigits(18);
 
-    // Texas: 20 digits
+    // Texas: 11 digits (e.g., 10000492102)
     case "TX":
-      return randomDigits(20);
+      return randomDigits(11);
 
     // Utah: 18 digits
     case "UT":
@@ -441,9 +441,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "VT":
       return randomDigits(18);
 
-    // Virginia: 18 digits
+    // Virginia: 16 digits (e.g., 9061900001136215)
     case "VA":
-      return randomDigits(18);
+      return randomDigits(16);
 
     // Washington: 18 alphanumeric
     case "WA":

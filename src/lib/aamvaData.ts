@@ -160,8 +160,8 @@ export const DEFAULT_AAMVA_DATA: AAMVAData = {
   dlClass: "C",
   issueDate: "08262021",
   expirationDate: "01152026",
-  documentDiscriminator: "08/25/202165508/AAFD/26",
-  inventoryControlNumber: "21237D12345670401",
+  documentDiscriminator: "39JVRM7512",
+  inventoryControlNumber: "A8F9G2H1J3K",
   restrictions: "NONE",
   endorsement: "NONE",
   
@@ -266,6 +266,12 @@ function randomNum(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Generate random alphanumeric string (letters + digits only)
+function generateAlphanumericString(length: number): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
 // Convert MMDDYYYY to YYYYMMDD for AAMVA format
 function formatDateToAAMVA(mmddyyyy: string): string {
   if (mmddyyyy.length !== 8) return mmddyyyy;
@@ -280,10 +286,9 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   const version = aamvaVersion.padStart(2, "0");
   const jurVersion = jurisdictionVersion.padStart(2, "0");
   
-  // Height: total inches zero-padded to 3 digits + " in"
+  // Height: total inches zero-padded to 3 digits (no units)
   const heightInches = parseInt(data.height) || 69;
-  const heightStr = padZero(heightInches, 3) + " in";
-
+  const heightStr = padZero(heightInches, 3);
   // Jurisdiction subfile type: "Z" + first letter of state name
   const stateConfig = getStateConfig(data.stateCode);
   const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
@@ -331,11 +336,9 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   dlElements += `DAJ${data.stateCode}\n`;
   dlElements += `DAK${data.postalCode}\n`;
 
-  // Document discriminator
-  if (data.documentDiscriminator) {
-    dlElements += `DCF${data.documentDiscriminator}\n`;
-  }
-
+  // Document discriminator (alphanumeric only, 8-12 chars)
+  const cleanDCF = (data.documentDiscriminator || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(10);
+  dlElements += `DCF${cleanDCF}\n`;
   // Country
   dlElements += `DCGUSA\n`;
 
@@ -352,18 +355,13 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   // REAL ID Mandatory: DCI - Jurisdiction (full state name)
   dlElements += `DCI${fullStateName}\n`;
 
-  // REAL ID Mandatory: DDK - Organ Donor (always include)
-  dlElements += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
+  // REAL ID Mandatory: DDK - Inventory Control Number (alphanumeric 10-12 chars, unique per card)
+  const cleanDDK = (data.inventoryControlNumber || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(11);
+  dlElements += `DDK${cleanDDK}\n`;
 
-  // Optional elements
-  if (data.hairColor) {
-    dlElements += `DAZ${data.hairColor}\n`;
-  }
+  // Weight (3-digit zero-padded)
   if (data.weight) {
     dlElements += `DAW${data.weight.padStart(3, "0")}\n`;
-  }
-  if (data.race) {
-    dlElements += `DCL${data.race}\n`;
   }
 
   // DL Class
@@ -374,9 +372,6 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   // Restrictions and Endorsements (always include, default NONE)
   dlElements += `DCB${data.restrictions && data.restrictions !== "NONE" ? data.restrictions : "NONE"}\n`;
   dlElements += `DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}\n`;
-
-  // Inventory Control Number (always include)
-  dlElements += `DCK${data.inventoryControlNumber || "0000000000"}\n`;
 
   // Full DL subfile = "DL" prefix + elements + segment terminator
   const dlSubfile = "DL" + dlElements;

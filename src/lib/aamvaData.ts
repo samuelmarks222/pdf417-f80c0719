@@ -277,116 +277,142 @@ function formatDateToAAMVA(mmddyyyy: string): string {
 
 // Encode data to AAMVA PDF417 format
 export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, jurisdictionVersion: string): string {
-  // Calculate header sizes based on AAMVA version
   const version = aamvaVersion.padStart(2, "0");
   const jurVersion = jurisdictionVersion.padStart(2, "0");
   
-  // Height format
+  // Height: total inches zero-padded to 3 digits + " in"
   const heightInches = parseInt(data.height) || 69;
-  const heightStr = `${Math.floor(heightInches / 12)}${padZero(heightInches % 12)} in`;
-  
-  // Build the barcode data string following AAMVA CDS format
-  let barcodeData = "";
-  
-  // Compliance Indicator and Header
-  barcodeData += "@\n";
-  barcodeData += "\x1e\r";
-  barcodeData += `ANSI ${iin}${version}${jurVersion}DL00410288ZA03290015DL`;
-  barcodeData += "\n";
-  
-  // Mandatory Data Elements
-  barcodeData += `DAQ${data.licenseNumber}\n`;
-  barcodeData += `DCS${data.lastName}\n`;
-  barcodeData += `DDEN\n`;
-  
-  // Handle name fields based on state format
+  const heightStr = padZero(heightInches, 3) + " in";
+
+  // Jurisdiction subfile type: "Z" + first letter of state name
+  const stateConfig = getStateConfig(data.stateCode);
+  const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
+  const jurSubfileType = "Z" + (fullStateName.charAt(0) || data.stateCode.charAt(0));
+
+  // --- Build DL subfile content (without "DL" prefix) ---
+  let dlElements = "";
+
+  // Mandatory AAMVA elements
+  dlElements += `DAQ${data.licenseNumber}\n`;
+  dlElements += `DCS${data.lastName}\n`;
+  dlElements += `DDEN\n`; // Family name truncation
+
+  // Name fields
   if (data.firstMiddleName && !data.firstName) {
     // NY-style combined first & middle name
-    barcodeData += `DCT${data.firstMiddleName}\n`;
+    dlElements += `DCT${data.firstMiddleName}\n`;
   } else {
-    barcodeData += `DAC${data.firstName}\n`;
-    barcodeData += `DDFN\n`;
-    // REAL ID: Always include DAD even if empty
-    barcodeData += `DAD${data.middleName || ""}\n`;
-    barcodeData += `DDGN\n`;
+    dlElements += `DAC${data.firstName}\n`;
+    dlElements += `DDFN\n`; // First name truncation
+    dlElements += `DAD${data.middleName || ""}\n`; // Always include for REAL ID
+    dlElements += `DDGN\n`; // Middle name truncation
   }
-  
+
   // Name suffix
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
-    barcodeData += `DCU${data.nameSuffix}\n`;
+    dlElements += `DCU${data.nameSuffix}\n`;
   }
-  
-  // Document dates (MMDDYYYY format per AAMVA spec)
-  barcodeData += `DBD${data.issueDate}\n`;
-  barcodeData += `DBB${data.dateOfBirth}\n`;
-  barcodeData += `DBA${data.expirationDate}\n`;
-  
-  // Sex
-  barcodeData += `DBC${data.gender}\n`;
-  
+
+  // Document dates (MMDDYYYY)
+  dlElements += `DBD${data.issueDate}\n`;
+  dlElements += `DBB${data.dateOfBirth}\n`;
+  dlElements += `DBA${data.expirationDate}\n`;
+
+  // Sex (1=Male, 2=Female, 9=Not Specified)
+  dlElements += `DBC${data.gender}\n`;
+
   // Physical description
-  barcodeData += `DAY${data.eyeColor}\n`;
-  barcodeData += `DAU${heightStr}\n`;
-  
+  dlElements += `DAY${data.eyeColor}\n`;
+  dlElements += `DAU${heightStr}\n`;
+
   // Address
-  barcodeData += `DAG${data.streetAddress}\n`;
-  barcodeData += `DAI${data.city}\n`;
-  barcodeData += `DAJ${data.stateCode}\n`;
-  barcodeData += `DAK${data.postalCode}\n`;
-  
-  // Document info
+  dlElements += `DAG${data.streetAddress}\n`;
+  dlElements += `DAI${data.city}\n`;
+  dlElements += `DAJ${data.stateCode}\n`;
+  dlElements += `DAK${data.postalCode}\n`;
+
+  // Document discriminator
   if (data.documentDiscriminator) {
-    barcodeData += `DCF${data.documentDiscriminator}\n`;
+    dlElements += `DCF${data.documentDiscriminator}\n`;
   }
-  barcodeData += `DCGUSA\n`;
+
+  // Country
+  dlElements += `DCGUSA\n`;
 
   // REAL ID Mandatory: DDA - Compliance Type (F = Fully Compliant)
-  barcodeData += `DDAF\n`;
+  dlElements += `DDAF\n`;
 
   // REAL ID: DDB - Card Revision Date (MMDDYYYY)
   const revisionDateForDDB = data.revisionDate || "01012020";
-  barcodeData += `DDB${revisionDateForDDB}\n`;
+  dlElements += `DDB${revisionDateForDDB}\n`;
 
-  // REAL ID Mandatory: DCI - Place of birth / Jurisdiction (full state name)
-  const stateConfig = getStateConfig(data.stateCode);
-  const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
-  barcodeData += `DCI${fullStateName}\n`;
+  // REAL ID: DDC - Hazmat Endorsement Expiration (optional, include empty)
+  dlElements += `DDC\n`;
 
-  // REAL ID Mandatory: DDK - Organ Donor (always include, default 0)
-  barcodeData += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
-  
+  // REAL ID Mandatory: DCI - Jurisdiction (full state name)
+  dlElements += `DCI${fullStateName}\n`;
+
+  // REAL ID Mandatory: DDK - Organ Donor (always include)
+  dlElements += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
+
   // Optional elements
   if (data.hairColor) {
-    barcodeData += `DAZ${data.hairColor}\n`;
+    dlElements += `DAZ${data.hairColor}\n`;
   }
   if (data.weight) {
-    barcodeData += `DAW${data.weight}\n`;
+    dlElements += `DAW${data.weight.padStart(3, "0")}\n`;
   }
   if (data.race) {
-    barcodeData += `DCL${data.race}\n`;
+    dlElements += `DCL${data.race}\n`;
   }
-  
+
   // DL Class
   if (data.dlClass) {
-    barcodeData += `DCA${data.dlClass}\n`;
+    dlElements += `DCA${data.dlClass}\n`;
   }
-  
-  // Restrictions and Endorsements
-  if (data.restrictions && data.restrictions !== "NONE") {
-    barcodeData += `DCB${data.restrictions}\n`;
-  }
-  if (data.endorsement && data.endorsement !== "NONE") {
-    barcodeData += `DCD${data.endorsement}\n`;
-  }
-  
+
+  // Restrictions and Endorsements (always include, default NONE)
+  dlElements += `DCB${data.restrictions && data.restrictions !== "NONE" ? data.restrictions : "NONE"}\n`;
+  dlElements += `DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}\n`;
+
   // Inventory Control Number (always include)
-  barcodeData += `DCK${data.inventoryControlNumber || "0000000000"}\n`;
-  
-  // Jurisdiction-specific data
-  barcodeData += `ZC${data.stateCode}A${data.stateCode}\n`;
-  barcodeData += `ZC${data.stateCode}B\n`;
-  
-  return barcodeData;
+  dlElements += `DCK${data.inventoryControlNumber || "0000000000"}\n`;
+
+  // Full DL subfile = "DL" prefix + elements + segment terminator
+  const dlSubfile = "DL" + dlElements;
+
+  // --- Build jurisdiction subfile ---
+  const jurElements = `ZCA${data.stateCode}\nZCB\n`;
+  const jurSubfile = jurSubfileType + jurElements;
+
+  // --- Build header with dynamic offsets ---
+  // Header structure:
+  // @ (1) + \n (1) + \x1e (1) + \r (1) + "ANSI " (5) + IIN (6) + version (2) + jurVersion (2) + numEntries (2) = 21
+  // Per entry: type (2) + offset (4) + length (4) = 10
+  const numEntries = 2;
+  const headerLen = 21 + (10 * numEntries);
+
+  const dlOffset = headerLen;
+  const dlLength = dlSubfile.length;
+  const jurOffset = dlOffset + dlLength;
+  const jurLength = jurSubfile.length;
+
+  let header = "";
+  header += "@";        // Compliance indicator
+  header += "\n";       // Data element separator (LF 0x0A)
+  header += "\x1e";     // Record separator (RS 0x1E)
+  header += "\r";       // Segment terminator (CR 0x0D)
+  header += "ANSI ";    // File type (5 chars)
+  header += iin;        // IIN (6 chars)
+  header += version;    // AAMVA version (2 chars)
+  header += jurVersion; // Jurisdiction version (2 chars)
+  header += padZero(numEntries, 2); // Number of entries
+
+  // Entry descriptors
+  header += "DL" + padZero(dlOffset, 4) + padZero(dlLength, 4);
+  header += jurSubfileType + padZero(jurOffset, 4) + padZero(jurLength, 4);
+
+  return header + dlSubfile + jurSubfile;
 }
 
 // Height conversion helpers

@@ -1,176 +1,22 @@
 // AAMVA CDS (Card Design Standard) PDF417 Barcode Encoder
 // Follows the AAMVA DL/ID Card Design Standard specification
+// Compliant with REAL ID Act (6 CFR § 37.19)
+
+import { getStateConfig } from "./stateConfigs";
 
 // Control characters per AAMVA spec
-const COMPLIANCE_INDICATOR = "@";
 const DATA_ELEMENT_SEPARATOR = "\n";  // LF (0x0A)
 const RECORD_SEPARATOR = "\x1e";      // RS (0x1E)
 const SEGMENT_TERMINATOR = "\r";      // CR (0x0D)
-const FILE_TYPE = "ANSI ";
-
-interface AAMVAField {
-  id: string;
-  value: string;
-}
 
 function padZero(num: number, len: number = 2): string {
   return num.toString().padStart(len, "0");
 }
 
-// Convert MMDDYYYY to MMDDYYYY for AAMVA (already correct format for most versions)
-function formatDateMMDDYYYY(mmddyyyy: string): string {
-  if (mmddyyyy.length !== 8) return mmddyyyy;
-  return mmddyyyy;
-}
-
-// Build the subfile data elements for the DL subfile
-function buildDLSubfile(data: {
-  stateCode: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  firstMiddleName: string;
-  nameSuffix: string;
-  streetAddress: string;
-  city: string;
-  postalCode: string;
-  dateOfBirth: string;
-  gender: string;
-  eyeColor: string;
-  hairColor: string;
-  height: string;
-  weight: string;
-  race: string;
-  licenseNumber: string;
-  dlClass: string;
-  issueDate: string;
-  expirationDate: string;
-  documentDiscriminator: string;
-  inventoryControlNumber: string;
-  restrictions: string;
-  endorsement: string;
-  donor: string;
-}, aamvaVersion: number): string {
-  const fields: AAMVAField[] = [];
-  const heightInches = parseInt(data.height) || 69;
-  const feet = Math.floor(heightInches / 12);
-  const inches = heightInches % 12;
-  
-  // AAMVA spec: DAU is total inches zero-padded to 3 digits + " in"
-  const heightStr = padZero(heightInches, 3) + " in";
-
-  // Mandatory elements (order matters for scannability)
-  fields.push({ id: "DCS", value: data.lastName });
-  
-  // Handle name fields
-  if (data.firstMiddleName && !data.firstName) {
-    // NY-style combined
-    fields.push({ id: "DCT", value: data.firstMiddleName });
-  } else {
-    fields.push({ id: "DAC", value: data.firstName });
-    if (data.middleName) {
-      fields.push({ id: "DAD", value: data.middleName });
-    }
-  }
-  
-  // Name truncation indicators
-  fields.push({ id: "DDE", value: "N" }); // Family name truncation
-  fields.push({ id: "DDF", value: "N" }); // First name truncation
-  fields.push({ id: "DDG", value: "N" }); // Middle name truncation
-
-  // Name suffix
-  if (data.nameSuffix && data.nameSuffix !== "NONE") {
-    fields.push({ id: "DCU", value: data.nameSuffix });
-  }
-
-  // Document dates (MMDDYYYY format)
-  fields.push({ id: "DBD", value: formatDateMMDDYYYY(data.issueDate) });
-  fields.push({ id: "DBB", value: formatDateMMDDYYYY(data.dateOfBirth) });
-  fields.push({ id: "DBA", value: formatDateMMDDYYYY(data.expirationDate) });
-  
-  // License number
-  fields.push({ id: "DAQ", value: data.licenseNumber });
-  
-  // Sex
-  fields.push({ id: "DBC", value: data.gender });
-  
-  // Eye color
-  fields.push({ id: "DAY", value: data.eyeColor });
-  
-  // Height
-  fields.push({ id: "DAU", value: heightStr });
-
-  // Address
-  fields.push({ id: "DAG", value: data.streetAddress });
-  fields.push({ id: "DAI", value: data.city });
-  fields.push({ id: "DAJ", value: data.stateCode });
-  fields.push({ id: "DAK", value: data.postalCode });
-
-  // Country
-  fields.push({ id: "DCG", value: "USA" });
-
-  // Document discriminator
-  if (data.documentDiscriminator) {
-    fields.push({ id: "DCF", value: data.documentDiscriminator });
-  }
-  
-  // DL Class
-  if (data.dlClass) {
-    fields.push({ id: "DCA", value: data.dlClass });
-  }
-  
-  // Restrictions
-  if (data.restrictions && data.restrictions !== "NONE") {
-    fields.push({ id: "DCB", value: data.restrictions });
-  } else {
-    fields.push({ id: "DCB", value: "NONE" });
-  }
-  
-  // Endorsements
-  if (data.endorsement && data.endorsement !== "NONE") {
-    fields.push({ id: "DCD", value: data.endorsement });
-  } else {
-    fields.push({ id: "DCD", value: "NONE" });
-  }
-
-  // Hair color
-  if (data.hairColor) {
-    fields.push({ id: "DAZ", value: data.hairColor });
-  }
-
-  // Weight
-  if (data.weight) {
-    fields.push({ id: "DAW", value: data.weight.padStart(3, "0") });
-  }
-
-  // Race
-  if (data.race) {
-    fields.push({ id: "DCL", value: data.race });
-  }
-
-  // Inventory Control Number
-  if (data.inventoryControlNumber) {
-    fields.push({ id: "DCK", value: data.inventoryControlNumber });
-  }
-
-  // Donor
-  if (data.donor) {
-    fields.push({ id: "DDK", value: data.donor === "Y" ? "1" : "0" });
-  }
-
-  // Build subfile content: each field is "ID" + value + LF
-  let content = "";
-  for (const field of fields) {
-    content += field.id + field.value + DATA_ELEMENT_SEPARATOR;
-  }
-  
-  return content;
-}
-
-// Build jurisdiction-specific (ZA/ZC etc.) subfile
-function buildJurisdictionSubfile(stateCode: string): string {
-  // Minimal jurisdiction data
-  return `ZCA` + DATA_ELEMENT_SEPARATOR + `ZCB` + DATA_ELEMENT_SEPARATOR;
+// Generate random alphanumeric string (letters + digits only)
+function generateAlphanumericString(length: number): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 }
 
 export function encodeAAMVA(
@@ -200,52 +46,154 @@ export function encodeAAMVA(
     restrictions: string;
     endorsement: string;
     donor: string;
+    revisionDate?: string;
   },
   iin: string,
   aamvaVersionStr: string,
   jurisdictionVersionStr: string,
 ): string {
-  const aamvaVersion = parseInt(aamvaVersionStr) || 9;
   const jurVersion = jurisdictionVersionStr.padStart(2, "0");
   const versionStr = aamvaVersionStr.padStart(2, "0");
 
-  // Build subfile contents
-  const dlContent = "DL" + buildDLSubfile(data, aamvaVersion);
-  const zaContent = "ZC" + buildJurisdictionSubfile(data.stateCode);
+  // Height: total inches zero-padded to 3 digits (NO units per spec)
+  const heightInches = parseInt(data.height) || 69;
+  const heightStr = padZero(heightInches, 3);
 
-  // Number of subfile entries
+  // Jurisdiction subfile type: "Z" + first letter of state name
+  const stateConfig = getStateConfig(data.stateCode);
+  const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
+  const jurSubfileType = "Z" + (fullStateName.charAt(0) || data.stateCode.charAt(0));
+
+  // --- Build DL subfile elements ---
+  let dlElements = "";
+
+  // === MANDATORY AAMVA ELEMENTS ===
+
+  // License number (DAQ) - mandatory
+  dlElements += `DAQ${data.licenseNumber}\n`;
+
+  // Last name (DCS) - mandatory
+  dlElements += `DCS${data.lastName}\n`;
+
+  // Name truncation indicators
+  dlElements += `DDEN\n`; // Family name truncation
+  
+  // Name fields
+  if (data.firstMiddleName && !data.firstName) {
+    // NY-style combined first & middle name
+    dlElements += `DCT${data.firstMiddleName}\n`;
+  } else {
+    // First name (DAC) - mandatory
+    dlElements += `DAC${data.firstName}\n`;
+    dlElements += `DDFN\n`; // First name truncation
+    // Middle name (DAD) - always include even if empty for REAL ID
+    dlElements += `DAD${data.middleName || ""}\n`;
+    dlElements += `DDGN\n`; // Middle name truncation
+  }
+
+  // Name suffix
+  if (data.nameSuffix && data.nameSuffix !== "NONE") {
+    dlElements += `DCU${data.nameSuffix}\n`;
+  }
+
+  // Document dates - mandatory (MMDDYYYY format)
+  dlElements += `DBD${data.issueDate}\n`;      // Issue date
+  dlElements += `DBB${data.dateOfBirth}\n`;     // Date of birth
+  dlElements += `DBA${data.expirationDate}\n`;  // Expiration date
+
+  // Sex (DBC) - mandatory: 1=Male, 2=Female, 9=Not Specified
+  dlElements += `DBC${data.gender}\n`;
+
+  // Eye color (DAY)
+  dlElements += `DAY${data.eyeColor}\n`;
+
+  // Height (DAU) - 3-digit inches, NO units
+  dlElements += `DAU${heightStr}\n`;
+
+  // Address - mandatory
+  dlElements += `DAG${data.streetAddress}\n`;
+  dlElements += `DAI${data.city}\n`;
+  dlElements += `DAJ${data.stateCode}\n`;
+  dlElements += `DAK${data.postalCode}\n`;
+
+  // Document discriminator (DCF) - alphanumeric only, 8-12 chars
+  const cleanDCF = (data.documentDiscriminator || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(10);
+  dlElements += `DCF${cleanDCF}\n`;
+
+  // Country (DCG) - mandatory
+  dlElements += `DCGUSA\n`;
+
+  // === REAL ID MANDATORY FIELDS ===
+
+  // DDA - Compliance Type: F = Fully Compliant (CRITICAL for REAL ID)
+  dlElements += `DDAF\n`;
+
+  // DDB - Card Revision Date (MMDDYYYY)
+  const revisionDateForDDB = data.revisionDate || "01012020";
+  dlElements += `DDB${revisionDateForDDB}\n`;
+
+  // DDC - Hazmat Endorsement Expiration (include empty if none)
+  dlElements += `DDC\n`;
+
+  // DCI - Full Jurisdiction Name (mandatory, no abbreviations)
+  dlElements += `DCI${fullStateName}\n`;
+
+  // DDK - Inventory Control Number (alphanumeric 10-12 chars, unique per card)
+  const cleanDDK = (data.inventoryControlNumber || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(11);
+  dlElements += `DDK${cleanDDK}\n`;
+
+  // === OPTIONAL STANDARD FIELDS ===
+
+  // Weight (DAW) - 3-digit zero-padded
+  if (data.weight) {
+    dlElements += `DAW${data.weight.padStart(3, "0")}\n`;
+  }
+
+  // DL Class (DCA)
+  if (data.dlClass) {
+    dlElements += `DCA${data.dlClass}\n`;
+  }
+
+  // Restrictions (DCB) - always include, default NONE
+  dlElements += `DCB${data.restrictions && data.restrictions !== "NONE" ? data.restrictions : "NONE"}\n`;
+
+  // Endorsements (DCD) - always include, default NONE
+  dlElements += `DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}\n`;
+
+  // Full DL subfile = "DL" prefix + elements
+  const dlSubfile = "DL" + dlElements;
+
+  // --- Build jurisdiction subfile ---
+  const jurElements = `ZCA${data.stateCode}\nZCB\n`;
+  const jurSubfile = jurSubfileType + jurElements;
+
+  // --- Build header with dynamic offsets ---
   const numEntries = 2;
 
-  // Calculate the fixed header portion length:
-  // "@\n\x1e\rANSI " = 9 chars
-  // IIN (6) + version (2) + jurVersion (2) + numEntries (2) = 12 chars  
-  // Per entry: type(2) + offset(4) + length(4) = 10 chars
-  const headerFixedPart = COMPLIANCE_INDICATOR 
-    + DATA_ELEMENT_SEPARATOR 
-    + RECORD_SEPARATOR 
-    + SEGMENT_TERMINATOR 
-    + FILE_TYPE 
-    + iin 
-    + versionStr 
-    + jurVersion 
+  // Fixed header: @ + LF + RS + CR + "ANSI " + IIN(6) + version(2) + jurVersion(2) + numEntries(2)
+  const headerFixedPart = "@"
+    + DATA_ELEMENT_SEPARATOR
+    + RECORD_SEPARATOR
+    + SEGMENT_TERMINATOR
+    + "ANSI "
+    + iin
+    + versionStr
+    + jurVersion
     + padZero(numEntries, 2);
 
-  // Each entry descriptor is 10 chars (type 2 + offset 4 + length 4)
+  // Each entry descriptor: type(2) + offset(4) + length(4) = 10 chars
   const entryDescriptorLen = 10 * numEntries;
-  const headerLen = headerFixedPart.length + entryDescriptorLen + 1; // +1 for trailing LF after header
+  const headerLen = headerFixedPart.length + entryDescriptorLen + 1; // +1 for trailing LF
 
-  // Calculate offsets
   const dlOffset = headerLen;
-  const dlLength = dlContent.length;
+  const dlLength = dlSubfile.length;
   const zaOffset = dlOffset + dlLength;
-  const zaLength = zaContent.length;
+  const zaLength = jurSubfile.length;
 
-  // Build complete header
   let header = headerFixedPart;
   header += "DL" + padZero(dlOffset, 4) + padZero(dlLength, 4);
-  header += "ZC" + padZero(zaOffset, 4) + padZero(zaLength, 4);
+  header += jurSubfileType + padZero(zaOffset, 4) + padZero(zaLength, 4);
   header += DATA_ELEMENT_SEPARATOR;
 
-  // Combine everything
-  return header + dlContent + zaContent;
+  return header + dlSubfile + jurSubfile;
 }

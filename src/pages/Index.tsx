@@ -105,13 +105,24 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Legal Disclaimer */}
+          <Card className="mt-8 p-6 bg-destructive/5 border-destructive/20">
+            <h3 className="font-mono text-lg font-semibold mb-3 text-destructive">⚠️ Legal Disclaimer</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              This tool is for <strong>educational and testing purposes only</strong>. Do not use generated 
+              barcodes for fraudulent identification or any illegal activity. Misuse of this tool to create 
+              counterfeit identification documents is a federal crime. The developers assume no liability 
+              for misuse.
+            </p>
+          </Card>
+
           {/* Help Section */}
-          <Card className="mt-8 p-6 bg-card border-border">
+          <Card className="mt-4 p-6 bg-card border-border">
             <h3 className="font-mono text-lg font-semibold mb-4">Need help?</h3>
             <p className="text-muted-foreground text-sm">
-              Fill in the fields and click the "Create" button and your barcode will appear. 
-              The barcode is generated following AAMVA CDS specifications and is compatible 
-              with all major scanning applications.
+              Fill in the fields and your barcode will be generated automatically following 
+              AAMVA CDS specifications. It is compatible with all major scanning applications 
+              including Scandit, FIDScan, and Veriscan.
             </p>
           </Card>
         </div>

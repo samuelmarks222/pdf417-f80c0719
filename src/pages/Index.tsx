@@ -18,10 +18,13 @@ const Index = () => {
   const [formData, setFormData] = useState<AAMVAData>(() => {
     const config = getStateConfig(initialState);
     if (config) {
+      const rev = config.revisions[0];
+      const revDateClean = rev.revisionDate.replace(/\//g, "");
       return {
         ...DEFAULT_AAMVA_DATA,
         stateCode: initialState,
-        revisionId: config.revisions[0].id,
+        revisionId: rev.id,
+        revisionDate: revDateClean,
       };
     }
     return DEFAULT_AAMVA_DATA;

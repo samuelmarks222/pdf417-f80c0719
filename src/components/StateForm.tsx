@@ -61,10 +61,13 @@ export function StateForm({ data, onChange }: StateFormProps) {
     const config = getStateConfig(stateCode);
     if (config) {
       const rev = config.revisions[0];
+      // Convert revision date MM/DD/YYYY to MMDDYYYY for DDA field
+      const revDateClean = rev.revisionDate.replace(/\//g, "");
       onChange({ 
         ...data, 
         stateCode, 
         revisionId: rev.id,
+        revisionDate: revDateClean,
       });
     }
   };
@@ -74,7 +77,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
       const rev = stateConfig.revisions.find(r => r.id === revisionId);
       if (rev) {
         setRevision(rev);
-        onChange({ ...data, revisionId });
+        const revDateClean = rev.revisionDate.replace(/\//g, "");
+        onChange({ ...data, revisionId, revisionDate: revDateClean });
       }
     }
   };

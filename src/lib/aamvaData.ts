@@ -1,5 +1,6 @@
 // AAMVA Driver License/ID Data Structure
 import { generateDD, generateICN } from "./documentGenerators";
+import { getStateConfig } from "./stateConfigs";
 
 export const EYE_COLORS = [
   { code: "BLK", name: "Black" },
@@ -305,10 +306,9 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   } else {
     barcodeData += `DAC${data.firstName}\n`;
     barcodeData += `DDFN\n`;
-    if (data.middleName) {
-      barcodeData += `DAD${data.middleName}\n`;
-      barcodeData += `DDGN\n`;
-    }
+    // REAL ID: Always include DAD even if empty
+    barcodeData += `DAD${data.middleName || ""}\n`;
+    barcodeData += `DDGN\n`;
   }
   
   // Name suffix
@@ -316,10 +316,10 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
     barcodeData += `DCU${data.nameSuffix}\n`;
   }
   
-  // Document dates
-  barcodeData += `DBD${formatDateToAAMVA(data.issueDate)}\n`;
-  barcodeData += `DBB${formatDateToAAMVA(data.dateOfBirth)}\n`;
-  barcodeData += `DBA${formatDateToAAMVA(data.expirationDate)}\n`;
+  // Document dates (MMDDYYYY format per AAMVA spec)
+  barcodeData += `DBD${data.issueDate}\n`;
+  barcodeData += `DBB${data.dateOfBirth}\n`;
+  barcodeData += `DBA${data.expirationDate}\n`;
   
   // Sex
   barcodeData += `DBC${data.gender}\n`;
@@ -339,6 +339,19 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
     barcodeData += `DCF${data.documentDiscriminator}\n`;
   }
   barcodeData += `DCGUSA\n`;
+
+  // REAL ID Mandatory: DDA - Compliance Type / Card Revision Date (MMDDYYYY)
+  // Use revision date from state config, or fall back to a sensible default
+  const revisionDateForDDA = data.revisionDate || "01012020";
+  barcodeData += `DDA${revisionDateForDDA}\n`;
+
+  // REAL ID Mandatory: DCI - Place of birth / Jurisdiction (full state name)
+  const stateConfig = getStateConfig(data.stateCode);
+  const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
+  barcodeData += `DCI${fullStateName}\n`;
+
+  // REAL ID Mandatory: DDK - Organ Donor (always include, default 0)
+  barcodeData += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
   
   // Optional elements
   if (data.hairColor) {
@@ -364,15 +377,8 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
     barcodeData += `DCD${data.endorsement}\n`;
   }
   
-  // Inventory Control Number
-  if (data.inventoryControlNumber) {
-    barcodeData += `DCK${data.inventoryControlNumber}\n`;
-  }
-  
-  // Donor indicator
-  if (data.donor) {
-    barcodeData += `DDK${data.donor === "Y" ? "1" : "0"}\n`;
-  }
+  // Inventory Control Number (always include)
+  barcodeData += `DCK${data.inventoryControlNumber || "0000000000"}\n`;
   
   // Jurisdiction-specific data
   barcodeData += `ZC${data.stateCode}A${data.stateCode}\n`;

@@ -340,10 +340,12 @@ export function encodeAAMVA(data: AAMVAData, iin: string, aamvaVersion: string, 
   }
   barcodeData += `DCGUSA\n`;
 
-  // REAL ID Mandatory: DDA - Compliance Type / Card Revision Date (MMDDYYYY)
-  // Use revision date from state config, or fall back to a sensible default
-  const revisionDateForDDA = data.revisionDate || "01012020";
-  barcodeData += `DDA${revisionDateForDDA}\n`;
+  // REAL ID Mandatory: DDA - Compliance Type (F = Fully Compliant)
+  barcodeData += `DDAF\n`;
+
+  // REAL ID: DDB - Card Revision Date (MMDDYYYY)
+  const revisionDateForDDB = data.revisionDate || "01012020";
+  barcodeData += `DDB${revisionDateForDDB}\n`;
 
   // REAL ID Mandatory: DCI - Place of birth / Jurisdiction (full state name)
   const stateConfig = getStateConfig(data.stateCode);

@@ -3,9 +3,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StateForm } from "@/components/StateForm";
 import { BarcodePreview } from "@/components/BarcodePreview";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Code } from "lucide-react";
 import { AAMVAData, DEFAULT_AAMVA_DATA } from "@/lib/aamvaData";
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
@@ -50,81 +47,53 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-1 py-8">
-        <div className="container">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Form - takes 2 columns */}
-            <div className="lg:col-span-2">
-              <StateForm data={formData} onChange={handleFormChange} />
-            </div>
+      <main className="flex-1 py-6">
+        <div className="container max-w-5xl">
+          {/* Form */}
+          <StateForm data={formData} onChange={handleFormChange} />
 
-            {/* Barcode Preview - takes 1 column */}
-            <div className="space-y-6">
-              <BarcodePreview data={encodedData} />
-              
-              <Card className="p-4 bg-card border-border">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-mono text-sm font-semibold flex items-center gap-2">
-                    <Code className="h-4 w-4 text-primary" />
-                    Raw Barcode Data
-                  </h4>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setShowRawData(!showRawData)}
-                  >
-                    {showRawData ? "Hide" : "Show"}
-                  </Button>
-                </div>
-                
-                {showRawData && (
-                  <pre className="bg-secondary/50 rounded-lg p-3 text-xs font-mono text-muted-foreground overflow-x-auto max-h-64 overflow-y-auto">
-                    {encodedData.split("\n").map((line, i) => (
-                      <div key={i} className="hover:bg-primary/10 px-1">
-                        {line || " "}
-                      </div>
-                    ))}
-                  </pre>
-                )}
-              </Card>
+          {/* Barcode Preview - below form like pdf417.pro */}
+          <div className="mt-6">
+            <BarcodePreview data={encodedData} />
+          </div>
 
-              {/* Scanner Compatibility */}
-              <Card className="p-4 bg-card border-border">
-                <h4 className="font-mono text-sm font-semibold mb-3">Scanner Compatibility</h4>
-                <div className="flex flex-wrap gap-2">
-                  {["Scandit", "FIDScan", "Veriscan", "Show-Me ID"].map((scanner) => (
-                    <span 
-                      key={scanner}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary border border-primary/20"
-                    >
-                      {scanner} ✓
-                    </span>
-                  ))}
-                </div>
-              </Card>
+          {/* Raw Data Toggle */}
+          <div className="mt-4 border border-border rounded bg-card p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Raw Barcode Data</span>
+              <button 
+                onClick={() => setShowRawData(!showRawData)}
+                className="text-xs text-primary hover:underline"
+              >
+                {showRawData ? "Hide" : "Show"}
+              </button>
             </div>
+            
+            {showRawData && (
+              <pre className="mt-3 bg-muted rounded p-3 text-[11px] overflow-x-auto max-h-48 overflow-y-auto text-muted-foreground">
+                {encodedData.split("\n").map((line, i) => (
+                  <div key={i}>{line || " "}</div>
+                ))}
+              </pre>
+            )}
+          </div>
+
+          {/* Need help section - matches pdf417.pro */}
+          <div className="mt-6 text-center">
+            <h3 className="text-lg font-bold mb-3">Need help?</h3>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              Fill in the fields and click the "Create" button and your barcode will appear.
+              All barcodes are generated in accordance with official AAMVA documentation.
+            </p>
           </div>
 
           {/* Legal Disclaimer */}
-          <Card className="mt-8 p-6 bg-destructive/5 border-destructive/20">
-            <h3 className="font-mono text-lg font-semibold mb-3 text-destructive">⚠️ Legal Disclaimer</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              This tool is for <strong>educational and testing purposes only</strong>. Do not use generated 
-              barcodes for fraudulent identification or any illegal activity. Misuse of this tool to create 
-              counterfeit identification documents is a federal crime. The developers assume no liability 
-              for misuse.
+          <div className="mt-4 border border-destructive/20 rounded bg-destructive/5 p-4 text-center">
+            <p className="text-xs text-muted-foreground">
+              <strong>⚠️ Disclaimer:</strong> This tool is for <strong>educational and testing purposes only</strong>. 
+              Do not use generated barcodes for fraudulent identification or any illegal activity.
             </p>
-          </Card>
-
-          {/* Help Section */}
-          <Card className="mt-4 p-6 bg-card border-border">
-            <h3 className="font-mono text-lg font-semibold mb-4">Need help?</h3>
-            <p className="text-muted-foreground text-sm">
-              Fill in the fields and your barcode will be generated automatically following 
-              AAMVA CDS specifications. It is compatible with all major scanning applications 
-              including Scandit, FIDScan, and Veriscan.
-            </p>
-          </Card>
+          </div>
         </div>
       </main>
 

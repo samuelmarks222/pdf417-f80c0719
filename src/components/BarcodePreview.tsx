@@ -1,70 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Download, RefreshCw, CheckCircle } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-type BarcodeType = "pdf417" | "code128";
+import { Download, RefreshCw } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
   onGenerate?: () => void;
 }
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-
 export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
-  const pdf417CanvasRef = useRef<HTMLCanvasElement>(null);
-  const code128CanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generated, setGenerated] = useState(false);
-  const [activeType, setActiveType] = useState<BarcodeType>("pdf417");
-  const [code128Input, setCode128Input] = useState<string>("");
 
   const generateBarcode = async () => {
-    if (!data) return;
+    if (!data || !canvasRef.current) return;
 
     setIsGenerating(true);
     setError(null);
 
     try {
-      // Generate PDF417
-      if (pdf417CanvasRef.current) {
-        const ctx = pdf417CanvasRef.current.getContext("2d");
-        if (ctx) ctx.clearRect(0, 0, pdf417CanvasRef.current.width, pdf417CanvasRef.current.height);
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-        await bwipjs.toCanvas(pdf417CanvasRef.current, {
-          bcid: "pdf417",
-          text: data,
-          scale: 3,
-          height: 12,
-          includetext: false,
-          columns: 8,
-          rowmult: 3,
-          eclevel: 4,
-        });
-      }
-
-      // Generate Code 128
-      if (code128CanvasRef.current) {
-        const ctx = code128CanvasRef.current.getContext("2d");
-        if (ctx) ctx.clearRect(0, 0, code128CanvasRef.current.width, code128CanvasRef.current.height);
-
-        const code128Data = code128Input.trim() || data;
-        if (code128Data) {
-          await bwipjs.toCanvas(code128CanvasRef.current, {
-            bcid: "code128",
-            text: code128Data,
-            scale: 2,
-            height: 15,
-            includetext: false,
-          });
-        }
-      }
+      await bwipjs.toCanvas(canvasRef.current, {
+        bcid: "pdf417",
+        text: data,
+        scale: 3,
+        height: 12,
+        includetext: false,
+        columns: 8,
+        rowmult: 3,
+        eclevel: 4,
+      });
 
       setGenerated(true);
       onGenerate?.();
@@ -77,100 +46,61 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   };
 
   const downloadBarcode = () => {
-    const canvas = activeType === "pdf417" ? pdf417CanvasRef.current : code128CanvasRef.current;
-    if (!canvas || !generated) return;
-
+    if (!canvasRef.current || !generated) return;
     const link = document.createElement("a");
-    link.download = `${activeType}-barcode-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.download = `pdf417-barcode-${Date.now()}.png`;
+    link.href = canvasRef.current.toDataURL("image/png");
     link.click();
   };
 
   useEffect(() => {
-    if (data) {
-      generateBarcode();
-    }
-  }, [data, code128Input]);
+    if (data) generateBarcode();
+  }, [data]);
 
   return (
-    <Card className="p-6 bg-card border-border">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-mono text-lg font-semibold flex items-center gap-2">
-          Barcode Preview
-          {generated && <CheckCircle className="h-5 w-5 text-primary" />}
-        </h3>
-        <div className="flex gap-2">
+    <div className="border border-border rounded bg-card p-6">
+      {/* Barcode area */}
+      <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
+        {error ? (
+          <p className="text-destructive text-sm">{error}</p>
+        ) : !generated ? (
+          <p className="text-muted-foreground text-sm">
+            Fill in the fields and click the "Create" button and your barcode will appear here.
+          </p>
+        ) : (
+          <canvas
+            ref={canvasRef}
+            className="max-w-full bg-white rounded"
+            style={{ imageRendering: "pixelated" }}
+          />
+        )}
+        {/* Hidden canvas for generation before first display */}
+        {!generated && <canvas ref={canvasRef} className="hidden" />}
+      </div>
+
+      {/* Actions */}
+      {generated && (
+        <div className="mt-4 flex items-center justify-center gap-3">
           <Button
             variant="outline"
             size="sm"
             onClick={generateBarcode}
-            disabled={isGenerating || !data}
-            className="gap-2"
+            disabled={isGenerating}
+            className="gap-2 text-xs"
           >
-            <RefreshCw className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
             Regenerate
           </Button>
           <Button
             size="sm"
             onClick={downloadBarcode}
-            disabled={!generated}
-            className="gap-2"
+            className="gap-2 text-xs"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3.5 w-3.5" />
             Download PNG
           </Button>
         </div>
-      </div>
-
-      {/* Barcode type tabs */}
-      <Tabs value={activeType} onValueChange={(v) => setActiveType(v as BarcodeType)} className="mb-4">
-        <TabsList className="w-full">
-          <TabsTrigger value="pdf417" className="flex-1 font-mono text-xs">PDF417</TabsTrigger>
-          <TabsTrigger value="code128" className="flex-1 font-mono text-xs">Code 128</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {activeType === "code128" && (
-        <div className="mb-4">
-          <Label className="text-xs font-mono mb-1.5 block">Custom Code 128 Data (leave empty to use AAMVA data)</Label>
-          <Textarea
-            value={code128Input}
-            onChange={(e) => setCode128Input(e.target.value)}
-            placeholder="Enter custom data for Code 128 barcode..."
-            className="font-mono text-xs min-h-[80px]"
-          />
-        </div>
       )}
-
-      <div className="bg-secondary/50 rounded-lg p-8 flex items-center justify-center min-h-[200px]">
-        {error ? (
-          <p className="text-destructive text-sm">{error}</p>
-        ) : (
-          <>
-            <canvas
-              ref={pdf417CanvasRef}
-              className="max-w-full bg-white rounded"
-              style={{ imageRendering: "pixelated", display: activeType === "pdf417" ? "block" : "none" }}
-            />
-            <canvas
-              ref={code128CanvasRef}
-              className="max-w-full bg-white rounded"
-              style={{ imageRendering: "pixelated", display: activeType === "code128" ? "block" : "none" }}
-            />
-          </>
-        )}
-      </div>
-
-      {generated && (
-        <div className="mt-4 flex items-center gap-2 text-sm text-primary">
-          <CheckCircle className="h-4 w-4" />
-          <span>
-            {activeType === "pdf417"
-              ? "PDF417 barcode generated — AAMVA compliant, scannable"
-              : "Code 128 barcode generated — scannable"}
-          </span>
-        </div>
-      )}
-    </Card>
+    </div>
   );
 }

@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import { Shuffle, Calculator, Info } from "lucide-react";
+import { Shuffle, Calculator, Info, Check } from "lucide-react";
 import { 
   EYE_COLORS, 
   EYE_COLORS_ON_DL,
@@ -13,7 +12,6 @@ import {
   GENDER_OPTIONS,
   RACE_OPTIONS,
   NAME_SUFFIXES,
-  DL_CLASSES,
   AAMVAData, 
   generateRandomData,
   inchesToCm,
@@ -36,6 +34,14 @@ interface StateFormProps {
   data: AAMVAData;
   onChange: (data: AAMVAData) => void;
 }
+
+const SCANNERS = [
+  { name: "Scandit", color: "green" },
+  { name: "Show-Me ID", color: "orange" },
+  { name: "FIDScan", color: "green" },
+  { name: "Veriscan", color: "green" },
+  { name: "Uscan.pro", color: "green" },
+];
 
 export function StateForm({ data, onChange }: StateFormProps) {
   const [stateConfig, setStateConfig] = useState<StateConfig | null>(null);
@@ -61,14 +67,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
     const config = getStateConfig(stateCode);
     if (config) {
       const rev = config.revisions[0];
-      // Convert revision date MM/DD/YYYY to MMDDYYYY for DDA field
       const revDateClean = rev.revisionDate.replace(/\//g, "");
-      onChange({ 
-        ...data, 
-        stateCode, 
-        revisionId: rev.id,
-        revisionDate: revDateClean,
-      });
+      onChange({ ...data, stateCode, revisionId: rev.id, revisionDate: revDateClean });
     }
   };
 
@@ -89,64 +89,24 @@ export function StateForm({ data, onChange }: StateFormProps) {
   };
 
   const handleGenerateDD = () => {
-    if (!data.firstName && !data.firstMiddleName) {
-      alert("Please enter First Name before generating DD.");
-      return;
-    }
-    if (!data.lastName) {
-      alert("Please enter Last Name before generating DD.");
-      return;
-    }
-    if (!data.licenseNumber) {
-      alert("Please enter DL Number before generating DD.");
-      return;
-    }
+    if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
     updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate));
   };
 
   const handleGenerateICN = () => {
-    if (!data.firstName && !data.firstMiddleName) {
-      alert("Please enter First Name before generating ICN.");
-      return;
-    }
-    if (!data.lastName) {
-      alert("Please enter Last Name before generating ICN.");
-      return;
-    }
-    if (!data.licenseNumber) {
-      alert("Please enter DL Number before generating ICN.");
-      return;
-    }
+    if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
     updateField("inventoryControlNumber", generateICN(data.stateCode, data.licenseNumber, data.issueDate));
   };
 
-  const handleCalcDLNumber = () => {
-    updateField("licenseNumber", generateDLNumber(data.stateCode));
-  };
-
-  const handleCalcFirstName = () => {
-    updateField("firstName", generateFirstName(data.gender));
-  };
-
-  const handleCalcMiddleName = () => {
-    updateField("middleName", generateMiddleName(data.gender));
-  };
-
-  const handleCalcLastName = () => {
-    updateField("lastName", generateLastName());
-  };
-
-  const handleCalcFirstMiddleName = () => {
-    updateField("firstMiddleName", generateFirstMiddleName(data.gender));
-  };
+  const handleCalcDLNumber = () => updateField("licenseNumber", generateDLNumber(data.stateCode));
+  const handleCalcFirstName = () => updateField("firstName", generateFirstName(data.gender));
+  const handleCalcMiddleName = () => updateField("middleName", generateMiddleName(data.gender));
+  const handleCalcLastName = () => updateField("lastName", generateLastName());
+  const handleCalcFirstMiddleName = () => updateField("firstMiddleName", generateFirstMiddleName(data.gender));
 
   const handleCalcIssueDate = () => {
     const issueDate = calculateIssueDate();
-    onChange({ 
-      ...data, 
-      issueDate,
-      expirationDate: calculateExpiryDate(issueDate, data.stateCode, data.dateOfBirth),
-    });
+    onChange({ ...data, issueDate, expirationDate: calculateExpiryDate(issueDate, data.stateCode, data.dateOfBirth) });
   };
 
   const handleCalcExpiryDate = () => {
@@ -157,34 +117,30 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
   const fields = revision?.fields;
 
-  return (
-    <Card className="p-6 bg-card border-border">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="font-mono text-2xl font-bold">{stateConfig?.name || "Select State"}</h2>
-          {revision && (
-            <p className="text-sm text-muted-foreground font-mono">
-              Rev. {revision.revisionDate} ({revision.aamvaVersion}{revision.jurisdictionVersion})
-              {revision.realIdCompliant && (
-                <span className="ml-2 text-primary">★ REAL ID</span>
-              )}
-            </p>
-          )}
-        </div>
-        <Button variant="outline" size="sm" onClick={handleRandomize} className="gap-2">
-          <Shuffle className="h-4 w-4" />
-          Random Data
-        </Button>
-      </div>
+  const CalcButton = ({ onClick }: { onClick: () => void }) => (
+    <Button variant="ghost" size="icon" className="h-4 w-4 ml-1 text-muted-foreground hover:text-primary" onClick={onClick}>
+      <Calculator className="h-3 w-3" />
+    </Button>
+  );
 
-      {/* State & Revision Selection */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div>
-          <Label>State</Label>
+  const InfoTip = ({ text }: { text: string }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Info className="h-3 w-3 text-muted-foreground ml-0.5" />
+      </TooltipTrigger>
+      <TooltipContent>{text}</TooltipContent>
+    </Tooltip>
+  );
+
+  return (
+    <div className="border border-border rounded bg-card">
+      {/* Header - centered like pdf417.pro */}
+      <div className="text-center pt-6 pb-4 px-6">
+        {/* State selector */}
+        <div className="flex items-center justify-center gap-3 mb-2">
           <Select value={data.stateCode} onValueChange={handleStateChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select state" />
+            <SelectTrigger className="w-[200px] text-center">
+              <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
               {STATE_CONFIGS.map((state) => (
@@ -194,358 +150,218 @@ export function StateForm({ data, onChange }: StateFormProps) {
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        {stateConfig && stateConfig.revisions.length > 1 && (
-          <div>
-            <Label>Revision</Label>
+          {stateConfig && stateConfig.revisions.length > 1 && (
             <Select value={data.revisionId} onValueChange={handleRevisionChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select revision" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {stateConfig.revisions.map((rev) => (
-                  <SelectItem key={rev.id} value={rev.id}>
-                    {rev.name}
-                  </SelectItem>
+                  <SelectItem key={rev.id} value={rev.id}>{rev.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          )}
+          <Button variant="outline" size="sm" onClick={handleRandomize} className="gap-1.5 text-xs">
+            <Shuffle className="h-3.5 w-3.5" />
+            Random
+          </Button>
+        </div>
+
+        <h2 className="text-2xl font-bold">{stateConfig?.name || "Select State"}</h2>
+        {revision && (
+          <p className="text-sm text-muted-foreground mt-1">
+            Rev. {revision.revisionDate} ({revision.aamvaVersion}{revision.jurisdictionVersion})
+            {revision.realIdCompliant && " ⭐"}
+          </p>
         )}
+
+        {/* Scanner badges - like pdf417.pro */}
+        <div className="flex items-center justify-center gap-2 mt-3">
+          {SCANNERS.map((s) => (
+            <span
+              key={s.name}
+              className={s.color === "green" ? "scanner-badge-green" : "scanner-badge-orange"}
+            >
+              {s.name} <Check className="h-3 w-3" />
+            </span>
+          ))}
+        </div>
       </div>
 
-      <div className="section-divider mb-6" />
-
-      {/* Form Fields */}
-      <div className="space-y-6">
+      {/* Form fields */}
+      <div className="px-6 pb-6 space-y-4">
         {/* Row 1: DL Number, Names */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-3">
           <div>
-            <Label className="flex items-center gap-1">
-              DL Number
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>Generate state-specific DL number</TooltipContent>
-              </Tooltip>
-              <Button variant="ghost" size="icon" className="h-5 w-5 ml-1" onClick={handleCalcDLNumber}>
-                <Calculator className="h-3 w-3" />
-              </Button>
+            <Label className="text-xs flex items-center gap-0.5">
+              DL Number <InfoTip text="State-specific format" /> <CalcButton onClick={handleCalcDLNumber} />
             </Label>
             <Input
               value={data.licenseNumber}
               onChange={(e) => updateField("licenseNumber", e.target.value.toUpperCase())}
               placeholder="D1234567"
+              className="text-sm h-9"
             />
           </div>
 
           {fields?.hasFirstMiddleCombined ? (
             <>
               <div>
-                <Label className="flex items-center gap-1">
-                  Last name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcLastName}>
-                    <Calculator className="h-3 w-3" />
-                  </Button>
+                <Label className="text-xs flex items-center gap-0.5">
+                  Last name <CalcButton onClick={handleCalcLastName} />
                 </Label>
-                <Input
-                  value={data.lastName}
-                  onChange={(e) => updateField("lastName", e.target.value.toUpperCase())}
-                  placeholder="DOE"
-                />
+                <Input value={data.lastName} onChange={(e) => updateField("lastName", e.target.value.toUpperCase())} placeholder="Doe" className="text-sm h-9" />
               </div>
               <div className="col-span-2">
-                <Label className="flex items-center gap-1">
-                  First & Middle name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcFirstMiddleName}>
-                    <Calculator className="h-3 w-3" />
-                  </Button>
+                <Label className="text-xs flex items-center gap-0.5">
+                  First & Middle name <CalcButton onClick={handleCalcFirstMiddleName} />
                 </Label>
-                <Input
-                  value={data.firstMiddleName}
-                  onChange={(e) => updateField("firstMiddleName", e.target.value.toUpperCase())}
-                  placeholder="JOHN,MICHAEL"
-                />
+                <Input value={data.firstMiddleName} onChange={(e) => updateField("firstMiddleName", e.target.value.toUpperCase())} placeholder="JOHN,MICHAEL" className="text-sm h-9" />
               </div>
             </>
           ) : (
             <>
               <div>
-                <Label className="flex items-center gap-1">
-                  First name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcFirstName}>
-                    <Calculator className="h-3 w-3" />
-                  </Button>
+                <Label className="text-xs flex items-center gap-0.5">
+                  First name <CalcButton onClick={handleCalcFirstName} />
                 </Label>
-                <Input
-                  value={data.firstName}
-                  onChange={(e) => updateField("firstName", e.target.value.toUpperCase())}
-                  placeholder="JOHN"
-                />
+                <Input value={data.firstName} onChange={(e) => updateField("firstName", e.target.value.toUpperCase())} placeholder="John" className="text-sm h-9" />
               </div>
               <div>
-                <Label className="flex items-center gap-1">
-                  Last name
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcLastName}>
-                    <Calculator className="h-3 w-3" />
-                  </Button>
+                <Label className="text-xs flex items-center gap-0.5">
+                  Last name <CalcButton onClick={handleCalcLastName} />
                 </Label>
-                <Input
-                  value={data.lastName}
-                  onChange={(e) => updateField("lastName", e.target.value.toUpperCase())}
-                  placeholder="DOE"
-                />
+                <Input value={data.lastName} onChange={(e) => updateField("lastName", e.target.value.toUpperCase())} placeholder="Doe" className="text-sm h-9" />
               </div>
               {fields?.hasMiddleName && (
                 <div>
-                  <Label className="flex items-center gap-1">
-                    Middle name
-                    <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcMiddleName}>
-                      <Calculator className="h-3 w-3" />
-                    </Button>
+                  <Label className="text-xs flex items-center gap-0.5">
+                    Middle name <InfoTip text="Optional" /> <CalcButton onClick={handleCalcMiddleName} />
                   </Label>
-                  <Input
-                    value={data.middleName}
-                    onChange={(e) => updateField("middleName", e.target.value.toUpperCase())}
-                    placeholder="MICHAEL"
-                  />
+                  <Input value={data.middleName} onChange={(e) => updateField("middleName", e.target.value.toUpperCase())} placeholder="" className="text-sm h-9" />
                 </div>
               )}
             </>
           )}
         </div>
 
-        {/* Row 2: Address */}
-        <div className="grid grid-cols-4 gap-4">
-          <div>
-            <Label>Address</Label>
-            <Input
-              value={data.streetAddress}
-              onChange={(e) => updateField("streetAddress", e.target.value.toUpperCase())}
-              placeholder="123 MAIN ST"
-            />
+        {/* Row 2: Address, City, Zip, DL Class, Sex, Donor */}
+        <div className="grid grid-cols-7 gap-3">
+          <div className="col-span-2">
+            <Label className="text-xs">Address</Label>
+            <Input value={data.streetAddress} onChange={(e) => updateField("streetAddress", e.target.value.toUpperCase())} placeholder="516 Anson Ct" className="text-sm h-9" />
           </div>
           <div>
-            <Label>City</Label>
-            <Input
-              value={data.city}
-              onChange={(e) => updateField("city", e.target.value.toUpperCase())}
-              placeholder="LOS ANGELES"
-            />
+            <Label className="text-xs">City</Label>
+            <Input value={data.city} onChange={(e) => updateField("city", e.target.value.toUpperCase())} placeholder="Ronhert Park" className="text-sm h-9" />
           </div>
           <div>
-            <Label className="flex items-center gap-1">
-              Zip code
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>9-digit ZIP code</TooltipContent>
-              </Tooltip>
-            </Label>
-            <Input
-              value={data.postalCode}
-              onChange={(e) => updateField("postalCode", e.target.value.replace(/\D/g, "").slice(0, 9))}
-              placeholder="900010000"
-              maxLength={9}
-            />
+            <Label className="text-xs">Zip code</Label>
+            <Input value={data.postalCode} onChange={(e) => updateField("postalCode", e.target.value.replace(/\D/g, "").slice(0, 9))} placeholder="875420000" maxLength={9} className="text-sm h-9" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {fields?.hasDLClass && (
-              <div>
-                <Label>DL Class</Label>
-                <Input
-                  value={data.dlClass}
-                  onChange={(e) => updateField("dlClass", e.target.value.toUpperCase())}
-                  placeholder="e.g. C, D, M"
-                  maxLength={5}
-                />
-              </div>
-            )}
+          {fields?.hasDLClass && (
             <div>
-              <Label>Sex</Label>
-              <Select value={data.gender} onValueChange={(v) => updateField("gender", v)}>
-                <SelectTrigger>
+              <Label className="text-xs">DL Class</Label>
+              <Input value={data.dlClass} onChange={(e) => updateField("dlClass", e.target.value.toUpperCase())} placeholder="C" maxLength={5} className="text-sm h-9" />
+            </div>
+          )}
+          <div>
+            <Label className="text-xs">Sex</Label>
+            <Select value={data.gender} onValueChange={(v) => updateField("gender", v)}>
+              <SelectTrigger className="h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GENDER_OPTIONS.map((g) => (
+                  <SelectItem key={g.code} value={g.code}>{g.short}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {fields?.hasDonor && (
+            <div>
+              <Label className="text-xs">Donor</Label>
+              <Select value={data.donor} onValueChange={(v) => updateField("donor", v)}>
+                <SelectTrigger className="h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {GENDER_OPTIONS.map((g) => (
-                    <SelectItem key={g.code} value={g.code}>{g.short}</SelectItem>
-                  ))}
+                  <SelectItem value="N">No</SelectItem>
+                  <SelectItem value="Y">Yes</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {fields?.hasDonor && (
-              <div>
-                <Label>Donor</Label>
-                <Select value={data.donor} onValueChange={(v) => updateField("donor", v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="N">No</SelectItem>
-                    <SelectItem value="Y">Yes</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
-        {/* Row 3: Dates */}
-        <div className="grid grid-cols-5 gap-4">
+        {/* Row 3: Dates, DD, ICN */}
+        <div className="grid grid-cols-5 gap-3">
           <div>
-            <Label className="flex items-center gap-1">
-              Birth date
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>MMDDYYYY format</TooltipContent>
-              </Tooltip>
+            <Label className="text-xs flex items-center gap-0.5">
+              Birth date <InfoTip text="MMDDYYYY format" />
             </Label>
-            <Input
-              value={data.dateOfBirth}
-              onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))}
-              placeholder="01151970"
-              maxLength={8}
-            />
+            <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="01151970" maxLength={8} className="text-sm h-9" />
           </div>
           <div>
-            <Label className="flex items-center gap-1">
-              Issue date
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>Click calculator to set today's date</TooltipContent>
-              </Tooltip>
-              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcIssueDate}>
-                <Calculator className="h-3 w-3" />
-              </Button>
+            <Label className="text-xs flex items-center gap-0.5">
+              Issue date <InfoTip text="MMDDYYYY" /> <CalcButton onClick={handleCalcIssueDate} />
             </Label>
-            <Input
-              value={data.issueDate}
-              onChange={(e) => updateField("issueDate", e.target.value.replace(/\D/g, "").slice(0, 8))}
-              placeholder="08262021"
-              maxLength={8}
-            />
+            <Input value={data.issueDate} onChange={(e) => updateField("issueDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="08262021" maxLength={8} className="text-sm h-9" />
           </div>
           <div>
-            <Label className="flex items-center gap-1">
-              Expiry date
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>Auto-calculate from issue date + state validity period</TooltipContent>
-              </Tooltip>
-              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleCalcExpiryDate}>
-                <Calculator className="h-3 w-3" />
-              </Button>
+            <Label className="text-xs flex items-center gap-0.5">
+              Expiry date <InfoTip text="Auto-calculate" /> <CalcButton onClick={handleCalcExpiryDate} />
             </Label>
-            <Input
-              value={data.expirationDate}
-              onChange={(e) => updateField("expirationDate", e.target.value.replace(/\D/g, "").slice(0, 8))}
-              placeholder="01152026"
-              maxLength={8}
-            />
+            <Input value={data.expirationDate} onChange={(e) => updateField("expirationDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="01152026" maxLength={8} className="text-sm h-9" />
           </div>
           {fields?.hasDD && (
             <div>
-              <Label className="flex items-center gap-1">
-                DD
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-3 w-3 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>Document Discriminator</TooltipContent>
-                </Tooltip>
-                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleGenerateDD}>
-                  <Calculator className="h-3 w-3" />
-                </Button>
+              <Label className="text-xs flex items-center gap-0.5">
+                DD <InfoTip text="Document Discriminator" /> <CalcButton onClick={handleGenerateDD} />
               </Label>
-              <Input
-                value={data.documentDiscriminator}
-                onChange={(e) => updateField("documentDiscriminator", e.target.value)}
-                placeholder="Click calculator"
-                className="text-xs"
-              />
+              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", e.target.value)} placeholder="Click calculator" className="text-[11px] h-9" />
             </div>
           )}
           {fields?.hasICN && (
             <div>
-              <Label className="flex items-center gap-1">
-                ICN
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-3 w-3 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>Inventory Control Number</TooltipContent>
-                </Tooltip>
-                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleGenerateICN}>
-                  <Calculator className="h-3 w-3" />
-                </Button>
+              <Label className="text-xs flex items-center gap-0.5">
+                ICN <InfoTip text="Inventory Control Number" /> <CalcButton onClick={handleGenerateICN} />
               </Label>
-              <Input
-                value={data.inventoryControlNumber}
-                onChange={(e) => updateField("inventoryControlNumber", e.target.value)}
-                placeholder="Click calculator"
-                className="text-xs"
-              />
+              <Input value={data.inventoryControlNumber} onChange={(e) => updateField("inventoryControlNumber", e.target.value)} placeholder="Click calculator" className="text-[11px] h-9" />
             </div>
           )}
         </div>
 
         {/* Row 4: Restrictions, Endorsement, Height, Weight */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-3">
           {fields?.hasRestrictions && (
             <div>
-              <Label>Restrictions</Label>
-              <Input
-                value={data.restrictions}
-                onChange={(e) => updateField("restrictions", e.target.value.toUpperCase())}
-                placeholder="NONE"
-              />
+              <Label className="text-xs">Restrictions</Label>
+              <Input value={data.restrictions} onChange={(e) => updateField("restrictions", e.target.value.toUpperCase())} placeholder="NONE" className="text-sm h-9" />
             </div>
           )}
           {fields?.hasEndorsement && (
             <div>
-              <Label>Endorsement</Label>
-              <Input
-                value={data.endorsement}
-                onChange={(e) => updateField("endorsement", e.target.value.toUpperCase())}
-                placeholder="NONE"
-              />
+              <Label className="text-xs">Endorsement</Label>
+              <Input value={data.endorsement} onChange={(e) => updateField("endorsement", e.target.value.toUpperCase())} placeholder="NONE" className="text-sm h-9" />
             </div>
           )}
           <div>
-            <Label>Height (in.)</Label>
+            <Label className="text-xs">Height (in.)</Label>
             <div className="relative">
-              <Input
-                value={data.height}
-                onChange={(e) => updateField("height", e.target.value.replace(/\D/g, "").slice(0, 2))}
-                placeholder="69"
-                maxLength={2}
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+              <Input value={data.height} onChange={(e) => updateField("height", e.target.value.replace(/\D/g, "").slice(0, 2))} placeholder="69" maxLength={2} className="text-sm h-9 pr-16" />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
                 ≈ {inchesToCm(parseInt(data.height) || 0)} cm
               </span>
             </div>
           </div>
           {fields?.hasWeight && (
             <div>
-              <Label>Weight (lb.)</Label>
+              <Label className="text-xs">Weight (lb.)</Label>
               <div className="relative">
-                <Input
-                  value={data.weight}
-                  onChange={(e) => updateField("weight", e.target.value.replace(/\D/g, "").slice(0, 3))}
-                  placeholder="169"
-                  maxLength={3}
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                <Input value={data.weight} onChange={(e) => updateField("weight", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="169" maxLength={3} className="text-sm h-9 pr-16" />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
                   ≈ {lbsToKg(parseInt(data.weight) || 0)} kg
                 </span>
               </div>
@@ -554,12 +370,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 5: Eye/Hair Colors */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-3">
           {fields?.hasEyeColorOnDL && (
             <div>
-              <Label>Eye (as on DL)</Label>
+              <Label className="text-xs">Eye (as on DL)</Label>
               <Select value={data.eyeColorOnDL} onValueChange={(v) => updateField("eyeColorOnDL", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -572,9 +388,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
           )}
           {fields?.hasEyeColor && (
             <div>
-              <Label>Eye (ANSI D-20)</Label>
+              <Label className="text-xs">Eye (ANSI D-20)</Label>
               <Select value={data.eyeColor} onValueChange={(v) => updateField("eyeColor", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -587,9 +403,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
           )}
           {fields?.hasHairColorOnDL && (
             <div>
-              <Label>Hair (as on DL)</Label>
+              <Label className="text-xs">Hair (as on DL)</Label>
               <Select value={data.hairColorOnDL} onValueChange={(v) => updateField("hairColorOnDL", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -602,9 +418,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
           )}
           {fields?.hasHairColor && (
             <div>
-              <Label>Hair (ANSI D-20)</Label>
+              <Label className="text-xs">Hair (ANSI D-20)</Label>
               <Select value={data.hairColor} onValueChange={(v) => updateField("hairColor", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -617,14 +433,14 @@ export function StateForm({ data, onChange }: StateFormProps) {
           )}
         </div>
 
-        {/* Row 6: Race, Name Suffix, Safe Driver (conditional) */}
+        {/* Row 6: Race, Name Suffix, Revision Date, Safe Driver */}
         {(fields?.hasRace || fields?.hasNameSuffix || fields?.hasSafeDriver || fields?.hasRevisionDate) && (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             {fields?.hasRace && (
               <div>
-                <Label>Race (ANSI D-20)</Label>
+                <Label className="text-xs">Race (ANSI D-20)</Label>
                 <Select value={data.race} onValueChange={(v) => updateField("race", v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue placeholder="== Select ==" />
                   </SelectTrigger>
                   <SelectContent>
@@ -637,9 +453,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
             )}
             {fields?.hasNameSuffix && (
               <div>
-                <Label>Name Suffix</Label>
+                <Label className="text-xs">Name Suffix</Label>
                 <Select value={data.nameSuffix} onValueChange={(v) => updateField("nameSuffix", v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -652,9 +468,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
             )}
             {fields?.hasRevisionDate && fields.revisionDates && (
               <div>
-                <Label>Revision date</Label>
+                <Label className="text-xs">Revision date</Label>
                 <Select value={data.revisionDate} onValueChange={(v) => updateField("revisionDate", v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue placeholder="== Select ==" />
                   </SelectTrigger>
                   <SelectContent>
@@ -667,17 +483,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
             )}
             {fields?.hasSafeDriver && (
               <div>
-                <Label className="flex items-center gap-1">
-                  Safe Driver
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>Florida Safe Driver designation</TooltipContent>
-                  </Tooltip>
-                </Label>
+                <Label className="text-xs">Safe Driver</Label>
                 <Select value={data.safeDriver} onValueChange={(v) => updateField("safeDriver", v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -689,7 +497,14 @@ export function StateForm({ data, onChange }: StateFormProps) {
             )}
           </div>
         )}
+
+        {/* Create button - centered like pdf417.pro */}
+        <div className="flex justify-center pt-2">
+          <Button className="px-8 h-10 text-sm font-semibold">
+            Create
+          </Button>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 }

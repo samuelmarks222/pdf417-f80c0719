@@ -160,6 +160,9 @@ export function encodeAAMVA(
   // Endorsements (DCD) - always include, default NONE
   dlElements += `DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}\n`;
 
+  // Organ Donor (DDL) - Y or N
+  dlElements += `DDL${data.donor === "Y" ? "1" : "0"}\n`;
+
   // Full DL subfile = "DL" prefix + elements
   const dlSubfile = "DL" + dlElements;
 
@@ -183,7 +186,7 @@ export function encodeAAMVA(
 
   // Each entry descriptor: type(2) + offset(4) + length(4) = 10 chars
   const entryDescriptorLen = 10 * numEntries;
-  const headerLen = headerFixedPart.length + entryDescriptorLen + 1; // +1 for trailing LF
+  const headerLen = headerFixedPart.length + entryDescriptorLen;
 
   const dlOffset = headerLen;
   const dlLength = dlSubfile.length;
@@ -193,7 +196,6 @@ export function encodeAAMVA(
   let header = headerFixedPart;
   header += "DL" + padZero(dlOffset, 4) + padZero(dlLength, 4);
   header += jurSubfileType + padZero(zaOffset, 4) + padZero(zaLength, 4);
-  header += DATA_ELEMENT_SEPARATOR;
 
   return header + dlSubfile + jurSubfile;
 }

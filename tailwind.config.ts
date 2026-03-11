@@ -14,10 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        mono: ["Space Grotesk", "sans-serif"],
-        sans: ["DM Sans", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
       },
       colors: {
+        "nav-background": "hsl(var(--nav-background))",
+        "nav-foreground": "hsl(var(--nav-foreground))",
+        "nav-foreground-active": "hsl(var(--nav-foreground-active))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -1,11 +1,9 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Card } from "@/components/ui/card";
 import { STATE_CONFIGS } from "@/lib/stateConfigs";
 import { Link } from "react-router-dom";
-import { ChevronRight, ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const States = () => {
   const [expandedStates, setExpandedStates] = useState<Set<string>>(new Set());
@@ -20,7 +18,7 @@ const States = () => {
     setExpandedStates(newExpanded);
   };
 
-  // Group states into columns
+  // Group states into 4 columns like pdf417.pro
   const statesPerColumn = Math.ceil(STATE_CONFIGS.length / 4);
   const columns = [
     STATE_CONFIGS.slice(0, statesPerColumn),
@@ -30,94 +28,84 @@ const States = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background font-mono">
       <Header />
-      
-      <main className="flex-1 py-12">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h1 className="font-mono text-3xl font-bold mb-4">
-              List of available states and regions
-            </h1>
-          </div>
 
-          {/* USA Section */}
-          <div className="mb-12">
-            <h2 className="font-mono text-2xl font-semibold mb-6 flex items-center gap-3">
-              USA <span className="text-2xl">🇺🇸</span>
-            </h2>
+      <main className="flex-1">
+        <h1 className="sr-only">List of available states and regions</h1>
 
-            <div className="grid md:grid-cols-4 gap-4">
-              {columns.map((column, colIndex) => (
-                <div key={colIndex} className="space-y-2">
+        <section className="container p-4 pb-8">
+          <h3 className="text-center pb-4 pt-3 text-2xl font-semibold">
+            USA 🇺🇸
+          </h3>
+
+          <div className="grid md:grid-cols-4 gap-0">
+            {columns.map((column, colIndex) => (
+              <div key={colIndex}>
+                <ul className="divide-y divide-border border border-border rounded-lg overflow-hidden">
                   {column.map((state) => (
-                    <div key={state.code}>
+                    <li key={state.code} className="bg-card">
                       {state.revisions.length === 1 ? (
-                        // Single revision - direct link
-                        <Link to={`/?state=${state.code}`}>
-                          <Card className="p-3 bg-card border-border hover:border-primary/50 transition-all cursor-pointer flex items-center justify-between group">
-                            <span className="text-primary font-medium">{state.name}</span>
-                            {state.revisions[0].realIdCompliant && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
-                          </Card>
+                        // Single revision - direct link with checkmark
+                        <Link
+                          to={`/generator?state=${state.code}`}
+                          className="flex items-center justify-between px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                        >
+                          <span className="text-primary font-medium text-sm">{state.name}</span>
+                          {state.revisions[0].realIdCompliant && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
                         </Link>
                       ) : (
                         // Multiple revisions - expandable
-                        <Collapsible 
-                          open={expandedStates.has(state.code)} 
-                          onOpenChange={() => toggleState(state.code)}
-                        >
-                          <CollapsibleTrigger asChild>
-                            <Card className="p-3 bg-card border-border hover:border-primary/50 transition-all cursor-pointer flex items-center justify-between group">
-                              <span className="text-primary font-medium">{state.name}</span>
-                              <div className="flex items-center gap-2">
-                                {state.revisions.some(r => r.realIdCompliant) && (
-                                  <Check className="h-4 w-4 text-primary" />
-                                )}
-                                {expandedStates.has(state.code) ? (
-                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </div>
-                            </Card>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <div className="ml-4 mt-1 space-y-1">
-                              {state.revisions.map((revision) => (
-                                <Link
-                                  key={revision.id}
-                                  to={`/?state=${state.code}&revision=${revision.id}`}
-                                >
-                                  <div className="p-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 rounded transition-colors flex items-center gap-2">
-                                    <span>➜</span>
-                                    <span>{revision.name}</span>
-                                    {revision.id.includes("2024") || revision.id.includes("2025") ? (
-                                      <span className="text-xs px-1.5 py-0.5 bg-primary/20 text-primary rounded">NEW</span>
-                                    ) : null}
-                                  </div>
-                                </Link>
-                              ))}
+                        <div>
+                          <button
+                            onClick={() => toggleState(state.code)}
+                            className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-muted/50 transition-colors text-left"
+                          >
+                            <span className="text-primary font-medium text-sm flex items-center gap-2">
+                              {state.name}
+                              {state.revisions.some(r => r.year === "2024" || r.year === "2025") && (
+                                <span className="text-[10px] px-1.5 py-0.5 bg-primary text-primary-foreground rounded font-bold">NEW</span>
+                              )}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {state.revisions.some(r => r.realIdCompliant) && (
+                                <Check className="h-4 w-4 text-primary" />
+                              )}
+                              <ChevronDown
+                                className={`h-4 w-4 text-muted-foreground transition-transform ${
+                                  expandedStates.has(state.code) ? "rotate-180" : ""
+                                }`}
+                              />
                             </div>
-                          </CollapsibleContent>
-                        </Collapsible>
+                          </button>
+                          {expandedStates.has(state.code) && (
+                            <ul className="pl-4 pb-2">
+                              {state.revisions.map((revision) => (
+                                <li key={revision.id}>
+                                  <Link
+                                    to={`/generator?state=${state.code}&revision=${revision.id}`}
+                                    className="block px-2 py-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                    ➜ {revision.name}
+                                    {(revision.year === "2024" || revision.year === "2025") && (
+                                      <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded font-bold">NEW</span>
+                                    )}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
                       )}
-                    </div>
+                    </li>
                   ))}
-                </div>
-              ))}
-            </div>
+                </ul>
+              </div>
+            ))}
           </div>
-
-          {/* Info Card */}
-          <Card className="p-6 bg-card border-border">
-            <p className="text-sm text-muted-foreground text-center">
-              All 50 US states plus Washington DC are supported. Each state has specific 
-              AAMVA version and field requirements. Select a state to generate a barcode.
-            </p>
-          </Card>
-        </div>
+        </section>
       </main>
 
       <Footer />

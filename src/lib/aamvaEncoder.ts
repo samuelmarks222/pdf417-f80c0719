@@ -1,13 +1,14 @@
 // AAMVA CDS (Card Design Standard) PDF417 Barcode Encoder
 // Follows the AAMVA DL/ID Card Design Standard specification
 // Compliant with REAL ID Act (6 CFR § 37.19)
+// Reference: AAMVA 2020 DL/ID Card Design Standard
 
 import { getStateConfig } from "./stateConfigs";
 
-// Control characters per AAMVA spec
-const DATA_ELEMENT_SEPARATOR = "\n";  // LF (0x0A)
-const RECORD_SEPARATOR = "\x1e";      // RS (0x1E)
-const SEGMENT_TERMINATOR = "\r";      // CR (0x0D)
+// Control characters per AAMVA spec (Section D.12)
+const LF = "\n";           // Data Element Separator (0x0A)
+const RS = "\x1e";          // Record Separator (0x1E)
+const CR = "\r";            // Segment Terminator (0x0D)
 
 function padZero(num: number, len: number = 2): string {
   return num.toString().padStart(len, "0");
@@ -55,145 +56,139 @@ export function encodeAAMVA(
   const jurVersion = jurisdictionVersionStr.padStart(2, "0");
   const versionStr = aamvaVersionStr.padStart(2, "0");
 
-  // Height: total inches zero-padded to 3 digits (NO units per spec)
+  // Height: total inches zero-padded to 3 digits + " in" per AAMVA CDS D.12
   const heightInches = parseInt(data.height) || 69;
-  const heightStr = padZero(heightInches, 3);
+  const heightStr = padZero(heightInches, 3) + " in";
 
   // Jurisdiction subfile type: "Z" + first letter of state name
   const stateConfig = getStateConfig(data.stateCode);
   const fullStateName = stateConfig ? stateConfig.name : data.stateCode;
   const jurSubfileType = "Z" + (fullStateName.charAt(0) || data.stateCode.charAt(0));
 
-  // --- Build DL subfile elements ---
-  let dlElements = "";
+  // --- Build DL subfile data elements ---
+  // Each element separated by LF (0x0A), last element terminated by CR (0x0D)
+  const dlDataElements: string[] = [];
 
-  // === MANDATORY AAMVA ELEMENTS ===
+  // === MANDATORY AAMVA ELEMENTS (per Section D.12.3.1) ===
 
   // License number (DAQ) - mandatory
-  dlElements += `DAQ${data.licenseNumber}\n`;
+  dlDataElements.push(`DAQ${data.licenseNumber}`);
 
-  // Last name (DCS) - mandatory
-  dlElements += `DCS${data.lastName}\n`;
+  // Customer name components
+  dlDataElements.push(`DCS${data.lastName}`);
+  dlDataElements.push(`DDEN`); // Family name truncation: N = not truncated
 
-  // Name truncation indicators
-  dlElements += `DDEN\n`; // Family name truncation
-  
-  // Name fields
   if (data.firstMiddleName && !data.firstName) {
     // NY-style combined first & middle name
-    dlElements += `DCT${data.firstMiddleName}\n`;
+    dlDataElements.push(`DCT${data.firstMiddleName}`);
   } else {
-    // First name (DAC) - mandatory
-    dlElements += `DAC${data.firstName}\n`;
-    dlElements += `DDFN\n`; // First name truncation
-    // Middle name (DAD) - always include even if empty for REAL ID
-    dlElements += `DAD${data.middleName || ""}\n`;
-    dlElements += `DDGN\n`; // Middle name truncation
+    dlDataElements.push(`DAC${data.firstName}`);
+    dlDataElements.push(`DDFN`); // First name truncation
+    dlDataElements.push(`DAD${data.middleName || ""}`); // Always include for REAL ID
+    dlDataElements.push(`DDGN`); // Middle name truncation
   }
 
   // Name suffix
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
-    dlElements += `DCU${data.nameSuffix}\n`;
+    dlDataElements.push(`DCU${data.nameSuffix}`);
   }
 
-  // Document dates - mandatory (MMDDYYYY format)
-  dlElements += `DBD${data.issueDate}\n`;      // Issue date
-  dlElements += `DBB${data.dateOfBirth}\n`;     // Date of birth
-  dlElements += `DBA${data.expirationDate}\n`;  // Expiration date
+  // Document dates - mandatory (MMDDYYYY format per AAMVA spec)
+  dlDataElements.push(`DBD${data.issueDate}`);      // Document Issue Date
+  dlDataElements.push(`DBB${data.dateOfBirth}`);     // Date of Birth
+  dlDataElements.push(`DBA${data.expirationDate}`);  // Document Expiration Date
 
   // Sex (DBC) - mandatory: 1=Male, 2=Female, 9=Not Specified
-  dlElements += `DBC${data.gender}\n`;
+  dlDataElements.push(`DBC${data.gender}`);
 
   // Eye color (DAY)
-  dlElements += `DAY${data.eyeColor}\n`;
+  dlDataElements.push(`DAY${data.eyeColor}`);
 
-  // Height (DAU) - 3-digit inches, NO units
-  dlElements += `DAU${heightStr}\n`;
+  // Height (DAU) - "FFF in" format per AAMVA CDS
+  dlDataElements.push(`DAU${heightStr}`);
 
   // Address - mandatory
-  dlElements += `DAG${data.streetAddress}\n`;
-  dlElements += `DAI${data.city}\n`;
-  dlElements += `DAJ${data.stateCode}\n`;
-  dlElements += `DAK${data.postalCode}\n`;
+  dlDataElements.push(`DAG${data.streetAddress}`);
+  dlDataElements.push(`DAI${data.city}`);
+  dlDataElements.push(`DAJ${data.stateCode}`);
+  dlDataElements.push(`DAK${data.postalCode}`);
 
-  // Document discriminator (DCF) - alphanumeric only, 8-12 chars
-  const cleanDCF = (data.documentDiscriminator || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(10);
-  dlElements += `DCF${cleanDCF}\n`;
+  // Document discriminator (DCF) - alphanumeric only
+  const cleanDCF = (data.documentDiscriminator || "").replace(/[^A-Z0-9]/gi, "").substring(0, 25) || generateAlphanumericString(10);
+  dlDataElements.push(`DCF${cleanDCF}`);
 
   // Country (DCG) - mandatory
-  dlElements += `DCGUSA\n`;
+  dlDataElements.push(`DCGUSA`);
 
-  // === REAL ID MANDATORY FIELDS ===
+  // === REAL ID MANDATORY FIELDS (6 CFR § 37.19) ===
 
-  // DDA - Compliance Type: F = Fully Compliant (CRITICAL for REAL ID)
-  dlElements += `DDAF\n`;
+  // DDA - Compliance Type: F = Fully Compliant
+  dlDataElements.push(`DDAF`);
 
   // DDB - Card Revision Date (MMDDYYYY)
   const revisionDateForDDB = data.revisionDate || "01012020";
-  dlElements += `DDB${revisionDateForDDB}\n`;
+  dlDataElements.push(`DDB${revisionDateForDDB}`);
 
-  // DDC - Hazmat Endorsement Expiration (include empty if none)
-  dlElements += `DDC\n`;
-
-  // DCI - Full Jurisdiction Name (mandatory, no abbreviations)
-  dlElements += `DCI${fullStateName}\n`;
-
-  // DDK - Inventory Control Number (alphanumeric 10-12 chars, unique per card)
-  const cleanDDK = (data.inventoryControlNumber || "").replace(/[^A-Z0-9]/gi, "").substring(0, 12) || generateAlphanumericString(11);
-  dlElements += `DDK${cleanDDK}\n`;
+  // DDK - Inventory Control Number (alphanumeric, unique per card)
+  const cleanDDK = (data.inventoryControlNumber || "").replace(/[^A-Z0-9]/gi, "").substring(0, 25) || generateAlphanumericString(11);
+  dlDataElements.push(`DDK${cleanDDK}`);
 
   // === OPTIONAL STANDARD FIELDS ===
 
-  // Weight (DAW) - 3-digit zero-padded
+  // Weight (DAW) - 3-digit zero-padded (pounds)
   if (data.weight) {
-    dlElements += `DAW${data.weight.padStart(3, "0")}\n`;
+    dlDataElements.push(`DAW${data.weight.padStart(3, "0")}`);
+  }
+
+  // Hair color (DAZ) if provided
+  if (data.hairColor) {
+    dlDataElements.push(`DAZ${data.hairColor}`);
   }
 
   // DL Class (DCA)
   if (data.dlClass) {
-    dlElements += `DCA${data.dlClass}\n`;
+    dlDataElements.push(`DCA${data.dlClass}`);
   }
 
-  // Restrictions (DCB) - always include, default NONE
-  dlElements += `DCB${data.restrictions && data.restrictions !== "NONE" ? data.restrictions : "NONE"}\n`;
+  // Restrictions (DCB) - include actual value or NONE
+  dlDataElements.push(`DCB${data.restrictions && data.restrictions !== "NONE" ? data.restrictions : "NONE"}`);
 
-  // Endorsements (DCD) - always include, default NONE
-  dlElements += `DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}\n`;
+  // Endorsements (DCD) - include actual value or NONE
+  dlDataElements.push(`DCD${data.endorsement && data.endorsement !== "NONE" ? data.endorsement : "NONE"}`);
 
-  // Organ Donor (DDL) - Y or N
-  dlElements += `DDL${data.donor === "Y" ? "1" : "0"}\n`;
-
-  // Full DL subfile = "DL" prefix + elements
-  const dlSubfile = "DL" + dlElements;
+  // Build DL subfile: "DL" + elements separated by LF, last terminated by CR
+  const dlSubfile = "DL" + dlDataElements.join(LF) + CR;
 
   // --- Build jurisdiction subfile ---
-  const jurElements = `ZCA${data.stateCode}\nZCB\n`;
-  const jurSubfile = jurSubfileType + jurElements;
+  const jurElements = [`ZCA${data.stateCode}`, `ZCB`];
+  const jurSubfile = jurSubfileType + jurElements.join(LF) + CR;
 
   // --- Build header with dynamic offsets ---
+  // Header structure per AAMVA CDS D.12.1:
+  // @ (1) + LF (1) + RS (1) + CR (1) + "ANSI " (5) + IIN (6) + version (2) + jurVersion (2) + numEntries (2) = 21
+  // Per entry descriptor: type (2) + offset (4) + length (4) = 10
   const numEntries = 2;
-
-  // Fixed header: @ + LF + RS + CR + "ANSI " + IIN(6) + version(2) + jurVersion(2) + numEntries(2)
-  const headerFixedPart = "@"
-    + DATA_ELEMENT_SEPARATOR
-    + RECORD_SEPARATOR
-    + SEGMENT_TERMINATOR
-    + "ANSI "
-    + iin
-    + versionStr
-    + jurVersion
-    + padZero(numEntries, 2);
-
-  // Each entry descriptor: type(2) + offset(4) + length(4) = 10 chars
+  const headerFixedLen = 21;
   const entryDescriptorLen = 10 * numEntries;
-  const headerLen = headerFixedPart.length + entryDescriptorLen;
+  const headerLen = headerFixedLen + entryDescriptorLen;
 
   const dlOffset = headerLen;
   const dlLength = dlSubfile.length;
   const zaOffset = dlOffset + dlLength;
   const zaLength = jurSubfile.length;
 
-  let header = headerFixedPart;
+  let header = "";
+  header += "@";            // Compliance Indicator
+  header += LF;             // Data Element Separator
+  header += RS;             // Record Separator
+  header += CR;             // Segment Terminator
+  header += "ANSI ";        // File Type (5 chars including space)
+  header += iin;            // Issuer Identification Number (6 digits)
+  header += versionStr;     // AAMVA Version Number (2 digits)
+  header += jurVersion;     // Jurisdiction Version Number (2 digits)
+  header += padZero(numEntries, 2); // Number of Entries (2 digits)
+
+  // Entry descriptors
   header += "DL" + padZero(dlOffset, 4) + padZero(dlLength, 4);
   header += jurSubfileType + padZero(zaOffset, 4) + padZero(zaLength, 4);
 

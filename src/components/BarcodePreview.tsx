@@ -28,11 +28,15 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
         bcid: "pdf417",
         text: data,
         scale: 3,
-        height: 12,
+        height: 10,
         includetext: false,
         columns: 8,
         rowmult: 3,
-        eclevel: 4,
+        eclevel: 5,
+        paddingwidth: 12,
+        paddingheight: 8,
+        backgroundcolor: "FFFFFF",
+        barcolor: "000000",
       });
 
       setGenerated(true);

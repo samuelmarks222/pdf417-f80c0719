@@ -46,13 +46,20 @@ interface BuildDlSubfileArgs {
 
 export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): string {
   const stateCode = normalizeStateCode(data.stateCode);
-  const lastName = sanitizeUpper(data.lastName || FALLBACKS.LAST_NAME, 40);
-  const firstMiddleName = sanitizeUpper(data.firstMiddleName || "", 80);
-  const [combinedFirstName = "", combinedMiddleName = ""] = firstMiddleName
+  const [combinedFirstNameRaw = "", combinedMiddleNameRaw = ""] = sanitizeUpper(data.firstMiddleName || "", 81)
     .split(",")
-    .map((part) => sanitizeUpper(part, 40));
-  const firstName = sanitizeUpper(data.firstName || combinedFirstName || FALLBACKS.FIRST_NAME, 40);
-  const middleName = sanitizeUpper(data.middleName || combinedMiddleName || "", 40);
+    .map((part) => part.trim());
+
+  const sourceLastName = sanitizeUpper(data.lastName || FALLBACKS.LAST_NAME, 128);
+  const sourceFirstName = sanitizeUpper(
+    combinedFirstNameRaw || data.firstName || FALLBACKS.FIRST_NAME,
+    128,
+  );
+  const sourceMiddleName = sanitizeUpper(combinedMiddleNameRaw || data.middleName || "", 128);
+
+  const lastName = sourceLastName.substring(0, 40);
+  const firstName = sourceFirstName.substring(0, 40);
+  const middleName = sourceMiddleName.substring(0, 40);
 
   const issueDate = ensureDateMMDDYYYY(data.issueDate, FALLBACKS.ISSUE);
   const dob = ensureDateMMDDYYYY(data.dateOfBirth, FALLBACKS.DOB);
@@ -73,13 +80,13 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   // Mandatory identifiers
   elements.push(`DAQ${licenseNumber}`);
   elements.push(`DCS${lastName}`);
-  elements.push("DDEN");
+  elements.push(`DDE${sourceLastName.length > 40 ? "T" : "N"}`);
 
-  // Name structure - keep a standard DAC/DAD layout for scanner compatibility
+  // Name structure - prefer combined first/middle input when present for scanner consistency
   elements.push(`DAC${firstName}`);
-  elements.push("DDFN");
+  elements.push(`DDF${sourceFirstName.length > 40 ? "T" : "N"}`);
   elements.push(`DAD${middleName}`);
-  elements.push("DDGN");
+  elements.push(`DDG${sourceMiddleName.length > 40 ? "T" : "N"}`);
 
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
     elements.push(`DCU${sanitizeUpper(data.nameSuffix, 10)}`);

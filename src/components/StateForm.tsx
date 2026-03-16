@@ -233,7 +233,16 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 <Label className="text-xs flex items-center">
                   First & Middle name <CalcIcon onClick={handleCalcFirstMiddleName} />
                 </Label>
-                <Input value={data.firstMiddleName} onChange={(e) => updateField("firstMiddleName", e.target.value.toUpperCase())} placeholder="JOHN,MICHAEL" className="h-9 text-sm mt-1" />
+                <Input
+                  value={data.firstMiddleName}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase();
+                    const [firstName = "", middleName = ""] = value.split(",", 2).map((part) => part.trim());
+                    onChange({ ...data, firstMiddleName: value, firstName, middleName });
+                  }}
+                  placeholder="JOHN,MICHAEL"
+                  className="h-9 text-sm mt-1"
+                />
               </div>
             </>
           ) : (

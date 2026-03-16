@@ -75,15 +75,11 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   elements.push(`DCS${lastName}`);
   elements.push("DDEN");
 
-  // Name structure
-  if (firstMiddleName && !firstName) {
-    elements.push(`DCT${firstMiddleName}`);
-  } else {
-    elements.push(`DAC${firstName}`);
-    elements.push("DDFN");
-    elements.push(`DAD${middleName}`);
-    elements.push("DDGN");
-  }
+  // Name structure - keep a standard DAC/DAD layout for scanner compatibility
+  elements.push(`DAC${firstName}`);
+  elements.push("DDFN");
+  elements.push(`DAD${middleName}`);
+  elements.push("DDGN");
 
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
     elements.push(`DCU${sanitizeUpper(data.nameSuffix, 10)}`);

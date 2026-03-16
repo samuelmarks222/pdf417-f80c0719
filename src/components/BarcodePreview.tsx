@@ -62,7 +62,13 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   };
 
   useEffect(() => {
-    if (data) generateBarcode();
+    if (data) {
+      generateBarcode();
+      return;
+    }
+
+    setGenerated(false);
+    setError(null);
   }, [data]);
 
   return (

@@ -1,4 +1,4 @@
-import { AAMVA_CONTROL, AAMVA_REAL_ID_COMPLIANCE, FALLBACKS, JURISDICTION_SUBFILE_TYPE } from "./constants";
+import { AAMVA_CONTROL, AAMVA_REAL_ID_COMPLIANCE, FALLBACKS } from "./constants";
 import {
   ensureDateMMDDYYYY,
   formatHeightInches,

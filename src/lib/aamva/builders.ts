@@ -47,9 +47,12 @@ interface BuildDlSubfileArgs {
 export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): string {
   const stateCode = normalizeStateCode(data.stateCode);
   const lastName = sanitizeUpper(data.lastName || FALLBACKS.LAST_NAME, 40);
-  const firstName = sanitizeUpper(data.firstName || FALLBACKS.FIRST_NAME, 40);
-  const middleName = sanitizeUpper(data.middleName || "", 40);
   const firstMiddleName = sanitizeUpper(data.firstMiddleName || "", 80);
+  const [combinedFirstName = "", combinedMiddleName = ""] = firstMiddleName
+    .split(",")
+    .map((part) => sanitizeUpper(part, 40));
+  const firstName = sanitizeUpper(data.firstName || combinedFirstName || FALLBACKS.FIRST_NAME, 40);
+  const middleName = sanitizeUpper(data.middleName || combinedMiddleName || "", 40);
 
   const issueDate = ensureDateMMDDYYYY(data.issueDate, FALLBACKS.ISSUE);
   const dob = ensureDateMMDDYYYY(data.dateOfBirth, FALLBACKS.DOB);

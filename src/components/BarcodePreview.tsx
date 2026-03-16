@@ -15,9 +15,13 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   const [generated, setGenerated] = useState(false);
 
   const generateBarcode = async () => {
-    if (!data || !canvasRef.current) return;
+    if (!data || !canvasRef.current) {
+      setGenerated(false);
+      return;
+    }
 
     setIsGenerating(true);
+    setGenerated(false);
     setError(null);
 
     try {
@@ -28,13 +32,13 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
         bcid: "pdf417",
         text: data,
         scale: 3,
-        height: 10,
+        height: 9,
         includetext: false,
         columns: 8,
         rowmult: 3,
         eclevel: 5,
-        paddingwidth: 12,
-        paddingheight: 8,
+        paddingwidth: 16,
+        paddingheight: 12,
         backgroundcolor: "FFFFFF",
         barcolor: "000000",
       });

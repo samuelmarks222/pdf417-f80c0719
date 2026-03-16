@@ -2,12 +2,7 @@
 // Rebuilt with deterministic subfile/header builders for scanner reliability
 
 import { getStateConfig } from "./stateConfigs";
-import {
-  AamvaEncodeInput,
-  buildDlSubfile,
-  buildHeader,
-  buildJurisdictionSubfile,
-} from "./aamva/builders";
+import { AamvaEncodeInput, buildDlSubfile, buildHeader } from "./aamva/builders";
 
 export function encodeAAMVA(
   data: AamvaEncodeInput,

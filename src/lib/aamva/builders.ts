@@ -140,7 +140,6 @@ interface BuildHeaderArgs {
   aamvaVersion: string;
   jurisdictionVersion: string;
   dlSubfileLength: number;
-  jurisdictionSubfileLength: number;
 }
 
 export function buildHeader({
@@ -148,11 +147,10 @@ export function buildHeader({
   aamvaVersion,
   jurisdictionVersion,
   dlSubfileLength,
-  jurisdictionSubfileLength,
 }: BuildHeaderArgs): string {
   const version = aamvaVersion.padStart(2, "0");
   const jurVersion = jurisdictionVersion.padStart(2, "0");
-  const numEntries = 2;
+  const numEntries = 1;
 
   const fixedHeader =
     "@" +
@@ -167,17 +165,7 @@ export function buildHeader({
 
   const entryDescriptorLength = 10 * numEntries;
   const headerLength = fixedHeader.length + entryDescriptorLength;
-
   const dlOffset = headerLength;
-  const jurisdictionOffset = dlOffset + dlSubfileLength;
 
-  return (
-    fixedHeader +
-    "DL" +
-    padZero(dlOffset, 4) +
-    padZero(dlSubfileLength, 4) +
-    JURISDICTION_SUBFILE_TYPE +
-    padZero(jurisdictionOffset, 4) +
-    padZero(jurisdictionSubfileLength, 4)
-  );
+  return fixedHeader + "DL" + padZero(dlOffset, 4) + padZero(dlSubfileLength, 4);
 }

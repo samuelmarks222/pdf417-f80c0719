@@ -26,7 +26,8 @@ export function ensureDateMMDDYYYY(value: string, fallback: string): string {
 
 export function formatHeightInches(value: string): string {
   const inches = parseInt(sanitizeDigits(value, 3), 10);
-  return padZero(Number.isNaN(inches) ? FALLBACKS.HEIGHT_INCHES : inches, 3);
+  const normalized = Number.isNaN(inches) ? FALLBACKS.HEIGHT_INCHES : inches;
+  return `${padZero(normalized, 3)} in`;
 }
 
 export function formatWeight(value: string): string {

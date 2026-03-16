@@ -1,4 +1,4 @@
-import { AAMVA_CONTROL, AAMVA_REAL_ID_COMPLIANCE, FALLBACKS, JURISDICTION_SUBFILE_TYPE } from "./constants";
+import { AAMVA_CONTROL, AAMVA_REAL_ID_COMPLIANCE, FALLBACKS } from "./constants";
 import {
   ensureDateMMDDYYYY,
   formatHeightInches,
@@ -47,9 +47,12 @@ interface BuildDlSubfileArgs {
 export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): string {
   const stateCode = normalizeStateCode(data.stateCode);
   const lastName = sanitizeUpper(data.lastName || FALLBACKS.LAST_NAME, 40);
-  const firstName = sanitizeUpper(data.firstName || FALLBACKS.FIRST_NAME, 40);
-  const middleName = sanitizeUpper(data.middleName || "", 40);
   const firstMiddleName = sanitizeUpper(data.firstMiddleName || "", 80);
+  const [combinedFirstName = "", combinedMiddleName = ""] = firstMiddleName
+    .split(",")
+    .map((part) => sanitizeUpper(part, 40));
+  const firstName = sanitizeUpper(data.firstName || combinedFirstName || FALLBACKS.FIRST_NAME, 40);
+  const middleName = sanitizeUpper(data.middleName || combinedMiddleName || "", 40);
 
   const issueDate = ensureDateMMDDYYYY(data.issueDate, FALLBACKS.ISSUE);
   const dob = ensureDateMMDDYYYY(data.dateOfBirth, FALLBACKS.DOB);
@@ -72,15 +75,11 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   elements.push(`DCS${lastName}`);
   elements.push("DDEN");
 
-  // Name structure
-  if (firstMiddleName && !firstName) {
-    elements.push(`DCT${firstMiddleName}`);
-  } else {
-    elements.push(`DAC${firstName}`);
-    elements.push("DDFN");
-    elements.push(`DAD${middleName}`);
-    elements.push("DDGN");
-  }
+  // Name structure - keep a standard DAC/DAD layout for scanner compatibility
+  elements.push(`DAC${firstName}`);
+  elements.push("DDFN");
+  elements.push(`DAD${middleName}`);
+  elements.push("DDGN");
 
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
     elements.push(`DCU${sanitizeUpper(data.nameSuffix, 10)}`);
@@ -130,18 +129,12 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   return `DL${elements.join(AAMVA_CONTROL.LF)}${AAMVA_CONTROL.CR}`;
 }
 
-export function buildJurisdictionSubfile(stateCode: string): string {
-  const normalizedState = normalizeStateCode(stateCode);
-  const elements = [`ZCA${normalizedState}`, "ZCB"];
-  return `${JURISDICTION_SUBFILE_TYPE}${elements.join(AAMVA_CONTROL.LF)}${AAMVA_CONTROL.CR}`;
-}
 
 interface BuildHeaderArgs {
   iin: string;
   aamvaVersion: string;
   jurisdictionVersion: string;
   dlSubfileLength: number;
-  jurisdictionSubfileLength: number;
 }
 
 export function buildHeader({
@@ -149,11 +142,10 @@ export function buildHeader({
   aamvaVersion,
   jurisdictionVersion,
   dlSubfileLength,
-  jurisdictionSubfileLength,
 }: BuildHeaderArgs): string {
   const version = aamvaVersion.padStart(2, "0");
   const jurVersion = jurisdictionVersion.padStart(2, "0");
-  const numEntries = 2;
+  const numEntries = 1;
 
   const fixedHeader =
     "@" +
@@ -168,17 +160,7 @@ export function buildHeader({
 
   const entryDescriptorLength = 10 * numEntries;
   const headerLength = fixedHeader.length + entryDescriptorLength;
-
   const dlOffset = headerLength;
-  const jurisdictionOffset = dlOffset + dlSubfileLength;
 
-  return (
-    fixedHeader +
-    "DL" +
-    padZero(dlOffset, 4) +
-    padZero(dlSubfileLength, 4) +
-    JURISDICTION_SUBFILE_TYPE +
-    padZero(jurisdictionOffset, 4) +
-    padZero(jurisdictionSubfileLength, 4)
-  );
+  return fixedHeader + "DL" + padZero(dlOffset, 4) + padZero(dlSubfileLength, 4);
 }

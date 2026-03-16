@@ -129,11 +129,6 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   return `DL${elements.join(AAMVA_CONTROL.LF)}${AAMVA_CONTROL.CR}`;
 }
 
-export function buildJurisdictionSubfile(stateCode: string): string {
-  const normalizedState = normalizeStateCode(stateCode);
-  const elements = [`ZCA${normalizedState}`, "ZCB"];
-  return `${JURISDICTION_SUBFILE_TYPE}${elements.join(AAMVA_CONTROL.LF)}${AAMVA_CONTROL.CR}`;
-}
 
 interface BuildHeaderArgs {
   iin: string;

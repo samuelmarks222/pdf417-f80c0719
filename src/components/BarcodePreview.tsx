@@ -73,26 +73,21 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
 
   return (
     <div className="border border-border rounded bg-card p-6">
-      {/* Barcode area */}
       <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
+        <canvas
+          ref={canvasRef}
+          className={generated ? "max-w-full bg-white rounded" : "hidden"}
+          style={{ imageRendering: "pixelated" }}
+        />
         {error ? (
           <p className="text-destructive text-sm">{error}</p>
         ) : !generated ? (
           <p className="text-muted-foreground text-sm">
             Fill in the fields and click the "Create" button and your barcode will appear here.
           </p>
-        ) : (
-          <canvas
-            ref={canvasRef}
-            className="max-w-full bg-white rounded"
-            style={{ imageRendering: "pixelated" }}
-          />
-        )}
-        {/* Hidden canvas for generation before first display */}
-        {!generated && <canvas ref={canvasRef} className="hidden" />}
+        ) : null}
       </div>
 
-      {/* Actions */}
       {generated && (
         <div className="mt-4 flex items-center justify-center gap-3">
           <Button
@@ -105,11 +100,7 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
             <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
             Regenerate
           </Button>
-          <Button
-            size="sm"
-            onClick={downloadBarcode}
-            className="gap-2 text-xs"
-          >
+          <Button size="sm" onClick={downloadBarcode} className="gap-2 text-xs">
             <Download className="h-3.5 w-3.5" />
             Download PNG
           </Button>

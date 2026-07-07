@@ -5,11 +5,12 @@ import { Download, RefreshCw } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
-+  code128Text?: string;
+  code128Text?: string;
++  onCode128TextChange?: (value: string) => void;
   onGenerate?: () => void;
 }
 
-export function BarcodePreview({ data, code128Text = "", onGenerate }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -94,15 +95,18 @@ export function BarcodePreview({ data, code128Text = "", onGenerate }: BarcodePr
   };
 
   useEffect(() => {
-    if (data) {
-      generateBarcode();
-      generateCode128();
-      return;
-    }
+    generateBarcode();
+  }, [data]);
 
-    setGenerated(false);
-    setGenerated2(false);
-    setError(null);
+  useEffect(() => {
+    generateCode128();
+  }, [code128Text]);
+
+  useEffect(() => {
+    if (!data) {
+      setGenerated(false);
+      setError(null);
+    }
   }, [data]);
 
   return (
@@ -146,7 +150,7 @@ export function BarcodePreview({ data, code128Text = "", onGenerate }: BarcodePr
       </div>
 
       <div className="border border-border rounded bg-card p-6">
-        <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
+        <div className="bg-muted/50 rounded p-8 flex flex-col items-center justify-center min-h-[140px] gap-4">
           <canvas
             ref={canvasRef2}
             className={"max-w-full bg-white rounded"}
@@ -154,8 +158,15 @@ export function BarcodePreview({ data, code128Text = "", onGenerate }: BarcodePr
             height={120}
             style={{ imageRendering: "pixelated" }}
           />
-          {!generated2 && !error ? (
-            <p className="text-muted-foreground text-sm">Code 128 will appear here.</p>
+          <textarea
+            value={code128Text}
+            onChange={(e) => onCode128TextChange?.(e.target.value)}
+            placeholder="Enter text to render in Code 128"
+            className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary"
+            rows={3}
+          />
+          {!generated2 ? (
+            <p className="text-muted-foreground text-sm">Enter Code 128 text above and it will appear here.</p>
           ) : null}
         </div>
 

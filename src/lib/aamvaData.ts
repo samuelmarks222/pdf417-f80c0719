@@ -137,9 +137,9 @@ export const DEFAULT_AAMVA_DATA: AAMVAData = {
   revisionId: "CA_2017",
   
   firstName: "JOHN",
-  middleName: "MICHAEL",
+  middleName: "",
   lastName: "DOE",
-  firstMiddleName: "JOHN,MICHAEL",
+  firstMiddleName: "",
   nameSuffix: "",
   
   streetAddress: "123 MAIN ST",

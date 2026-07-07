@@ -50,9 +50,9 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
     .split(",")
     .map((part) => part.trim());
 
-  const sourceLastName = sanitizeUpper(data.lastName || FALLBACKS.LAST_NAME, 128);
+  const sourceLastName = sanitizeUpper(data.lastName || "", 128);
   const sourceFirstName = sanitizeUpper(
-    combinedFirstNameRaw || data.firstName || FALLBACKS.FIRST_NAME,
+    combinedFirstNameRaw || data.firstName || "",
     128,
   );
   const sourceMiddleName = sanitizeUpper(combinedMiddleNameRaw || data.middleName || "", 128);
@@ -79,14 +79,22 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
 
   // Mandatory identifiers
   elements.push(`DAQ${licenseNumber}`);
-  elements.push(`DCS${lastName}`);
-  elements.push(`DDE${sourceLastName.length > 40 ? "T" : "N"}`);
+  // Last name - include only if provided
+  if (sourceLastName) {
+    elements.push(`DCS${lastName}`);
+    elements.push(`DDE${sourceLastName.length > 40 ? "T" : "N"}`);
+  }
 
   // Name structure - prefer combined first/middle input when present for scanner consistency
-  elements.push(`DAC${firstName}`);
-  elements.push(`DDF${sourceFirstName.length > 40 ? "T" : "N"}`);
-  elements.push(`DAD${middleName}`);
-  elements.push(`DDG${sourceMiddleName.length > 40 ? "T" : "N"}`);
+  if (sourceFirstName) {
+    elements.push(`DAC${firstName}`);
+    elements.push(`DDF${sourceFirstName.length > 40 ? "T" : "N"}`);
+  }
+  // Middle name - include only if provided
+  if (sourceMiddleName) {
+    elements.push(`DAD${middleName}`);
+    elements.push(`DDG${sourceMiddleName.length > 40 ? "T" : "N"}`);
+  }
 
   if (data.nameSuffix && data.nameSuffix !== "NONE") {
     elements.push(`DCU${sanitizeUpper(data.nameSuffix, 10)}`);

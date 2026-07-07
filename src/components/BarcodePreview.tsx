@@ -116,7 +116,9 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
         <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
           <canvas
             ref={canvasRef}
-            className={generated ? "max-w-full bg-white rounded" : "hidden"}
+            className={"max-w-full bg-white rounded"}
+            width={600}
+            height={200}
             style={{ imageRendering: "pixelated" }}
           />
           {error ? (
@@ -152,7 +154,9 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
         <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
           <canvas
             ref={canvasRef2}
-            className={generated2 ? "max-w-full bg-white rounded" : "hidden"}
+            className={"max-w-full bg-white rounded"}
+            width={500}
+            height={120}
             style={{ imageRendering: "pixelated" }}
           />
           {!generated2 && !error ? (

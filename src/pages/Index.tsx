@@ -28,6 +28,7 @@ const Index = () => {
   });
   
   const [encodedData, setEncodedData] = useState<string>("");
+  const [code128Text, setCode128Text] = useState<string>("");
   const [showRawData, setShowRawData] = useState(false);
 
   useEffect(() => {
@@ -54,7 +55,24 @@ const Index = () => {
 
           {/* Barcode Preview - below form like pdf417.pro */}
           <div className="mt-6">
-            <BarcodePreview data={encodedData} />
+            <BarcodePreview data={encodedData} code128Text={code128Text} />
+          </div>
+
+          <div className="mt-4 border border-border rounded bg-card p-4">
+            <label className="block text-xs font-medium text-muted-foreground mb-2" htmlFor="code128-input">
+              Code 128 text
+            </label>
+            <textarea
+              id="code128-input"
+              value={code128Text}
+              onChange={(e) => setCode128Text(e.target.value)}
+              placeholder="Enter text to render in Code 128"
+              className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary"
+              rows={3}
+            />
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              This value is used only for the Code 128 barcode. Leave blank to hide the Code 128 preview.
+            </p>
           </div>
 
           {/* Raw Data Toggle */}

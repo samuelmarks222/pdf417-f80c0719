@@ -5,10 +5,11 @@ import { Download, RefreshCw } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
++  code128Text?: string;
   onGenerate?: () => void;
 }
 
-export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onGenerate }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -64,7 +65,7 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
   };
 
   const generateCode128 = async () => {
-    if (!data || !canvasRef2.current) {
+    if (!code128Text || !canvasRef2.current) {
       setGenerated2(false);
       return;
     }
@@ -75,13 +76,7 @@ export function BarcodePreview({ data, onGenerate }: BarcodePreviewProps) {
 
       await bwipjs.toCanvas(canvasRef2.current, {
         bcid: "code128",
-        text: data,
-        scale: 3,
-        height: 18,
-        includetext: true,
-        textxalign: "center",
-        backgroundcolor: "FFFFFF",
-        barcolor: "000000",
+          text: code128Text,
       });
 
       setGenerated2(true);

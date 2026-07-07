@@ -306,9 +306,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
           </div>
           {fields?.hasDonor && (
             <div className="col-span-2">
-              <Label className="text-xs">Donor</Label>
+              <Label className="text-xs">Donor (Y/N)</Label>
               <Select value={data.donor} onValueChange={(v) => updateField("donor", v)}>
-                <SelectTrigger className="h-9 text-sm mt-1">
+                <SelectTrigger className="h-9 text-sm mt-1" aria-label="Donor">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -316,6 +316,9 @@ export function StateForm({ data, onChange }: StateFormProps) {
                   <SelectItem value="Y">Yes</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Select <strong>Yes</strong> for organ donor, <strong>No</strong> otherwise. The underlying value stored is Y or N.
+              </p>
             </div>
           )}
         </div>

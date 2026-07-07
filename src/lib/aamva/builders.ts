@@ -7,6 +7,7 @@ import {
   normalizePostalCode,
   normalizeStateCode,
   padZero,
+  sanitizeAamvaCode,
   sanitizeUpper,
 } from "./formatters";
 
@@ -67,8 +68,12 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   const revisionDate = ensureDateMMDDYYYY(data.revisionDate || "", FALLBACKS.REVISION);
 
   const licenseNumber = sanitizeUpper(data.licenseNumber || FALLBACKS.LICENSE_NUMBER, 25);
-  const documentDiscriminator = normalizeAlphanumeric(data.documentDiscriminator, 8, 25, 10);
-  const inventoryControlNumber = normalizeAlphanumeric(data.inventoryControlNumber, 10, 25, 11);
+  const documentDiscriminator = data.documentDiscriminator
+    ? sanitizeAamvaCode(data.documentDiscriminator, 25)
+    : normalizeAlphanumeric(data.documentDiscriminator, 8, 25, 10);
+  const inventoryControlNumber = data.inventoryControlNumber
+    ? sanitizeAamvaCode(data.inventoryControlNumber, 25)
+    : normalizeAlphanumeric(data.inventoryControlNumber, 10, 25, 11);
 
   const dlClass = sanitizeUpper(data.dlClass || "", 8);
   const restrictions = sanitizeUpper(data.restrictions || "NONE", 40);

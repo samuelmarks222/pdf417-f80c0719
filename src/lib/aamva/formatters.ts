@@ -52,6 +52,13 @@ export function normalizeAlphanumeric(value: string, minLen: number, maxLen: num
   return randomAlphanumeric(fallbackLength);
 }
 
+export function sanitizeAamvaCode(value: string, maxLen: number): string {
+  return (value || "")
+    .replace(/[\r\n\x1e\s]+/g, "")
+    .toUpperCase()
+    .substring(0, maxLen);
+}
+
 export function randomAlphanumeric(length: number): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");

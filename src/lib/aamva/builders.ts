@@ -37,6 +37,7 @@ export interface AamvaEncodeInput {
   restrictions: string;
   endorsement: string;
   donor: string;
+  complianceType?: string;
   revisionDate?: string;
 }
 

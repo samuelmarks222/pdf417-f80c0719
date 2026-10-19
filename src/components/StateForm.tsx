@@ -322,6 +322,22 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </p>
             </div>
           )}
+          <div className="col-span-2">
+            <Label className="text-xs">Compliance Type</Label>
+            <Select value={data.complianceType} onValueChange={(v) => updateField("complianceType", v)}>
+              <SelectTrigger className="h-9 text-sm mt-1" aria-label="Compliance Type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COMPLIANCE_TYPES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              <strong>F</strong> = Fully Compliant (REAL ID). Encoded in the barcode as DDA.
+            </p>
+          </div>
         </div>
 
         {/* Row 3: Birth date | Issue date | Expiry date | DD | ICN */}

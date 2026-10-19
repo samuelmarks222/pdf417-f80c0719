@@ -96,7 +96,7 @@ export const COMPLIANCE_TYPES = [
   { code: "Q", name: "Q - Exemption (Religious)" },
   { code: "V", name: "V - Virginia (VA)" },
 ] as const;
-] as const;
+
 
 export interface AAMVAData {
   // State/Revision info

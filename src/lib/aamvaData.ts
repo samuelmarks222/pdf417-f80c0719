@@ -90,11 +90,11 @@ export const DL_CLASSES = [
 
 // AAMVA CDS DDA - Compliance Type
 export const COMPLIANCE_TYPES = [
-  { code: "F", name: "F - Fully Compliant (REAL ID)" },
+  { code: "F", name: "F - Fully Compliant" },
   { code: "A", name: "A - Non-Compliant" },
-  { code: "B", name: "B - Non-Compliant, Under 21" },
-  { code: "Q", name: "Q - Exemption (Religious)" },
-  { code: "V", name: "V - Virginia (VA)" },
+  { code: "B", name: "B - Non-Compliant U21" },
+  { code: "Q", name: "Q - Exemption" },
+  { code: "V", name: "V - Virginia" },
 ] as const;
 
 

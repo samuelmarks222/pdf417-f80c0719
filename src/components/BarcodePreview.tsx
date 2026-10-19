@@ -6,7 +6,7 @@ import { Download, RefreshCw } from "lucide-react";
 interface BarcodePreviewProps {
   data: string;
   code128Text?: string;
-+  onCode128TextChange?: (value: string) => void;
+onCode128TextChange?: (value: string) => void;
   onGenerate?: () => void;
 }
 

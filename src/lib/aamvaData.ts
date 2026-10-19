@@ -88,6 +88,16 @@ export const DL_CLASSES = [
   { code: "M", name: "Class M (Motorcycle)" },
 ] as const;
 
+// AAMVA CDS DDA - Compliance Type
+export const COMPLIANCE_TYPES = [
+  { code: "F", name: "F - Fully Compliant" },
+  { code: "A", name: "A - Non-Compliant" },
+  { code: "B", name: "B - Non-Compliant U21" },
+  { code: "Q", name: "Q - Exemption" },
+  { code: "V", name: "V - Virginia" },
+] as const;
+
+
 export interface AAMVAData {
   // State/Revision info
   stateCode: string;
@@ -124,6 +134,7 @@ export interface AAMVAData {
   documentDiscriminator: string;
   inventoryControlNumber: string;
   restrictions: string;
+  complianceType: string;
   endorsement: string;
   
   // Additional
@@ -164,6 +175,7 @@ export const DEFAULT_AAMVA_DATA: AAMVAData = {
   inventoryControlNumber: "A8F9G2H1J3K",
   restrictions: "NONE",
   endorsement: "NONE",
+  complianceType: "F",
   
   donor: "N",
   safeDriver: "Y",

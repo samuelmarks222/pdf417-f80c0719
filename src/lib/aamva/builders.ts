@@ -37,6 +37,7 @@ export interface AamvaEncodeInput {
   restrictions: string;
   endorsement: string;
   donor: string;
+  complianceType?: string;
   revisionDate?: string;
 }
 
@@ -133,7 +134,9 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   // Standard/REAL ID
   elements.push(`DCF${documentDiscriminator}`);
   elements.push("DCGUSA");
-  elements.push(`DDA${AAMVA_REAL_ID_COMPLIANCE}`);
+  const compliance = (data.complianceType || "").toUpperCase().substring(0, 1);
+  const allowedCompliance = ["A", "B", "F", "Q", "V"];
+  elements.push(`DDA${allowedCompliance.includes(compliance) ? compliance : AAMVA_REAL_ID_COMPLIANCE}`);
   elements.push(`DDB${revisionDate}`);
   elements.push(`DCI${sanitizeUpper(fullStateName, 40)}`);
   elements.push(`DDK${inventoryControlNumber}`);

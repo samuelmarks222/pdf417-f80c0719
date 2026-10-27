@@ -6,8 +6,8 @@ import { Download, RefreshCw } from "lucide-react";
 interface BarcodePreviewProps {
   data: string;
   code128Text?: string;
-onCode128TextChange?: (value: string) => void;
-  onGenerate?: () => void;
+  onCode128TextChange?: (value: string) => void;
+  onGenerate?: (generationId: string, dataDigest: string) => Promise<boolean>;
 }
 
 export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate }: BarcodePreviewProps) {
@@ -18,6 +18,19 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
   const [generated, setGenerated] = useState(false);
   const [generated2, setGenerated2] = useState(false);
 
+  const chargeForGeneration = async (format: "pdf417" | "code128", text: string) => {
+    if (!onGenerate) {
+      return false;
+    }
+
+    const digestInput = new TextEncoder().encode(`${format}\0${text}`);
+    const digestBuffer = await crypto.subtle.digest("SHA-256", digestInput);
+    const dataDigest = [...new Uint8Array(digestBuffer)]
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+    return onGenerate(crypto.randomUUID(), dataDigest);
+  };
+
   const generateBarcode = async () => {
     if (!data || !canvasRef.current) {
       setGenerated(false);
@@ -25,14 +38,11 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
     }
 
     setIsGenerating(true);
-    setGenerated(false);
     setError(null);
 
     try {
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-      await bwipjs.toCanvas(canvasRef.current, {
+      const output = document.createElement("canvas");
+      await bwipjs.toCanvas(output, {
         bcid: "pdf417",
         text: data,
         scale: 3,
@@ -47,8 +57,16 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         barcolor: "000000",
       });
 
+      if (!canvasRef.current.getContext("2d")) throw new Error("Could not display generated barcode.");
+      const canPublish = await chargeForGeneration("pdf417", data);
+      if (!canPublish) return;
+
+      canvasRef.current.width = output.width;
+      canvasRef.current.height = output.height;
+      const context = canvasRef.current.getContext("2d");
+      if (!context) throw new Error("Could not display generated barcode.");
+      context.drawImage(output, 0, 0);
       setGenerated(true);
-      onGenerate?.();
     } catch (err) {
       console.error("Barcode generation error:", err);
       setError("Failed to generate barcode. Please check your data.");
@@ -71,18 +89,30 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
       return;
     }
 
+    setIsGenerating(true);
+    setError(null);
     try {
-      const ctx = canvasRef2.current.getContext("2d");
-      if (ctx) ctx.clearRect(0, 0, canvasRef2.current.width, canvasRef2.current.height);
-
-      await bwipjs.toCanvas(canvasRef2.current, {
+      const output = document.createElement("canvas");
+      await bwipjs.toCanvas(output, {
         bcid: "code128",
-          text: code128Text,
+        text: code128Text,
       });
 
+      if (!canvasRef2.current.getContext("2d")) throw new Error("Could not display generated barcode.");
+      const canPublish = await chargeForGeneration("code128", code128Text);
+      if (!canPublish) return;
+
+      canvasRef2.current.width = output.width;
+      canvasRef2.current.height = output.height;
+      const context = canvasRef2.current.getContext("2d");
+      if (!context) throw new Error("Could not display generated barcode.");
+      context.drawImage(output, 0, 0);
       setGenerated2(true);
     } catch (err) {
-      console.error("Code128 generation error:", err);
+      console.error("Code 128 generation error:", err);
+      setError("Failed to generate the Code 128 barcode.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -95,19 +125,15 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
   };
 
   useEffect(() => {
-    generateBarcode();
-  }, [data]);
-
-  useEffect(() => {
-    generateCode128();
-  }, [code128Text]);
-
-  useEffect(() => {
     if (!data) {
       setGenerated(false);
       setError(null);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (!code128Text) setGenerated2(false);
+  }, [code128Text]);
 
   return (
     <div className="grid md:grid-cols-2 gap-4">
@@ -129,6 +155,12 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
           ) : null}
         </div>
 
+        <div className="mt-4 flex justify-center">
+          <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 text-xs">
+            {isGenerating ? "Generating…" : generated ? "Generate another PDF417 (1 credit)" : "Create PDF417 (1 credit)"}
+          </Button>
+        </div>
+
         {generated && (
           <div className="mt-4 flex items-center justify-center gap-3">
             <Button
@@ -139,7 +171,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               className="gap-2 text-xs"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
-              Regenerate
+              Generate again · 1 credit
             </Button>
             <Button size="sm" onClick={downloadBarcode} className="gap-2 text-xs">
               <Download className="h-3.5 w-3.5" />
@@ -166,8 +198,14 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             rows={3}
           />
           {!generated2 ? (
-            <p className="text-muted-foreground text-sm">Enter Code 128 text above and it will appear here.</p>
+            <p className="text-muted-foreground text-sm">Enter Code 128 text above, then create the barcode.</p>
           ) : null}
+        </div>
+
+        <div className="mt-4 flex justify-center">
+          <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 text-xs">
+            {generated2 ? "Generate another Code 128 (1 credit)" : "Create Code 128 (1 credit)"}
+          </Button>
         </div>
 
         {generated2 && (
@@ -179,7 +217,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               className="gap-2 text-xs"
             >
               <RefreshCw className={`h-3.5 w-3.5`} />
-              Regenerate
+              Generate again · 1 credit
             </Button>
             <Button size="sm" onClick={downloadCode128} className="gap-2 text-xs">
               <Download className="h-3.5 w-3.5" />

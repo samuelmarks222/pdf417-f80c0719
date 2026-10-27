@@ -70,9 +70,9 @@ const Home = () => {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold mb-2">Free to use</h2>
+                  <h2 className="text-xl font-semibold mb-2">Credit-based generation</h2>
                   <p className="text-muted-foreground">
-                    Generate barcodes completely free. No account required, no limits. Just fill in the fields and get your barcode instantly.
+                    Sign in to manage your barcode credits. Each successfully generated barcode uses one credit; buy a package whenever you need more.
                   </p>
                 </div>
               </article>

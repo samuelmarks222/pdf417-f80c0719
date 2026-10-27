@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import States from "./pages/States";
 import Features from "./pages/Features";
 import NotFound from "./pages/NotFound";
+import Account from "./pages/Account";
+import Admin from "./pages/Admin";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -16,15 +19,19 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/generator" element={<Index />} />
-          <Route path="/states" element={<States />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/generator" element={<Index />} />
+            <Route path="/states" element={<States />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

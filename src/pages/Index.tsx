@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StateForm } from "@/components/StateForm";
@@ -7,8 +7,14 @@ import { AAMVAData, DEFAULT_AAMVA_DATA } from "@/lib/aamvaData";
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
 import { useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/useAuth";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const { user, profile, refreshProfile } = useAuth();
   const [searchParams] = useSearchParams();
   const initialState = searchParams.get("state") || "CA";
   
@@ -44,12 +50,56 @@ const Index = () => {
     setFormData(data);
   };
 
+  const handleGenerate = useCallback(async (generationId: string, dataDigest: string) => {
+    if (!isSupabaseConfigured || !supabase) {
+      toast.error("Credits are not configured. Sign-in and credit services are unavailable.");
+      return false;
+    }
+    if (!user) {
+      toast.error("Sign in with Google before generating a barcode.");
+      return false;
+    }
+
+    const { error } = await supabase.rpc("consume_barcode_credit", {
+      p_generation_id: generationId,
+      p_data_digest: dataDigest,
+    });
+    if (error) {
+      if (error.message.toLowerCase().includes("insufficient credits")) {
+        toast.error("You need more credits to generate a barcode.");
+      } else {
+        toast.error(`Barcode credit could not be charged: ${error.message}`);
+      }
+      return false;
+    }
+
+    void refreshProfile().catch((error: unknown) => {
+      toast.error(error instanceof Error ? error.message : "Could not refresh the credit balance.");
+    });
+    return true;
+  }, [user, refreshProfile]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1 py-6">
         <div className="container max-w-5xl">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card px-4 py-3">
+            <div className="text-sm">
+              <span className="text-muted-foreground">Available credits: </span>
+              <strong>{profile?.credit_balance ?? "—"}</strong>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              {user ? <span className="text-muted-foreground">{user.email}</span> : <span className="text-muted-foreground">Sign in is required to generate a barcode.</span>}
+              <Button asChild size="sm" variant="outline"><Link to="/account">Buy credits</Link></Button>
+            </div>
+          </div>
+          {!isSupabaseConfigured && (
+            <div className="mb-5 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+              Credit-backed generation is unavailable until Supabase is configured for this deployment.
+            </div>
+          )}
           {/* Form */}
           <StateForm data={formData} onChange={handleFormChange} />
 
@@ -59,6 +109,7 @@ const Index = () => {
               data={encodedData}
               code128Text={code128Text}
               onCode128TextChange={setCode128Text}
+              onGenerate={handleGenerate}
             />
           </div>
 

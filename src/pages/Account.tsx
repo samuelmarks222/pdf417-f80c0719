@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { ArrowRight, Check, ChevronRight, CreditCard, ShieldCheck, Smartphone } from "lucide-react";
 
 interface CreditPackage {
   id: string;
@@ -111,6 +112,9 @@ const Account = () => {
   }, [user, refreshAccount]);
 
   const hasPendingPayments = payments.some((payment) => payment.status === "pending");
+  const singleCreditPrice = Number(packages.find((item) => item.credits === 1)?.price_usd ?? 3);
+  const selectedPackageDetails = packages.find((item) => item.id === selectedPackage);
+
   useEffect(() => {
     if (!user || !hasPendingPayments) return;
     const timer = window.setInterval(() => void refreshAccount(), 5000);
@@ -193,52 +197,164 @@ const Account = () => {
                 <h2 className="mt-1 text-xl font-bold">Credit packages</h2>
               </div>
               {packages.length === 0 ? <p className="text-sm text-muted-foreground">Package pricing appears here after the Supabase migration is applied.</p> : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} onSelect={setSelectedPackage} />)}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={setSelectedPackage} />)}
                 </div>
               )}
             </section>
           </>
         ) : (
           <>
-            <section className="surface-panel mb-8 p-5 sm:p-6">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Top up</p>
-                  <h2 className="mt-1 text-xl font-bold">Buy barcode credits</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">One credit is used for each successfully generated barcode.</p>
+            <section className="surface-panel mb-8 overflow-hidden">
+              <div className="relative overflow-hidden border-b border-border/70 bg-gradient-to-br from-primary/[0.08] via-card to-cyan-400/[0.04] px-5 py-6 sm:px-7 sm:py-7">
+                <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-primary/[0.07] blur-3xl" />
+                <div className="relative flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 1</p>
+                    <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Choose your credit package</h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                      Pick the amount that fits your work. Larger packages lower your cost per barcode.
+                    </p>
+                  </div>
+                  <Link to="/generator" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:text-primary">
+                    Go to generator <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
-                <Link to="/generator" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 hover:text-primary">Go to generator <span aria-hidden="true">→</span></Link>
               </div>
 
-              {packages.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No active packages are available right now.</p>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} onSelect={setSelectedPackage} />)}
-                </div>
-              )}
-
-              <div className="mt-6 grid gap-4 rounded-2xl bg-muted/60 p-4 md:grid-cols-[1fr_2fr_auto] md:items-end sm:p-5">
-                <div>
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Payment method</label>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" size="sm" variant={provider === "sasapay" ? "default" : "outline"} className="rounded-full" onClick={() => setProvider("sasapay")}>SasaPay / M-Pesa</Button>
-                    <Button type="button" size="sm" variant={provider === "plisio" ? "default" : "outline"} className="rounded-full" onClick={() => setProvider("plisio")}>Crypto / Plisio</Button>
+              <div className="p-5 sm:p-7">
+                {packages.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No active packages are available right now.</p>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={setSelectedPackage} />)}
                   </div>
+                )}
+              </div>
+
+              <div className="border-t border-border/70 bg-slate-50/60 p-5 sm:p-7">
+                <div className="mb-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 2</p>
+                  <h3 className="mt-2 text-xl font-bold tracking-tight sm:text-2xl">Choose how you’d like to pay</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground">Select a payment option to see its checkout details.</p>
                 </div>
+
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <button
+                    type="button"
+                    aria-pressed={provider === "sasapay"}
+                    onClick={() => setProvider("sasapay")}
+                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
+                      provider === "sasapay"
+                        ? "border-emerald-500 ring-2 ring-emerald-500/15 shadow-md shadow-emerald-900/5"
+                        : "border-border hover:border-emerald-300 hover:shadow-md"
+                    }`}
+                  >
+                    {provider === "sasapay" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
+                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-emerald-100 bg-emerald-50/60 p-2">
+                      <img
+                        src="https://raw.githubusercontent.com/shayan-deriv/quill-icons/main/svg/Logo/LogoPaymentMethodMpesaBrand.svg"
+                        alt="M-PESA logo"
+                        className="h-12 w-full object-contain"
+                        loading="lazy"
+                      />
+                    </span>
+                    <span className="min-w-0 flex-1 pr-7">
+                      <span className="block text-base font-bold">M-PESA</span>
+                      <span className="mt-1 block text-sm text-muted-foreground">Mobile money · KES</span>
+                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">Secure prompt by SasaPay <ChevronRight className="h-3.5 w-3.5" /></span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    aria-pressed={provider === "plisio"}
+                    onClick={() => setProvider("plisio")}
+                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
+                      provider === "plisio"
+                        ? "border-violet-500 ring-2 ring-violet-500/15 shadow-md shadow-violet-900/5"
+                        : "border-border hover:border-violet-300 hover:shadow-md"
+                    }`}
+                  >
+                    {provider === "plisio" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-violet-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
+                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-violet-100 bg-violet-50/70 text-violet-700">
+                      <CreditCard className="h-7 w-7" />
+                    </span>
+                    <span className="min-w-0 flex-1 pr-7">
+                      <span className="block text-base font-bold">Cryptocurrency</span>
+                      <span className="mt-1 block text-sm text-muted-foreground">Pay with digital assets</span>
+                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-violet-700">Hosted checkout by Plisio <ChevronRight className="h-3.5 w-3.5" /></span>
+                    </span>
+                  </button>
+                </div>
+
                 {provider === "sasapay" ? (
-                  <div>
-                    <label className="mb-2 block text-xs font-medium" htmlFor="mpesa-phone">M-Pesa phone number</label>
-                    <Input id="mpesa-phone" value={phoneNumber} onChange={(event) => setPhoneNumber(event.target.value)} placeholder="0712345678" inputMode="tel" />
-                    <p className="mt-1 text-[11px] text-muted-foreground">The checkout amount will be shown in KES before payment is initiated.</p>
+                  <div className="mt-4 grid gap-5 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_1.1fr_auto] lg:items-end">
+                    <div className="flex items-start gap-3">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800"><Smartphone className="h-5 w-5" /></span>
+                      <div>
+                        <h4 className="font-bold">Pay with M-PESA</h4>
+                        <p className="mt-1 text-sm leading-5 text-muted-foreground">Enter your Safaricom number. You’ll receive a secure payment prompt on your phone.</p>
+                        {selectedPackageDetails && (
+                          <p className="mt-3 text-xs font-semibold text-foreground">
+                            {selectedPackageDetails.name} · {selectedPackageDetails.credits.toLocaleString()} credits · {currency(Number(selectedPackageDetails.price_usd))}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-foreground" htmlFor="mpesa-phone">M-PESA phone number</label>
+                      <Input
+                        id="mpesa-phone"
+                        value={phoneNumber}
+                        onChange={(event) => setPhoneNumber(event.target.value)}
+                        placeholder="0712 345 678"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        className="h-11 rounded-xl border-emerald-200 bg-white"
+                      />
+                      <p className="mt-2 text-xs text-muted-foreground">The payable amount is calculated in KES for the selected package.</p>
+                    </div>
+                    <Button disabled={!selectedPackage || submitting} onClick={startCheckout} className="h-11 w-full rounded-xl bg-emerald-700 px-5 text-white hover:bg-emerald-800 lg:w-auto">
+                      {submitting ? "Sending request…" : "Request payment"} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground">Plisio opens a hosted invoice with the supported cryptocurrencies available to your merchant account.</p>
+                  <div className="mt-4 grid gap-5 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+                    <div>
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700"><ShieldCheck className="h-5 w-5" /></span>
+                          <div>
+                            <h4 className="font-bold">Continue to crypto checkout</h4>
+                            <p className="mt-1 max-w-xl text-sm leading-5 text-muted-foreground">Plisio will open a secure hosted invoice with the coins currently enabled for checkout.</p>
+                            {selectedPackageDetails && (
+                              <p className="mt-3 text-xs font-semibold text-foreground">
+                                {selectedPackageDetails.name} · {selectedPackageDetails.credits.toLocaleString()} credits · {currency(Number(selectedPackageDetails.price_usd))}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-5 flex flex-wrap items-center gap-2" aria-label="Example cryptocurrency brands">
+                        <span className="mr-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Crypto options</span>
+                        <CryptoMark name="Bitcoin" ticker="BTC" src="https://cdn.simpleicons.org/bitcoin/F7931A" />
+                        <CryptoMark name="Ethereum" ticker="ETH" src="https://cdn.simpleicons.org/ethereum/627EEA" />
+                        <CryptoMark name="Tether" ticker="USDT" src="https://cdn.simpleicons.org/tether/50AF95" />
+                        <CryptoMark name="Litecoin" ticker="LTC" src="https://cdn.simpleicons.org/litecoin/A6A9AA" />
+                        <span className="text-[11px] text-muted-foreground">Availability is shown on the invoice.</span>
+                      </div>
+                    </div>
+                    <Button disabled={!selectedPackage || submitting} onClick={startCheckout} className="h-11 w-full rounded-xl bg-violet-700 px-5 text-white hover:bg-violet-800 lg:w-auto">
+                      {submitting ? "Preparing invoice…" : "Continue to Plisio"} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
-                <Button disabled={!selectedPackage || submitting} onClick={startCheckout} className="rounded-full px-5">
-                  {submitting ? "Starting…" : provider === "sasapay" ? "Request M-Pesa payment" : "Continue to crypto checkout"}
-                </Button>
+
+                <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700" />
+                  Payments are verified by the provider before credits are added to your balance.
+                </div>
               </div>
             </section>
 
@@ -312,26 +428,81 @@ const Account = () => {
 function PackageCard({
   item,
   selected,
+  referencePrice,
   onSelect,
 }: {
   item: CreditPackage;
   selected: boolean;
+  referencePrice: number;
   onSelect: (packageId: string) => void;
 }) {
+  const price = Number(item.price_usd);
+  const credits = Number(item.credits);
+  const unitPrice = credits > 0 ? price / credits : price;
+  const savings = referencePrice > 0
+    ? Math.max(0, Math.round((1 - unitPrice / referencePrice) * 100))
+    : 0;
+
   return (
     <button
       type="button"
+      aria-pressed={selected}
       onClick={() => onSelect(item.id)}
-      className={`relative rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${
-        selected ? "border-primary bg-primary/[0.04] ring-2 ring-primary/15 shadow-md shadow-primary/5" : "border-border bg-card hover:border-primary/40 hover:shadow-md"
+      className={`group relative flex min-h-52 flex-col overflow-hidden rounded-2xl border p-4 text-left transition-all hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:p-5 ${
+        selected
+          ? "border-primary bg-gradient-to-br from-primary/[0.08] via-card to-card ring-2 ring-primary/15 shadow-lg shadow-primary/10"
+          : "border-border/80 bg-card hover:border-primary/35 hover:shadow-lg hover:shadow-slate-900/5"
       }`}
     >
-      {item.recommended && <span className="absolute right-3 top-3 rounded-full bg-primary/10 px-2.5 py-1 text-[9px] font-bold tracking-wide text-primary">BEST VALUE</span>}
-      <span className="block pr-20 text-sm font-semibold text-muted-foreground">{item.name}</span>
-      <span className="mt-3 block text-2xl font-bold tracking-tight">{item.credits.toLocaleString()} <span className="text-sm font-medium text-muted-foreground">credits</span></span>
-      <span className="mt-2 block text-lg font-semibold">{currency(Number(item.price_usd))}</span>
-      <span className="mt-0.5 block text-xs text-muted-foreground">{currency(Number(item.price_usd) / item.credits)} per barcode</span>
+      {item.recommended && <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-blue-400 to-cyan-400" />}
+      <span className="flex items-center justify-between gap-2">
+        <span className="flex min-w-0 items-center gap-2">
+          <span className={`truncate text-xs font-bold uppercase tracking-[0.12em] ${item.recommended ? "text-primary" : "text-muted-foreground"}`}>{item.name}</span>
+          {item.recommended && <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-primary">Top pick</span>}
+        </span>
+        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border transition-colors ${selected ? "border-primary bg-primary text-white" : "border-border bg-white text-transparent group-hover:border-primary/50"}`}>
+          <Check className="h-3 w-3" />
+        </span>
+      </span>
+
+      <span className="mt-5 block text-3xl font-bold leading-none tracking-tight text-foreground sm:text-[2rem]">
+        {credits.toLocaleString()}
+      </span>
+      <span className="mt-1 text-xs font-medium text-muted-foreground">barcode credits</span>
+
+      <span className="mt-auto flex items-end justify-between gap-2 border-t border-border/70 pt-4">
+        <span>
+          <span className="block text-lg font-bold tracking-tight">{currency(price)}</span>
+          <span className="mt-0.5 block text-[11px] text-muted-foreground">{currency(unitPrice)} / barcode</span>
+        </span>
+        {savings > 0 && (
+          <span className="mb-0.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-600/10">
+            <ArrowRight className="h-3 w-3 -rotate-45" /> Save {savings}%
+          </span>
+        )}
+      </span>
+
     </button>
+  );
+}
+
+function CryptoMark({ name, ticker, src }: { name: string; ticker: string; src: string }) {
+  return (
+    <span aria-label={name} title={name} className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-card px-2 py-1.5 shadow-sm">
+      <span className="grid h-5 w-5 place-items-center overflow-hidden rounded-full bg-muted">
+        <img
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className="h-4 w-4 object-contain"
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+          }}
+        />
+      </span>
+      <span className="text-[10px] font-bold text-foreground">{ticker}</span>
+    </span>
   );
 }
 

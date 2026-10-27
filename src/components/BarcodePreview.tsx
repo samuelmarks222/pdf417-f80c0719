@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw } from "lucide-react";
+import { Barcode, Check, Download, RefreshCw, Sparkles } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
@@ -136,96 +136,144 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
   }, [code128Text]);
 
   return (
-    <div className="grid gap-5 md:grid-cols-2">
-      <div className="surface-panel p-4 sm:p-6">
-        <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-border bg-slate-50/80 p-6 sm:p-8">
-          <canvas
-            ref={canvasRef}
-            className={"max-w-full bg-white rounded"}
-            width={600}
-            height={200}
-            style={{ imageRendering: "pixelated" }}
-          />
-          {error ? (
-            <p className="text-destructive text-sm">{error}</p>
-          ) : !generated ? (
-            <p className="text-muted-foreground text-sm">
-              Fill in the fields and click the "Create" button and your barcode will appear here.
-            </p>
-          ) : null}
-        </div>
-
-        <div className="mt-5 flex justify-center">
-          <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 rounded-full px-5 text-xs">
-            {isGenerating ? "Generating…" : generated ? "Generate another PDF417 (1 credit)" : "Create PDF417 (1 credit)"}
-          </Button>
-        </div>
-
-        {generated && (
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateBarcode}
-              disabled={isGenerating}
-              className="gap-2 rounded-full text-xs"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
-              Generate again · 1 credit
-            </Button>
-            <Button size="sm" onClick={downloadBarcode} className="gap-2 rounded-full text-xs">
-              <Download className="h-3.5 w-3.5" />
-              Download PNG
-            </Button>
+    <div className="grid items-stretch gap-5 lg:grid-cols-2">
+      <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Barcode className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate text-base font-bold">PDF417 barcode</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">State-specific format</p>
+            </div>
           </div>
-        )}
-      </div>
-
-      <div className="surface-panel p-4 sm:p-6">
-        <div className="flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border bg-slate-50/80 p-6 sm:p-8">
-          <canvas
-            ref={canvasRef2}
-            className={"max-w-full bg-white rounded"}
-            width={500}
-            height={120}
-            style={{ imageRendering: "pixelated" }}
-          />
-          <textarea
-            value={code128Text}
-            onChange={(e) => onCode128TextChange?.(e.target.value)}
-            placeholder="Enter text to render in Code 128"
-            className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary"
-            rows={3}
-          />
-          {!generated2 ? (
-            <p className="text-muted-foreground text-sm">Enter Code 128 text above, then create the barcode.</p>
-          ) : null}
+          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit</span>
         </div>
 
-        <div className="mt-5 flex justify-center">
-          <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 rounded-full px-5 text-xs">
-            {generated2 ? "Generate another Code 128 (1 credit)" : "Create Code 128 (1 credit)"}
-          </Button>
-        </div>
-
-        {generated2 && (
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateCode128}
-              className="gap-2 rounded-full text-xs"
-            >
-              <RefreshCw className={`h-3.5 w-3.5`} />
-              Generate again · 1 credit
-            </Button>
-            <Button size="sm" onClick={downloadCode128} className="gap-2 rounded-full text-xs">
-              <Download className="h-3.5 w-3.5" />
-              Download PNG
-            </Button>
+        <div className="flex flex-1 flex-col p-4 sm:p-5">
+          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-slate-50/80 p-5 sm:min-h-[240px]">
+            <canvas
+              ref={canvasRef}
+              className={generated ? "block h-auto max-h-40 w-full max-w-[600px] rounded-lg bg-white object-contain" : "hidden"}
+              width={600}
+              height={200}
+              style={{ imageRendering: "pixelated" }}
+            />
+            {!generated && (
+              <div className="max-w-xs text-center">
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white text-primary shadow-sm ring-1 ring-border/70">
+                  <Barcode className="h-6 w-6" />
+                </span>
+                <p className="mt-4 text-sm font-semibold text-foreground">Your preview will appear here</p>
+                <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
+                  Complete the state fields above, then create your PDF417 barcode.
+                </p>
+                {error && <p role="alert" className="mt-3 text-xs font-medium text-destructive">{error}</p>}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              {generated ? (
+                <><span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-700"><Check className="h-3 w-3" /></span> Preview ready</>
+              ) : (
+                <><Sparkles className="h-4 w-4 text-primary" /> Ready to create</>
+              )}
+            </div>
+            {generated ? (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={generateBarcode} disabled={isGenerating} className="gap-2 rounded-full">
+                  <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
+                  Generate again
+                </Button>
+                <Button size="sm" onClick={downloadBarcode} className="gap-2 rounded-full">
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+              </div>
+            ) : (
+              <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 rounded-full px-5">
+                <Sparkles className="h-3.5 w-3.5" />
+                {isGenerating ? "Generating…" : "Create PDF417"}
+              </Button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
+              <Barcode className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate text-base font-bold">Code 128 barcode</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">Custom text format</p>
+            </div>
+          </div>
+          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit</span>
+        </div>
+
+        <div className="flex flex-1 flex-col p-4 sm:p-5">
+          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-slate-50/80 p-5 sm:min-h-[240px]">
+            <canvas
+              ref={canvasRef2}
+              className={generated2 ? "block h-auto max-h-40 w-full max-w-[500px] rounded-lg bg-white object-contain" : "hidden"}
+              width={500}
+              height={120}
+              style={{ imageRendering: "pixelated" }}
+            />
+            {!generated2 && (
+              <div className="max-w-xs text-center">
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white text-violet-700 shadow-sm ring-1 ring-border/70">
+                  <Barcode className="h-6 w-6" />
+                </span>
+                <p className="mt-4 text-sm font-semibold text-foreground">Create a custom barcode</p>
+                <p className="mt-1.5 text-xs leading-5 text-muted-foreground">Enter your text below to prepare a Code 128 preview.</p>
+                {error && <p role="alert" className="mt-3 text-xs font-medium text-destructive">{error}</p>}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4">
+            <label htmlFor="code128-text" className="mb-2 block text-xs font-semibold text-foreground">Text to encode</label>
+            <textarea
+              id="code128-text"
+              value={code128Text}
+              onChange={(e) => onCode128TextChange?.(e.target.value)}
+              placeholder="Type or paste your text here…"
+              className="min-h-20 w-full resize-y rounded-xl border border-input bg-card px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary focus:ring-4 focus:ring-primary/10"
+              rows={2}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-xs text-muted-foreground">
+              {generated2 ? "Preview ready" : `${code128Text.length} characters`}
+            </div>
+            {generated2 ? (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={generateCode128} disabled={isGenerating} className="gap-2 rounded-full">
+                  <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
+                  Generate again
+                </Button>
+                <Button size="sm" onClick={downloadCode128} className="gap-2 rounded-full">
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+              </div>
+            ) : (
+              <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 rounded-full px-5">
+                <Sparkles className="h-3.5 w-3.5" />
+                {isGenerating ? "Generating…" : "Create Code 128"}
+              </Button>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

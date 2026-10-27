@@ -1,57 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 11% 15%;
+    --background: 220 24% 98%;
+    --foreground: 222 38% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
+    --card-foreground: 222 38% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: 222 38% 13%;
 
-    --primary: 211 100% 50%;
+    --primary: 218 91% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 7% 96%;
-    --secondary-foreground: 210 11% 15%;
+    --secondary: 216 22% 95%;
+    --secondary-foreground: 222 38% 13%;
 
-    --muted: 210 7% 96%;
-    --muted-foreground: 215 14% 46%;
+    --muted: 216 22% 95%;
+    --muted-foreground: 218 12% 45%;
 
-    --accent: 210 7% 96%;
-    --accent-foreground: 210 11% 15%;
+    --accent: 216 22% 95%;
+    --accent-foreground: 222 38% 13%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 54%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 84%;
-    --input: 214 20% 84%;
-    --ring: 211 100% 50%;
+    --border: 218 20% 88%;
+    --input: 218 20% 86%;
+    --ring: 218 91% 52%;
 
-    --radius: 0.375rem;
+    --radius: 0.75rem;
 
     /* Navigation */
-    --nav-background: 210 11% 15%;
-    --nav-foreground: 210 14% 60%;
+    --nav-background: 222 38% 13%;
+    --nav-foreground: 218 15% 72%;
     --nav-foreground-active: 0 0% 100%;
 
-    --success: 142 71% 45%;
-    --warning: 45 93% 47%;
+    --success: 158 64% 38%;
+    --warning: 38 92% 50%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 210 11% 15%;
-    --sidebar-primary: 211 100% 50%;
+    --sidebar-foreground: 222 38% 13%;
+    --sidebar-primary: 218 91% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 7% 96%;
-    --sidebar-accent-foreground: 210 11% 15%;
-    --sidebar-border: 214 20% 84%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-accent: 216 22% 95%;
+    --sidebar-accent-foreground: 222 38% 13%;
+    --sidebar-border: 218 20% 88%;
+    --sidebar-ring: 218 91% 52%;
   }
 }
 
@@ -62,21 +62,34 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
-    font-size: 14px;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    background-image: radial-gradient(ellipse at 50% -20%, hsl(218 91% 52% / 0.07), transparent 42%);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'JetBrains Mono', 'SFMono-Regular', 'Menlo', monospace;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    letter-spacing: -0.025em;
   }
 
   input, select, textarea, button {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  }
+
+  code, pre, .font-mono {
     font-family: 'JetBrains Mono', 'SFMono-Regular', 'Menlo', monospace;
-    font-size: 14px;
+  }
+
+  ::selection {
+    background: hsl(218 91% 52% / 0.18);
   }
 }
 
 @layer components {
+  .surface-panel {
+    @apply rounded-2xl border border-border/80 bg-card shadow-sm;
+  }
+
   .scanner-badge {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border;
   }
@@ -87,5 +100,11 @@
 
   .scanner-badge-orange {
     @apply scanner-badge border-orange-300 bg-orange-50 text-orange-700;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a, button {
+    transition-duration: 180ms;
   }
 }

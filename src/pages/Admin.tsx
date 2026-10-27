@@ -227,10 +227,11 @@ const Admin = () => {
 
   return (
     <PageShell>
-      <main className="container max-w-6xl flex-1 space-y-8 py-8">
+      <main className="container max-w-7xl flex-1 space-y-7 py-8 sm:py-12">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Administration</p>
-          <h1 className="mt-1 text-2xl font-semibold">Credits &amp; payments</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Control center</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Credits &amp; payments</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Manage packages, review account activity, and verify provider transactions.</p>
         </div>
 
         {!user ? (
@@ -239,7 +240,7 @@ const Admin = () => {
           <Notice>This account is not authorized to access the admin panel.</Notice>
         ) : (
           <>
-            <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Stat label="Total users" value={stats?.total_users ?? "—"} />
               <Stat label="Barcodes generated" value={stats?.total_barcodes ?? "—"} />
               <Stat label="Successful payments" value={stats?.successful_payments ?? "—"} />
@@ -249,8 +250,11 @@ const Admin = () => {
               <Stat label="Credits consumed" value={stats?.credits_consumed ?? "—"} />
             </section>
 
-            <section className="rounded border border-border bg-card p-5">
-              <h2 className="mb-4 text-lg font-semibold">Package management</h2>
+            <section className="surface-panel p-5 sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Catalog</p>
+                <h2 className="mt-1 text-xl font-bold">Package management</h2>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[790px] text-left text-xs">
                   <thead className="border-b border-border text-muted-foreground">
@@ -273,11 +277,12 @@ const Admin = () => {
               </div>
             </section>
 
-            <section className="rounded border border-border bg-card p-5">
+            <section className="surface-panel p-5 sm:p-6">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold">Users &amp; credit adjustments</h2>
-                  <p className="text-xs text-muted-foreground">Adjustments require a reason and are added to the audit ledger.</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Accounts</p>
+                  <h2 className="mt-1 text-xl font-bold">Users &amp; credit adjustments</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Adjustments require a reason and are added to the audit ledger.</p>
                 </div>
                 <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search email, payment, or user ID" className="max-w-sm" />
               </div>
@@ -307,9 +312,12 @@ const Admin = () => {
               )}
             </section>
 
-            <section className="rounded border border-border bg-card p-5">
+            <section className="surface-panel p-5 sm:p-6">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold">Payments &amp; reconciliation</h2>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Transactions</p>
+                  <h2 className="mt-1 text-xl font-bold">Payments &amp; reconciliation</h2>
+                </div>
                 <div className="flex gap-2">
                   <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-background px-3 text-sm">
                     <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option>
@@ -339,8 +347,11 @@ const Admin = () => {
               </div>
             </section>
 
-            <section className="rounded border border-border bg-card p-5">
-              <h2 className="mb-4 text-lg font-semibold">Webhook &amp; verification events</h2>
+            <section className="surface-panel p-5 sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Provider activity</p>
+                <h2 className="mt-1 text-xl font-bold">Webhook &amp; verification events</h2>
+              </div>
               {events.length === 0 ? <p className="text-xs text-muted-foreground">No provider events recorded.</p> : (
                 <div className="max-h-96 space-y-2 overflow-auto">
                   {events.map((event) => (
@@ -384,11 +395,11 @@ function HistoryRows({ rows }: { rows: TransactionRow[] }) {
 }
 
 function Stat({ label, value }: { label: string; value: string | number }) {
-  return <div className="rounded border border-border bg-card p-4"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-xl font-semibold">{value}</p></div>;
+  return <div className="rounded-2xl border border-border/80 bg-card p-5 shadow-sm"><p className="text-xs font-medium text-muted-foreground">{label}</p><p className="mt-2 text-2xl font-bold tracking-tight">{value}</p></div>;
 }
 
 function Notice({ children }: { children: React.ReactNode }) {
-  return <div className="rounded border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">{children}</div>;
+  return <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-900">{children}</div>;
 }
 
 function PageShell({ children }: { children: React.ReactNode }) {

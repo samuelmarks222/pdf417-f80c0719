@@ -155,16 +155,17 @@ const Account = () => {
 
   return (
     <PageShell>
-      <main className="container max-w-5xl flex-1 py-8">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <main className="container max-w-6xl flex-1 py-8 sm:py-12">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Account</p>
-            <h1 className="mt-1 text-2xl font-semibold">Credits &amp; payments</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Your workspace</p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Credits &amp; payments</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Manage your balance, choose a package, and keep track of every transaction.</p>
           </div>
           {user && (
-            <div className="rounded border border-border bg-card px-5 py-3 text-right">
-              <p className="text-xs text-muted-foreground">Available credits</p>
-              <p className="text-2xl font-semibold">{profile?.credit_balance ?? "—"}</p>
+            <div className="min-w-44 rounded-2xl bg-nav-background px-5 py-4 text-right text-nav-foreground-active shadow-lg shadow-slate-900/10">
+              <p className="text-xs font-medium text-nav-foreground">Available balance</p>
+              <p className="mt-1 text-3xl font-bold tracking-tight">{profile?.credit_balance ?? "—"} <span className="text-sm font-medium text-nav-foreground">credits</span></p>
             </div>
           )}
         </div>
@@ -173,8 +174,9 @@ const Account = () => {
           <SetupNotice />
         ) : !user ? (
           <>
-            <section className="rounded border border-border bg-card p-8 text-center">
-              <h2 className="text-xl font-semibold">Sign in to manage credits</h2>
+            <section className="surface-panel relative overflow-hidden p-8 text-center sm:p-12">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/20 via-primary to-cyan-400" />
+              <h2 className="text-2xl font-bold">Sign in to manage credits</h2>
               <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
                 Use your Google account to buy packages, keep a private transaction history, and generate barcodes.
               </p>
@@ -185,8 +187,11 @@ const Account = () => {
                 Continue with Google
               </Button>
             </section>
-            <section className="mt-8 rounded border border-border bg-card p-5">
-              <h2 className="mb-4 text-lg font-semibold">Credit packages</h2>
+            <section className="surface-panel mt-8 p-5 sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Choose a package</p>
+                <h2 className="mt-1 text-xl font-bold">Credit packages</h2>
+              </div>
               {packages.length === 0 ? <p className="text-sm text-muted-foreground">Package pricing appears here after the Supabase migration is applied.</p> : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} onSelect={setSelectedPackage} />)}
@@ -196,13 +201,14 @@ const Account = () => {
           </>
         ) : (
           <>
-            <section className="mb-8 rounded border border-border bg-card p-5">
+            <section className="surface-panel mb-8 p-5 sm:p-6">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold">Buy barcode credits</h2>
-                  <p className="text-xs text-muted-foreground">One credit is used for each successfully generated PDF417 barcode.</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Top up</p>
+                  <h2 className="mt-1 text-xl font-bold">Buy barcode credits</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">One credit is used for each successfully generated barcode.</p>
                 </div>
-                <Link to="/generator" className="text-sm text-primary hover:underline">Go to generator</Link>
+                <Link to="/generator" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 hover:text-primary">Go to generator <span aria-hidden="true">→</span></Link>
               </div>
 
               {packages.length === 0 ? (
@@ -213,12 +219,12 @@ const Account = () => {
                 </div>
               )}
 
-              <div className="mt-5 grid gap-4 border-t border-border pt-5 md:grid-cols-[1fr_2fr_auto] md:items-end">
+              <div className="mt-6 grid gap-4 rounded-2xl bg-muted/60 p-4 md:grid-cols-[1fr_2fr_auto] md:items-end sm:p-5">
                 <div>
-                  <label className="mb-2 block text-xs font-medium">Payment method</label>
-                  <div className="flex gap-2">
-                    <Button type="button" size="sm" variant={provider === "sasapay" ? "default" : "outline"} onClick={() => setProvider("sasapay")}>SasaPay / M-Pesa</Button>
-                    <Button type="button" size="sm" variant={provider === "plisio" ? "default" : "outline"} onClick={() => setProvider("plisio")}>Crypto / Plisio</Button>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Payment method</label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" size="sm" variant={provider === "sasapay" ? "default" : "outline"} className="rounded-full" onClick={() => setProvider("sasapay")}>SasaPay / M-Pesa</Button>
+                    <Button type="button" size="sm" variant={provider === "plisio" ? "default" : "outline"} className="rounded-full" onClick={() => setProvider("plisio")}>Crypto / Plisio</Button>
                   </div>
                 </div>
                 {provider === "sasapay" ? (
@@ -230,14 +236,17 @@ const Account = () => {
                 ) : (
                   <p className="text-xs text-muted-foreground">Plisio opens a hosted invoice with the supported cryptocurrencies available to your merchant account.</p>
                 )}
-                <Button disabled={!selectedPackage || submitting} onClick={startCheckout}>
+                <Button disabled={!selectedPackage || submitting} onClick={startCheckout} className="rounded-full px-5">
                   {submitting ? "Starting…" : provider === "sasapay" ? "Request M-Pesa payment" : "Continue to crypto checkout"}
                 </Button>
               </div>
             </section>
 
-            <section className="mb-8 rounded border border-border bg-card p-5">
-              <h2 className="mb-4 text-lg font-semibold">Payment history</h2>
+            <section className="surface-panel mb-8 p-5 sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Recent activity</p>
+                <h2 className="mt-1 text-xl font-bold">Payment history</h2>
+              </div>
               {payments.length === 0 ? <p className="text-sm text-muted-foreground">No payments yet.</p> : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left text-xs">
@@ -267,8 +276,11 @@ const Account = () => {
               )}
             </section>
 
-            <section className="rounded border border-border bg-card p-5">
-              <h2 className="mb-4 text-lg font-semibold">Credit history</h2>
+            <section className="surface-panel p-5 sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Account ledger</p>
+                <h2 className="mt-1 text-xl font-bold">Credit history</h2>
+              </div>
               {transactions.length === 0 ? <p className="text-sm text-muted-foreground">No credit activity yet.</p> : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[560px] text-left text-xs">
@@ -310,15 +322,15 @@ function PackageCard({
     <button
       type="button"
       onClick={() => onSelect(item.id)}
-      className={`relative rounded border p-4 text-left transition-colors ${
-        selected ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary/50"
+      className={`relative rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${
+        selected ? "border-primary bg-primary/[0.04] ring-2 ring-primary/15 shadow-md shadow-primary/5" : "border-border bg-card hover:border-primary/40 hover:shadow-md"
       }`}
     >
-      {item.recommended && <span className="absolute right-2 top-2 rounded bg-primary/10 px-2 py-0.5 text-[10px] text-primary">RECOMMENDED</span>}
-      <span className="block font-semibold">{item.name}</span>
-      <span className="mt-2 block text-xl">{item.credits.toLocaleString()} <span className="text-sm text-muted-foreground">credits</span></span>
-      <span className="mt-1 block text-sm">{currency(Number(item.price_usd))}</span>
-      <span className="text-xs text-muted-foreground">{currency(Number(item.price_usd) / item.credits)} per barcode</span>
+      {item.recommended && <span className="absolute right-3 top-3 rounded-full bg-primary/10 px-2.5 py-1 text-[9px] font-bold tracking-wide text-primary">BEST VALUE</span>}
+      <span className="block pr-20 text-sm font-semibold text-muted-foreground">{item.name}</span>
+      <span className="mt-3 block text-2xl font-bold tracking-tight">{item.credits.toLocaleString()} <span className="text-sm font-medium text-muted-foreground">credits</span></span>
+      <span className="mt-2 block text-lg font-semibold">{currency(Number(item.price_usd))}</span>
+      <span className="mt-0.5 block text-xs text-muted-foreground">{currency(Number(item.price_usd) / item.credits)} per barcode</span>
     </button>
   );
 }
@@ -329,8 +341,8 @@ function PageShell({ children }: { children: React.ReactNode }) {
 
 function SetupNotice() {
   return (
-    <div className="rounded border border-amber-300 bg-amber-50 p-5 text-sm text-amber-900">
-      Supabase is not configured for this deployment. Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to the frontend environment, then deploy the database migration and Edge Functions before enabling credit checkout.
+    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
+      Supabase is not configured for this deployment. Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> (or the equivalent <code>VITE_*</code> variables) to the frontend environment, then deploy the database migration and Edge Functions before enabling credit checkout.
     </div>
   );
 }

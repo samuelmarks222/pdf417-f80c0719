@@ -83,20 +83,32 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-1 py-6">
-        <div className="container max-w-5xl">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded border border-border bg-card px-4 py-3">
+      <main className="flex-1 py-8 sm:py-12">
+        <div className="container max-w-6xl">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Barcode workspace</p>
+              <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Create a barcode</h1>
+              <p className="mt-2 text-sm text-muted-foreground">Select a format, enter your test data, and preview before downloading.</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link to="/account" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-sm transition hover:border-primary/40 hover:text-primary">
+                {profile?.credit_balance ?? "—"} credits <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card px-4 py-3.5 shadow-sm sm:px-5">
             <div className="text-sm">
-              <span className="text-muted-foreground">Available credits: </span>
-              <strong>{profile?.credit_balance ?? "—"}</strong>
+              <span className="font-medium text-muted-foreground">Signed in as </span>
+              <strong className="font-semibold">{user?.email ?? "Guest"}</strong>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              {user ? <span className="text-muted-foreground">{user.email}</span> : <span className="text-muted-foreground">Sign in is required to generate a barcode.</span>}
-              <Button asChild size="sm" variant="outline"><Link to="/account">Buy credits</Link></Button>
+              {user ? <span className="text-muted-foreground">New barcode generation uses one credit.</span> : <span className="text-muted-foreground">Sign in is required to generate a barcode.</span>}
+              <Button asChild size="sm" variant="outline" className="rounded-full"><Link to="/account">Manage credits</Link></Button>
             </div>
           </div>
           {!isSupabaseConfigured && (
-            <div className="mb-5 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+            <div className="mb-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
               Credit-backed generation is unavailable until Supabase is configured for this deployment.
             </div>
           )}
@@ -114,19 +126,22 @@ const Index = () => {
           </div>
 
           {/* Raw Data Toggle */}
-          <div className="mt-4 border border-border rounded bg-card p-4">
+          <div className="mt-5 rounded-2xl border border-border/80 bg-card p-4 shadow-sm sm:p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium">Raw Barcode Data</span>
+              <div>
+                <p className="text-sm font-semibold">Raw barcode data</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Inspect the encoded payload if needed.</p>
+              </div>
               <button 
                 onClick={() => setShowRawData(!showRawData)}
-                className="text-xs text-primary hover:underline"
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-primary hover:border-primary/40 hover:bg-primary/5"
               >
                 {showRawData ? "Hide" : "Show"}
               </button>
             </div>
             
             {showRawData && (
-              <pre className="mt-3 bg-muted rounded p-3 text-[11px] overflow-x-auto max-h-48 overflow-y-auto text-muted-foreground">
+              <pre className="mt-4 max-h-48 overflow-x-auto overflow-y-auto rounded-xl border border-border bg-muted/60 p-4 text-[11px] leading-5 text-muted-foreground">
                 {encodedData.split("\n").map((line, i) => (
                   <div key={i}>{line || " "}</div>
                 ))}
@@ -135,17 +150,17 @@ const Index = () => {
           </div>
 
           {/* Need help section - matches pdf417.pro */}
-          <div className="mt-6 text-center">
-            <h3 className="text-lg font-bold mb-3">Need help?</h3>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+          <div className="mt-8 rounded-2xl border border-border/80 bg-card px-5 py-6 text-center shadow-sm sm:px-8">
+            <h3 className="text-lg font-bold">Need a hand?</h3>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Fill in the fields and click the "Create" button and your barcode will appear.
               All barcodes are generated in accordance with official AAMVA documentation.
             </p>
           </div>
 
           {/* Legal Disclaimer */}
-          <div className="mt-4 border border-destructive/20 rounded bg-destructive/5 p-4 text-center">
-            <p className="text-xs text-muted-foreground">
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/80 p-4 text-center">
+            <p className="text-xs leading-5 text-amber-900">
               <strong>⚠️ Disclaimer:</strong> This tool is for <strong>educational and testing purposes only</strong>. 
               Do not use generated barcodes for fraudulent identification or any illegal activity.
             </p>

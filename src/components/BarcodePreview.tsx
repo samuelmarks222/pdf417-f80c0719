@@ -136,9 +136,9 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
   }, [code128Text]);
 
   return (
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="border border-border rounded bg-card p-6">
-        <div className="bg-muted/50 rounded p-8 flex items-center justify-center min-h-[140px]">
+    <div className="grid gap-5 md:grid-cols-2">
+      <div className="surface-panel p-4 sm:p-6">
+        <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-border bg-slate-50/80 p-6 sm:p-8">
           <canvas
             ref={canvasRef}
             className={"max-w-full bg-white rounded"}
@@ -155,8 +155,8 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
           ) : null}
         </div>
 
-        <div className="mt-4 flex justify-center">
-          <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 text-xs">
+        <div className="mt-5 flex justify-center">
+          <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 rounded-full px-5 text-xs">
             {isGenerating ? "Generating…" : generated ? "Generate another PDF417 (1 credit)" : "Create PDF417 (1 credit)"}
           </Button>
         </div>
@@ -168,12 +168,12 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               size="sm"
               onClick={generateBarcode}
               disabled={isGenerating}
-              className="gap-2 text-xs"
+              className="gap-2 rounded-full text-xs"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
               Generate again · 1 credit
             </Button>
-            <Button size="sm" onClick={downloadBarcode} className="gap-2 text-xs">
+            <Button size="sm" onClick={downloadBarcode} className="gap-2 rounded-full text-xs">
               <Download className="h-3.5 w-3.5" />
               Download PNG
             </Button>
@@ -181,8 +181,8 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         )}
       </div>
 
-      <div className="border border-border rounded bg-card p-6">
-        <div className="bg-muted/50 rounded p-8 flex flex-col items-center justify-center min-h-[140px] gap-4">
+      <div className="surface-panel p-4 sm:p-6">
+        <div className="flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border bg-slate-50/80 p-6 sm:p-8">
           <canvas
             ref={canvasRef2}
             className={"max-w-full bg-white rounded"}
@@ -202,8 +202,8 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
           ) : null}
         </div>
 
-        <div className="mt-4 flex justify-center">
-          <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 text-xs">
+        <div className="mt-5 flex justify-center">
+          <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 rounded-full px-5 text-xs">
             {generated2 ? "Generate another Code 128 (1 credit)" : "Create Code 128 (1 credit)"}
           </Button>
         </div>
@@ -214,12 +214,12 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               variant="outline"
               size="sm"
               onClick={generateCode128}
-              className="gap-2 text-xs"
+              className="gap-2 rounded-full text-xs"
             >
               <RefreshCw className={`h-3.5 w-3.5`} />
               Generate again · 1 credit
             </Button>
-            <Button size="sm" onClick={downloadCode128} className="gap-2 text-xs">
+            <Button size="sm" onClick={downloadCode128} className="gap-2 rounded-full text-xs">
               <Download className="h-3.5 w-3.5" />
               Download PNG
             </Button>

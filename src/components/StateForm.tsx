@@ -135,11 +135,10 @@ export function StateForm({ data, onChange }: StateFormProps) {
   ];
 
   return (
-    <div className="border border-border rounded-lg bg-card">
-      {/* Header section - centered like pdf417.pro */}
-      <div className="text-center pt-6 pb-2 px-6">
+    <div className="surface-panel overflow-hidden">
+      <div className="border-b border-border/70 bg-gradient-to-br from-primary/[0.06] via-transparent to-cyan-400/[0.04] px-4 pb-5 pt-6 text-center sm:px-6">
         {/* State & revision selector row */}
-        <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
           <Select value={data.stateCode} onValueChange={handleStateChange}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
@@ -164,14 +163,14 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </SelectContent>
             </Select>
           )}
-          <Button variant="outline" size="sm" onClick={handleRandomize} className="gap-1.5 text-xs">
+          <Button variant="outline" size="sm" onClick={handleRandomize} className="gap-1.5 rounded-full bg-card text-xs">
             <Shuffle className="h-3.5 w-3.5" />
             Random
           </Button>
         </div>
 
         {/* State name heading */}
-        <h2 className="text-3xl font-bold tracking-tight">{stateConfig?.name || "Select State"}</h2>
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{stateConfig?.name || "Select State"}</h2>
         
         {/* Revision info with gold star */}
         {revision && (
@@ -190,7 +189,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         )}
 
         {/* Scanner badges - exactly like pdf417.pro */}
-        <div className="flex items-center justify-center gap-2 mt-3 mb-2">
+        <div className="mt-3 mb-2 flex flex-wrap items-center justify-center gap-2">
           {scanners.map((s) => (
             <span
               key={s.name}
@@ -207,10 +206,10 @@ export function StateForm({ data, onChange }: StateFormProps) {
       </div>
 
       {/* Form fields - matching pdf417.pro exact layout */}
-      <div className="px-6 pb-6 space-y-3">
+      <div className="space-y-4 p-4 sm:p-6">
         
         {/* Row 1: DL Number | First name | Last name | Middle name */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Label className="text-xs flex items-center">
               DL Number <InfoIcon text="State-specific format" /> <CalcIcon onClick={handleCalcDLNumber} />
@@ -230,7 +229,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
                 </Label>
                 <Input value={data.lastName} onChange={(e) => updateField("lastName", e.target.value.toUpperCase())} placeholder="Doe" className="h-9 text-sm mt-1" />
               </div>
-              <div className="col-span-2">
+              <div className="col-span-1 sm:col-span-2">
                 <Label className="text-xs flex items-center">
                   First & Middle name <CalcIcon onClick={handleCalcFirstMiddleName} />
                 </Label>
@@ -273,26 +272,26 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 2: Address | City | Zip code | DL Class | Sex | Donor */}
-        <div className="grid grid-cols-12 gap-3">
-          <div className="col-span-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-12">
+          <div className="col-span-2 lg:col-span-3">
             <Label className="text-xs">Address</Label>
             <Input value={data.streetAddress} onChange={(e) => updateField("streetAddress", e.target.value.toUpperCase())} placeholder="516 Anson Ct" className="h-9 text-sm mt-1" />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">City</Label>
             <Input value={data.city} onChange={(e) => updateField("city", e.target.value.toUpperCase())} placeholder="Ronhert Park" className="h-9 text-sm mt-1" />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">Zip code</Label>
             <Input value={data.postalCode} onChange={(e) => updateField("postalCode", e.target.value.replace(/\D/g, "").slice(0, 9))} placeholder="875420000" maxLength={9} className="h-9 text-sm mt-1" />
           </div>
           {fields?.hasDLClass && (
-            <div className="col-span-1">
+            <div className="col-span-1 lg:col-span-1">
               <Label className="text-xs">DL Class</Label>
               <Input value={data.dlClass} onChange={(e) => updateField("dlClass", e.target.value.toUpperCase())} placeholder="C" maxLength={5} className="h-9 text-sm mt-1" />
             </div>
           )}
-          <div className="col-span-2">
+          <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">Sex</Label>
             <Select value={data.gender} onValueChange={(v) => updateField("gender", v)}>
               <SelectTrigger className="h-9 text-sm mt-1">
@@ -306,7 +305,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
             </Select>
           </div>
           {fields?.hasDonor && (
-            <div className="col-span-2">
+            <div className="col-span-1 lg:col-span-2">
               <Label className="text-xs">Donor (Y/N)</Label>
               <Select value={data.donor} onValueChange={(v) => updateField("donor", v)}>
                 <SelectTrigger className="h-9 text-sm mt-1" aria-label="Donor">
@@ -322,7 +321,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </p>
             </div>
           )}
-          <div className="col-span-2">
+          <div className="col-span-2 lg:col-span-2">
             <Label className="text-xs">Compliance Type</Label>
             <Select value={data.complianceType} onValueChange={(v) => updateField("complianceType", v)}>
               <SelectTrigger className="h-9 text-sm mt-1" aria-label="Compliance Type">
@@ -341,7 +340,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 3: Birth date | Issue date | Expiry date | DD | ICN */}
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <div>
             <Label className="text-xs flex items-center">
               Birth date <InfoIcon text="MMDDYYYY format" /> <CalcIcon onClick={() => {}} />
@@ -379,7 +378,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 4: Restrictions | Endorsement | Height | Weight */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {fields?.hasRestrictions && (
             <div>
               <Label className="text-xs">Restrictions</Label>
@@ -415,7 +414,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 5: Eye/Hair Colors - 4 cols like pdf417.pro */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {fields?.hasEyeColorOnDL && (
             <div>
               <Label className="text-xs">Eye (as on DL)</Label>
@@ -480,7 +479,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
         {/* Row 6: Race, Name Suffix, Revision Date, Safe Driver (conditional) */}
         {(fields?.hasRace || fields?.hasNameSuffix || fields?.hasSafeDriver || fields?.hasRevisionDate) && (
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {fields?.hasRace && (
               <div>
                 <Label className="text-xs">Race (ANSI D-20)</Label>
@@ -545,7 +544,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
         {/* Create button - centered like pdf417.pro */}
         <div className="flex justify-center pt-4 pb-2">
-          <Button className="px-10 h-10 text-sm font-semibold">
+          <Button className="h-11 rounded-full px-10 text-sm font-semibold shadow-md shadow-primary/20">
             Create
           </Button>
         </div>

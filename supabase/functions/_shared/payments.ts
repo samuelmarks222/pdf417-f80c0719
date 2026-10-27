@@ -1,7 +1,7 @@
 export async function getSasapayToken() {
   const baseUrl = Deno.env.get("SASAPAY_BASE_URL");
-  const consumerKey = Deno.env.get("SASAPAY_CONSUMER_KEY");
-  const consumerSecret = Deno.env.get("SASAPAY_CONSUMER_SECRET");
+  const consumerKey = Deno.env.get("SASAPAY_CLIENT_ID") ?? Deno.env.get("SASAPAY_CONSUMER_KEY");
+  const consumerSecret = Deno.env.get("SASAPAY_CLIENT_SECRET") ?? Deno.env.get("SASAPAY_CONSUMER_SECRET");
   if (!baseUrl || !consumerKey || !consumerSecret) {
     throw new Error("SasaPay credentials and base URL are required");
   }

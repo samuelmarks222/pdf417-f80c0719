@@ -36,7 +36,7 @@ Deno.serve(async (request: Request) => {
 
   const client = serviceClient();
   if (provider === "plisio") {
-    const secret = Deno.env.get("PLISIO_SECRET_KEY");
+    const secret = Deno.env.get("PLISIO_IPN_SECRET") ?? Deno.env.get("PLISIO_SECRET_KEY");
     if (!secret) return jsonResponse({ error: "Payment callback verification is not configured" }, 503);
     if (!await verifyPlisioCallback(payload, secret)) {
       await recordPaymentEvent(client, null, provider, "invalid_signature", "Callback signature did not match.");

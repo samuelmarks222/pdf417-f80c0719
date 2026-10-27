@@ -56,7 +56,7 @@ Deno.serve(async (request: Request) => {
     amountDue = Math.ceil(Number(pkg.price_usd) * exchangeRate);
     currency = "KES";
   } else {
-    if (!Deno.env.get("PLISIO_SECRET_KEY")) {
+    if (!Deno.env.get("PLISIO_API_KEY") && !Deno.env.get("PLISIO_SECRET_KEY")) {
       return jsonResponse({ error: "Plisio is not configured for this deployment." }, 503);
     }
     if (!appOrigin) return jsonResponse({ error: "APP_ORIGIN is required for Plisio return URLs." }, 503);
@@ -82,7 +82,7 @@ Deno.serve(async (request: Request) => {
 
   try {
     if (provider === "plisio") {
-      const apiKey = Deno.env.get("PLISIO_SECRET_KEY")!;
+      const apiKey = Deno.env.get("PLISIO_API_KEY") ?? Deno.env.get("PLISIO_SECRET_KEY")!;
       const params = new URLSearchParams({
         api_key: apiKey,
         order_number: paymentId,

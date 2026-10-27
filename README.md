@@ -90,17 +90,18 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
 4. Configure Edge Function secrets in the Supabase project (never in the frontend):
 
    ```sh
-   supabase secrets set APP_ORIGIN=https://your-domain.example
-   supabase secrets set SASAPAY_BASE_URL=https://sandbox.sasapay.app/api/v1
-   supabase secrets set SASAPAY_CONSUMER_KEY=<sandbox-consumer-key>
-   supabase secrets set SASAPAY_CONSUMER_SECRET=<sandbox-consumer-secret>
+   supabase secrets set APP_ORIGIN=https://pdf417-f80c0719.vercel.app
+   supabase secrets set SASAPAY_BASE_URL=https://api.sasapay.app
+   supabase secrets set SASAPAY_CLIENT_ID=<rotated-SasaPay-client-id>
+   supabase secrets set SASAPAY_CLIENT_SECRET=<rotated-SasaPay-client-secret>
    supabase secrets set SASAPAY_MERCHANT_CODE=<merchant-code>
    supabase secrets set SASAPAY_NETWORK_CODE=<M-Pesa-network-code>
-   supabase secrets set SASAPAY_KES_PER_USD=<configured-exchange-rate>
-   supabase secrets set PLISIO_SECRET_KEY=<Plisio-shop-secret-key>
+   supabase secrets set SASAPAY_KES_PER_USD=129
+   supabase secrets set PLISIO_API_KEY=<rotated-Plisio-API-key>
+   supabase secrets set PLISIO_IPN_SECRET=<rotated-Plisio-IPN-secret>
    ```
 
-   Set `SASAPAY_BASE_URL` to the production API base only after SasaPay activates the merchant. The default status path is `payments/transaction-status/`; if your active SasaPay environment documents a different path, set the optional `SASAPAY_STATUS_PATH` secret accordingly. The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using the required `SASAPAY_KES_PER_USD` setting; set and maintain that rate according to the merchant's pricing policy. Plisio invoices use USD and its hosted invoice lists enabled crypto options.
+   The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using `SASAPAY_KES_PER_USD`; the configured rate above is 129 KES per USD. Use the production base URL documented for your SasaPay merchant. The default status path is `payments/transaction-status/`; if your merchant's active API documents a different path, set optional `SASAPAY_STATUS_PATH`. The SasaPay merchant network code is also required. Plisio invoices use USD and its hosted invoice lists enabled crypto options; its callback signature must be verified with the separate `PLISIO_IPN_SECRET`. The Edge Function constructs the callback URL for this Supabase project; do not configure a callback URL belonging to a different application.
 5. Deploy the Edge Functions:
 
    ```sh

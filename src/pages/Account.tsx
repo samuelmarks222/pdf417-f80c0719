@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { ArrowRight, Check, ChevronRight, CreditCard, ShieldCheck, Smartphone } from "lucide-react";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface CreditPackage {
   id: string;
@@ -136,6 +137,17 @@ const Account = () => {
       const { data, error } = await supabase.functions.invoke("create-payment", {
         body: { packageId: selectedPackage, provider, phoneNumber },
       });
+      if (error instanceof FunctionsHttpError) {
+        const responseBody: unknown = await error.context.json().catch(() => null);
+        if (
+          responseBody !== null
+          && typeof responseBody === "object"
+          && "error" in responseBody
+          && typeof responseBody.error === "string"
+        ) {
+          throw new Error(responseBody.error);
+        }
+      }
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 

@@ -95,10 +95,17 @@ Deno.serve(async (request: Request) => {
         json: "true",
       });
       const response = await fetch(`https://api.plisio.net/api/v1/invoices/new?${params}`);
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
       const invoice = result?.data;
       if (!response.ok || result?.status !== "success" || !invoice?.txn_id || !invoice?.invoice_url) {
-        throw new Error("Plisio did not return a valid invoice.");
+        const providerMessage = result?.data?.message ?? result?.message ?? result?.error;
+        const safeProviderMessage = typeof providerMessage === "string"
+          ? providerMessage.replaceAll(apiKey, "[redacted]").slice(0, 300)
+          : "";
+        const details = safeProviderMessage
+          ? `: ${safeProviderMessage}`
+          : ` (HTTP ${response.status}; check that the Plisio API key and shop are active)`;
+        throw new Error(`Plisio invoice request failed${details}`);
       }
 
       const { error } = await client.from("credit_payments").update({
@@ -171,6 +178,9 @@ Deno.serve(async (request: Request) => {
       payload: {},
     });
     console.error(`${provider} checkout error:`, message);
-    return jsonResponse({ error: "Could not start provider checkout. Please try again later." }, 502);
+    const userMessage = provider === "plisio"
+      ? message
+      : "Could not start provider checkout. Please try again later.";
+    return jsonResponse({ error: userMessage }, 502);
   }
 });

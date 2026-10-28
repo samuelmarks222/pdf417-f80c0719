@@ -149,7 +149,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         </div>
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">
-          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-slate-50/80 p-5 sm:min-h-[240px]">
+          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted/45 p-5 sm:min-h-[240px]">
             <canvas
               ref={canvasRef}
               className={generated ? "block h-auto max-h-40 w-full max-w-[600px] rounded-lg bg-white object-contain" : "hidden"}
@@ -215,7 +215,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         </div>
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">
-          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-slate-50/80 p-5 sm:min-h-[240px]">
+          <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted/45 p-5 sm:min-h-[240px]">
             <canvas
               ref={canvasRef2}
               className={generated2 ? "block h-auto max-h-40 w-full max-w-[500px] rounded-lg bg-white object-contain" : "hidden"}

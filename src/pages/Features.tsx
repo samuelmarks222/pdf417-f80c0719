@@ -51,28 +51,28 @@ const Features = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-1 py-12">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h1 className="font-mono text-3xl font-bold mb-4">
+      <main className="flex-1 py-12 sm:py-16">
+        <div className="container max-w-7xl">
+          <div className="mb-12 max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Barcode workspace</p>
+            <h1 className="mb-4 mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
               All <span className="text-primary">Features</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to generate valid, scannable PDF417 barcodes 
-              for US Driver's Licenses.
+            <p className="max-w-2xl text-muted-foreground">
+              Explore the tools available in this PDF417 and Code 128 barcode generator, including U.S. state formats, previews, and PNG downloads.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {featuresList.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card 
                   key={index}
-                  className="p-6 bg-card border-border hover:border-primary/50 transition-colors group"
+                  className="rounded-2xl border-border/80 bg-white p-6 shadow-[0_8px_28px_rgba(39,70,61,0.04)] transition-all group-hover:-translate-y-0.5 group-hover:border-primary/40"
                 >
                   <Icon className="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-mono text-lg font-semibold mb-2">{feature.title}</h3>
+                  <h3 className="mb-2 text-lg font-bold">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {feature.description}
                   </p>
@@ -84,13 +84,13 @@ const Features = () => {
           {/* Technical Details */}
           <div className="mt-16">
             <div className="text-center mb-12">
-              <h2 className="font-mono text-2xl font-bold mb-4">Technical Details</h2>
+              <h2 className="mb-4 text-2xl font-bold">Technical Details</h2>
               <div className="section-divider max-w-md mx-auto" />
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <Card className="p-6 bg-card border-border">
-                <h4 className="font-mono font-semibold mb-4">AAMVA Field Support</h4>
+              <Card className="rounded-2xl border-border/80 bg-white p-6">
+                <h4 className="mb-4 font-semibold">AAMVA Field Support</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• DAQ - Customer ID Number (License Number)</li>
                   <li>• DCS - Customer Family Name</li>
@@ -110,8 +110,8 @@ const Features = () => {
                 </ul>
               </Card>
 
-              <Card className="p-6 bg-card border-border">
-                <h4 className="font-mono font-semibold mb-4">Barcode Specifications</h4>
+              <Card className="rounded-2xl border-border/80 bg-white p-6">
+                <h4 className="mb-4 font-semibold">Barcode Specifications</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• Format: PDF417</li>
                   <li>• Error Correction Level: 5</li>

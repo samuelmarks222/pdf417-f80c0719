@@ -136,7 +136,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
   return (
     <div className="surface-panel overflow-hidden">
-      <div className="border-b border-border/70 bg-gradient-to-br from-primary/[0.06] via-transparent to-cyan-400/[0.04] px-4 pb-5 pt-6 text-center sm:px-6">
+      <div className="border-b border-border/70 bg-gradient-to-br from-primary/[0.07] via-transparent to-amber-400/[0.06] px-4 pb-5 pt-6 text-center sm:px-6">
         {/* State & revision selector row */}
         <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
           <Select value={data.stateCode} onValueChange={handleStateChange}>

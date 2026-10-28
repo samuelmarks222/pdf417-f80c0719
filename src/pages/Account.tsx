@@ -218,7 +218,7 @@ const Account = () => {
         ) : (
           <>
             <section className="surface-panel mb-8 overflow-hidden">
-              <div className="relative overflow-hidden border-b border-border/70 bg-gradient-to-br from-primary/[0.08] via-card to-cyan-400/[0.04] px-5 py-6 sm:px-7 sm:py-7">
+              <div className="relative overflow-hidden border-b border-border/70 bg-gradient-to-br from-primary/[0.08] via-card to-amber-400/[0.06] px-5 py-6 sm:px-7 sm:py-7">
                 <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-primary/[0.07] blur-3xl" />
                 <div className="relative flex flex-wrap items-end justify-between gap-4">
                   <div>
@@ -244,7 +244,7 @@ const Account = () => {
                 )}
               </div>
 
-              <div className="border-t border-border/70 bg-slate-50/60 p-5 sm:p-7">
+              <div className="border-t border-border/70 bg-muted/35 p-5 sm:p-7">
                 <div className="mb-5">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 2</p>
                   <h3 className="mt-2 text-xl font-bold tracking-tight sm:text-2xl">Choose how you’d like to pay</h3>
@@ -466,7 +466,7 @@ function PackageCard({
           : "border-border/80 bg-card hover:border-primary/35 hover:shadow-lg hover:shadow-slate-900/5"
       }`}
     >
-      {item.recommended && <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-blue-400 to-cyan-400" />}
+      {item.recommended && <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-emerald-500 to-amber-400" />}
       <span className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2">
           <span className={`truncate text-xs font-bold uppercase tracking-[0.12em] ${item.recommended ? "text-primary" : "text-muted-foreground"}`}>{item.name}</span>

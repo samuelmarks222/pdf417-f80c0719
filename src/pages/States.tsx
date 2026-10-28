@@ -18,7 +18,6 @@ const States = () => {
     setExpandedStates(newExpanded);
   };
 
-  // Group states into 4 columns like pdf417.pro
   const statesPerColumn = Math.ceil(STATE_CONFIGS.length / 4);
   const columns = [
     STATE_CONFIGS.slice(0, statesPerColumn),
@@ -28,21 +27,25 @@ const States = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-mono">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
       <main className="flex-1">
         <h1 className="sr-only">List of available states and regions</h1>
 
-        <section className="container p-4 pb-8">
-          <h3 className="text-center pb-4 pt-3 text-2xl font-semibold">
-            USA 🇺🇸
-          </h3>
+        <section className="container max-w-7xl px-4 pb-12 pt-8 sm:px-6 sm:pb-16">
+          <div className="mb-7">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Available formats</p>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">USA state formats</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Browse available state and District of Columbia revisions, then open a format in the PDF417 generator.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-4 gap-0">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {columns.map((column, colIndex) => (
               <div key={colIndex}>
-                <ul className="divide-y divide-border border border-border rounded-lg overflow-hidden">
+                <ul className="surface-panel divide-y divide-border/70 overflow-hidden">
                   {column.map((state) => (
                     <li key={state.code} className="bg-card">
                       {state.revisions.length === 1 ? (

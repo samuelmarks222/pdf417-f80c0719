@@ -6,52 +6,52 @@
 
 @layer base {
   :root {
-    --background: 220 24% 98%;
-    --foreground: 222 38% 13%;
+    --background: 45 30% 98%;
+    --foreground: 160 17% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 38% 13%;
+    --card-foreground: 160 17% 13%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 38% 13%;
+    --popover: 45 35% 99%;
+    --popover-foreground: 160 17% 13%;
 
-    --primary: 218 91% 52%;
+    --primary: 169 84% 19%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 216 22% 95%;
-    --secondary-foreground: 222 38% 13%;
+    --secondary: 145 22% 93%;
+    --secondary-foreground: 160 17% 16%;
 
-    --muted: 216 22% 95%;
-    --muted-foreground: 218 12% 45%;
+    --muted: 145 18% 94%;
+    --muted-foreground: 155 10% 42%;
 
-    --accent: 216 22% 95%;
-    --accent-foreground: 222 38% 13%;
+    --accent: 145 22% 93%;
+    --accent-foreground: 160 17% 16%;
 
     --destructive: 0 72% 54%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 218 20% 88%;
-    --input: 218 20% 86%;
-    --ring: 218 91% 52%;
+    --border: 145 13% 87%;
+    --input: 145 13% 84%;
+    --ring: 169 84% 24%;
 
     --radius: 0.75rem;
 
     /* Navigation */
-    --nav-background: 222 38% 13%;
-    --nav-foreground: 218 15% 72%;
+    --nav-background: 169 84% 19%;
+    --nav-foreground: 145 20% 84%;
     --nav-foreground-active: 0 0% 100%;
 
     --success: 158 64% 38%;
     --warning: 38 92% 50%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 38% 13%;
-    --sidebar-primary: 218 91% 52%;
+    --sidebar-foreground: 160 17% 13%;
+    --sidebar-primary: 169 84% 19%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 216 22% 95%;
-    --sidebar-accent-foreground: 222 38% 13%;
-    --sidebar-border: 218 20% 88%;
-    --sidebar-ring: 218 91% 52%;
+    --sidebar-accent: 145 22% 93%;
+    --sidebar-accent-foreground: 160 17% 16%;
+    --sidebar-border: 145 13% 87%;
+    --sidebar-ring: 169 84% 24%;
   }
 }
 
@@ -64,7 +64,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'DM Sans', 'Segoe UI', sans-serif;
     font-size: 15px;
-    background-image: radial-gradient(ellipse at 50% -20%, hsl(218 91% 52% / 0.07), transparent 42%);
+    background-image: radial-gradient(ellipse at 50% -20%, hsl(150 28% 72% / 0.12), transparent 45%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -81,13 +81,13 @@
   }
 
   ::selection {
-    background: hsl(218 91% 52% / 0.18);
+    background: hsl(165 54% 46% / 0.2);
   }
 }
 
 @layer components {
   .surface-panel {
-    @apply rounded-2xl border border-border/80 bg-card shadow-sm;
+    @apply rounded-2xl border border-border/80 bg-card shadow-[0_8px_28px_rgba(39,70,61,0.04)];
   }
 
   .scanner-badge {

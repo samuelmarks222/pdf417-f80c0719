@@ -25,8 +25,8 @@ export function Header() {
         className={cn(
           "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
           active
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            ? "bg-[#eaf4ee] text-[#07584e]"
+            : "text-[#52615d] hover:bg-[#f1f5f1] hover:text-[#07584e]",
         )}
       >
         {label}
@@ -35,13 +35,13 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/90 backdrop-blur-xl">
-      <div className="container flex h-[68px] max-w-7xl items-center justify-between gap-5">
+    <header className="sticky top-0 z-40 w-full border-transparent bg-transparent">
+      <div className="container my-3 flex h-16 max-w-7xl items-center justify-between gap-5 rounded-full border border-white/80 bg-white/95 px-4 shadow-[0_8px_30px_rgba(27,45,38,0.08)] backdrop-blur-xl sm:px-6">
         <Link to="/" aria-label={`${settings.site_name} home`} className="flex shrink-0 items-center gap-2.5">
           {settings.logo_url ? (
             <img src={settings.logo_url} alt="" className="h-9 max-w-36 object-contain" />
           ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-sm shadow-primary/25">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#07584e] text-sm font-bold text-white shadow-sm shadow-[#07584e]/20">
               {settings.site_name.charAt(0).toUpperCase()}
             </span>
           )}
@@ -90,7 +90,7 @@ export function Header() {
                 const error = await signInWithGoogle();
                 if (error) toast.error(error);
               }}
-              className="rounded-full px-4"
+              className="rounded-full bg-[#07584e] px-4 text-white hover:bg-[#06483f]"
             >
               Sign in
             </Button>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shuffle, Calculator, Info, Check } from "lucide-react";
+import { Shuffle, Calculator, Info, Check, Star } from "lucide-react";
 import { 
   EYE_COLORS, 
   EYE_COLORS_ON_DL,
@@ -177,12 +177,13 @@ export function StateForm({ data, onChange }: StateFormProps) {
           <p className="text-sm text-muted-foreground mt-1">
             Rev. {revision.revisionDate} ({revision.aamvaVersion}{revision.jurisdictionVersion})
             {revision.realIdCompliant && (
-              <span className="ml-2 inline-block">
-                <img 
-                  src="https://www.keesingtechnologies.com/wp-content/uploads/2020/11/realid-gold-star-circle.svg" 
-                  alt="REAL ID Compliant" 
-                  className="inline h-5 w-5"
-                />
+              <span
+                role="img"
+                aria-label="REAL ID Compliant"
+                title="REAL ID Compliant"
+                className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-white align-middle"
+              >
+                <Star className="h-3 w-3 fill-current" />
               </span>
             )}
           </p>

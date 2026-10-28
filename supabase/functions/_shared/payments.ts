@@ -1,12 +1,3 @@
-export function normalizeSasapayBaseUrl(baseUrl: string) {
-  const normalized = baseUrl.trim().replace(/\/+$/, "");
-  return /\/api\/v1$/i.test(normalized) ? normalized : `${normalized}/api/v1`;
-}
-
-function sasapayApiUrl(baseUrl: string, path: string) {
-  return `${normalizeSasapayBaseUrl(baseUrl)}/${path.replace(/^\/+/, "")}`;
-}
-
 import { sasapayApiUrl } from "./payment-utils.ts";
 
 export { normalizeSasapayBaseUrl, verifyPlisioCallback } from "./payment-utils.ts";

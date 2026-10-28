@@ -103,7 +103,9 @@ const Index = () => {
               <strong className="font-semibold">{user?.email ?? "Guest"}</strong>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              {user ? <span className="text-muted-foreground">New barcode generation uses one credit.</span> : <span className="text-muted-foreground">Sign in is required to generate a barcode.</span>}
+              <span className="text-muted-foreground">
+                Code 128 is always free. {user ? "PDF417 generation uses one credit." : "Sign in to generate a credit-based PDF417 barcode."}
+              </span>
               <Button asChild size="sm" variant="outline" className="rounded-full"><Link to="/account">Manage credits</Link></Button>
             </div>
           </div>

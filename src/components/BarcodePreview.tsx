@@ -99,9 +99,6 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
       });
 
       if (!canvasRef2.current.getContext("2d")) throw new Error("Could not display generated barcode.");
-      const canPublish = await chargeForGeneration("code128", code128Text);
-      if (!canPublish) return;
-
       canvasRef2.current.width = output.width;
       canvasRef2.current.height = output.height;
       const context = canvasRef2.current.getContext("2d");
@@ -148,7 +145,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               <p className="mt-0.5 text-xs text-muted-foreground">State-specific format</p>
             </div>
           </div>
-          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit</span>
+          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit per generation</span>
         </div>
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">
@@ -211,10 +208,10 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             </span>
             <div className="min-w-0">
               <h2 className="truncate text-base font-bold">Code 128 barcode</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">Custom text format</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Custom text format · no credits required</p>
             </div>
           </div>
-          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit</span>
+          <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1.5 text-[11px] font-semibold text-emerald-800">Always free</span>
         </div>
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">

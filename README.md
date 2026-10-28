@@ -87,10 +87,12 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
    supabase db push
    ```
 
+   For an existing project, check `supabase migration list` and `supabase db push --dry-run` first. If a migration was already applied manually in the SQL Editor but is missing from the migration history, verify its schema and repair the history before pushing; do not blindly rerun an already-applied migration.
+
 4. Configure Edge Function secrets in the Supabase project (never in the frontend):
 
    ```sh
-   supabase secrets set APP_ORIGIN=https://pdf417-f80c0719.vercel.app
+   supabase secrets set APP_ORIGIN=https://pdf417.live
    supabase secrets set SASAPAY_BASE_URL=https://api.sasapay.app
    supabase secrets set SASAPAY_CLIENT_ID=<rotated-SasaPay-client-id>
    supabase secrets set SASAPAY_CLIENT_SECRET=<rotated-SasaPay-client-secret>
@@ -118,6 +120,8 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
    ```
 
    Do not grant admin access based on a client-supplied email. Package defaults are seeded only when absent, so package edits survive future deployments. Admins can update the ten seeded packages, and confirmed payments retain the package quantity and USD price captured at checkout.
+
+   The `/admin` page also includes site appearance, homepage content, and SEO settings. Apply the migrations before using this section. Administrators can update the public site name, tagline, HTTPS logo/favicon URLs, homepage hero copy, footer notice, SEO metadata, canonical origin, indexing directive, and social-sharing image. These values are stored in `public.site_settings`, read publicly, and writable only through an administrator-checked RPC. The shared header, homepage, footer, favicon, and document metadata use the saved values. Payment provider credentials remain Supabase Edge Function secrets and are never exposed in the browser or admin UI.
 
 ### Verification notes
 

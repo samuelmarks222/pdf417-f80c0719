@@ -3,7 +3,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/useAuth";
+import type { SiteSettings } from "@/contexts/site-settings-context";
+import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -240,6 +243,8 @@ const Admin = () => {
           <Notice>This account is not authorized to access the admin panel.</Notice>
         ) : (
           <>
+            <SiteSettingsPanel />
+
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Stat label="Total users" value={stats?.total_users ?? "—"} />
               <Stat label="Barcodes generated" value={stats?.total_barcodes ?? "—"} />
@@ -373,6 +378,193 @@ const Admin = () => {
     </PageShell>
   );
 };
+
+function SiteSettingsPanel() {
+  const { settings, loading, error: settingsError, refresh } = useSiteSettings();
+  const [draft, setDraft] = useState(settings);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  useEffect(() => {
+    setDraft(settings);
+  }, [settings]);
+
+  const update = (key: keyof SiteSettings, value: string) => {
+    setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const save = async () => {
+    if (!supabase) return;
+    if (!isHttpsUrl(draft.canonical_url) || !isOriginUrl(draft.canonical_url)) {
+      toast.error("Canonical URL must be an HTTPS site origin, such as https://pdf417.live.");
+      return;
+    }
+    for (const [label, value] of [
+      ["Logo", draft.logo_url],
+      ["Favicon", draft.favicon_url],
+      ["Social sharing image", draft.og_image_url],
+    ] as const) {
+      if (value && !isHttpsUrl(value)) {
+        toast.error(`${label} URL must start with https://.`);
+        return;
+      }
+    }
+
+    setSavingSettings(true);
+    const { error } = await supabase.rpc("admin_update_site_settings", {
+      p_site_name: draft.site_name,
+      p_site_tagline: draft.site_tagline,
+      p_logo_url: draft.logo_url,
+      p_favicon_url: draft.favicon_url,
+      p_meta_title: draft.meta_title,
+      p_meta_description: draft.meta_description,
+      p_meta_keywords: draft.meta_keywords,
+      p_canonical_url: draft.canonical_url,
+      p_meta_robots: draft.meta_robots,
+      p_og_image_url: draft.og_image_url,
+      p_twitter_handle: draft.twitter_handle,
+      p_hero_badge: draft.hero_badge,
+      p_hero_title: draft.hero_title,
+      p_hero_highlight: draft.hero_highlight,
+      p_hero_description: draft.hero_description,
+      p_footer_notice: draft.footer_notice,
+    });
+    setSavingSettings(false);
+    if (error) {
+      toast.error(`Could not save site settings: ${error.message}`);
+      return;
+    }
+    const refreshed = await refresh();
+    if (!refreshed) {
+      toast.error("Settings were saved, but the live preview could not refresh. Reload the page to retry.");
+      return;
+    }
+    toast.success("Site settings saved and published.");
+  };
+
+  return (
+    <section className="surface-panel space-y-6 p-5 sm:p-6">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Website</p>
+        <h2 className="mt-1 text-xl font-bold">Site appearance, content &amp; SEO</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Changes publish to the shared site settings used by the header, homepage, footer, and page metadata.
+        </p>
+      </div>
+
+      {settingsError && (
+        <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+          Could not load site settings: {settingsError}. Apply the site-settings migration, then reload this page.
+        </p>
+      )}
+
+      <div>
+        <h3 className="mb-3 text-sm font-semibold">Branding</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SettingsInput label="Site name" value={draft.site_name} onChange={(value) => update("site_name", value)} />
+          <SettingsInput label="Tagline" value={draft.site_tagline} onChange={(value) => update("site_tagline", value)} />
+          <SettingsInput label="Logo image URL (HTTPS)" value={draft.logo_url} onChange={(value) => update("logo_url", value)} placeholder="https://example.com/logo.png" />
+          <SettingsInput label="Favicon URL (HTTPS)" value={draft.favicon_url} onChange={(value) => update("favicon_url", value)} placeholder="https://example.com/favicon.png" />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-sm font-semibold">Homepage content</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SettingsInput label="Hero badge" value={draft.hero_badge} onChange={(value) => update("hero_badge", value)} />
+          <SettingsInput label="Main heading" value={draft.hero_title} onChange={(value) => update("hero_title", value)} />
+          <SettingsInput label="Highlighted heading" value={draft.hero_highlight} onChange={(value) => update("hero_highlight", value)} />
+          <SettingsInput label="Footer notice" value={draft.footer_notice} onChange={(value) => update("footer_notice", value)} />
+          <SettingsTextarea label="Homepage description" value={draft.hero_description} onChange={(value) => update("hero_description", value)} />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-sm font-semibold">Search and social metadata</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SettingsInput label="SEO page title" value={draft.meta_title} onChange={(value) => update("meta_title", value)} />
+          <SettingsInput label="Canonical site origin" value={draft.canonical_url} onChange={(value) => update("canonical_url", value)} placeholder="https://pdf417.live" />
+          <SettingsTextarea label="SEO description" value={draft.meta_description} onChange={(value) => update("meta_description", value)} />
+          <SettingsTextarea label="SEO keywords" value={draft.meta_keywords} onChange={(value) => update("meta_keywords", value)} />
+          <SettingsInput label="Social sharing image URL (HTTPS)" value={draft.og_image_url} onChange={(value) => update("og_image_url", value)} placeholder="https://example.com/social-image.png" />
+          <SettingsInput label="X/Twitter handle" value={draft.twitter_handle} onChange={(value) => update("twitter_handle", value)} placeholder="@yourhandle" />
+          <label className="grid gap-1.5 text-sm font-medium">
+            Search engine indexing
+            <select
+              value={draft.meta_robots}
+              onChange={(event) => update("meta_robots", event.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm font-normal"
+            >
+              <option value="index,follow">Allow indexing</option>
+              <option value="noindex,nofollow">Prevent indexing</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="max-w-2xl text-xs leading-5 text-muted-foreground">
+          Payment API keys remain protected as Supabase Edge Function secrets and are intentionally not editable or visible here.
+        </p>
+        <Button onClick={save} disabled={savingSettings || loading || Boolean(settingsError)} className="shrink-0">
+          {savingSettings ? "Publishing…" : loading ? "Loading settings…" : "Save and publish"}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+function SettingsInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm font-medium">
+      {label}
+      <Input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />
+    </label>
+  );
+}
+
+function SettingsTextarea({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm font-medium">
+      {label}
+      <Textarea value={value} onChange={(event) => onChange(event.target.value)} rows={3} />
+    </label>
+  );
+}
+
+function isHttpsUrl(value: string) {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function isOriginUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.pathname === "/" && !url.search && !url.hash;
+  } catch {
+    return false;
+  }
+}
 
 function updatePackage(
   id: string,

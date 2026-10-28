@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/useAuth";
+import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -12,6 +13,7 @@ const navItems = [
 export function Header() {
   const location = useLocation();
   const { configured, user, profile, signInWithGoogle, signOut } = useAuth();
+  const { settings } = useSiteSettings();
 
   const navLink = (path: string, label: string) => {
     const active = location.pathname === path;
@@ -35,12 +37,21 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/90 backdrop-blur-xl">
       <div className="container flex h-[68px] max-w-7xl items-center justify-between gap-5">
-        <Link to="/" aria-label="PDF417 Pro home" className="flex shrink-0 items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-sm shadow-primary/25">
-            P
-          </span>
-          <span className="text-[15px] font-bold tracking-tight text-foreground">
-            PDF417<span className="text-primary">.PRO</span>
+        <Link to="/" aria-label={`${settings.site_name} home`} className="flex shrink-0 items-center gap-2.5">
+          {settings.logo_url ? (
+            <img src={settings.logo_url} alt="" className="h-9 max-w-36 object-contain" />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-sm shadow-primary/25">
+              {settings.site_name.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <span className="flex min-w-0 flex-col">
+            <span className="text-[15px] font-bold leading-tight tracking-tight text-foreground">
+              {settings.site_name}
+            </span>
+            <span className="hidden truncate text-[10px] leading-tight text-muted-foreground sm:block">
+              {settings.site_tagline}
+            </span>
           </span>
         </Link>
 

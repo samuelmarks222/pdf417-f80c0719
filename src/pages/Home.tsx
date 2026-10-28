@@ -3,6 +3,7 @@ import { ArrowRight, Check, CreditCard, ShieldCheck, Sparkles, Zap } from "lucid
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/contexts/useSiteSettings";
 
 const features = [
   {
@@ -25,24 +26,27 @@ const features = [
   },
 ];
 
-const Home = () => (
-  <div className="flex min-h-screen flex-col bg-background">
-    <Header />
+const Home = () => {
+  const { settings } = useSiteSettings();
 
-    <main className="flex-1">
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header />
+
+      <main className="flex-1">
       <section className="overflow-hidden">
         <div className="container grid max-w-7xl items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
           <div className="relative z-10">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              A PRACTICAL BARCODE WORKSPACE
+              {settings.hero_badge}
             </div>
             <h1 className="max-w-2xl text-4xl font-bold leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-[3.65rem]">
-              Build, preview, and download
-              <span className="text-primary"> in one place.</span>
+              {settings.hero_title}
+              {settings.hero_highlight && <span className="text-primary"> {settings.hero_highlight}</span>}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-              A focused workspace for creating PDF417 and Code 128 barcodes with state-aware fields, useful helpers, and clear credit controls.
+              {settings.hero_description}
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -209,11 +213,12 @@ const Home = () => (
           </p>
         </div>
       </section>
-    </main>
+      </main>
 
-    <Footer />
-  </div>
-);
+      <Footer />
+    </div>
+  );
+};
 
 function Metric({ value, label }: { value: string; label: string }) {
   return (

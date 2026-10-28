@@ -72,7 +72,7 @@ Deno.serve(async (request: Request) => {
         return jsonResponse({ status, credited: false });
       }
     } else {
-      const apiKey = Deno.env.get("PLISIO_SECRET_KEY");
+      const apiKey = Deno.env.get("PLISIO_API_KEY") ?? Deno.env.get("PLISIO_SECRET_KEY");
       if (!apiKey || !payment.provider_reference) {
         return jsonResponse({ error: "Plisio invoice verification is not configured." }, 503);
       }

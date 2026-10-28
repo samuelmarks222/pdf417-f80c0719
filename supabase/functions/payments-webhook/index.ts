@@ -36,9 +36,9 @@ Deno.serve(async (request: Request) => {
 
   const client = serviceClient();
   if (provider === "plisio") {
-    const secret = Deno.env.get("PLISIO_IPN_SECRET") ?? Deno.env.get("PLISIO_SECRET_KEY");
-    if (!secret) return jsonResponse({ error: "Payment callback verification is not configured" }, 503);
-    if (!await verifyPlisioCallback(payload, secret)) {
+    const apiKey = Deno.env.get("PLISIO_API_KEY") ?? Deno.env.get("PLISIO_SECRET_KEY");
+    if (!apiKey) return jsonResponse({ error: "Payment callback verification is not configured" }, 503);
+    if (!await verifyPlisioCallback(payload, apiKey)) {
       await recordPaymentEvent(client, null, provider, "invalid_signature", "Callback signature did not match.");
       return jsonResponse({ error: "Invalid callback signature" }, 401);
     }
@@ -62,9 +62,18 @@ Deno.serve(async (request: Request) => {
     const status = String(payload.status ?? payload.Status ?? "").toLowerCase();
     const transactionReference = String(payload.txn_id ?? "");
     if (status === "completed") {
+      if (!transactionReference || transactionReference !== payment.provider_reference) {
+        const message = "Completed callback transaction reference did not match the stored invoice.";
+        await updatePaymentStatus(client, payment.id, "underpaid", message, payload);
+        await recordPaymentEvent(client, payment.id, provider, "verification_error", message, {
+          txn_id: transactionReference || null,
+        });
+        return jsonResponse({ error: "Invoice reference verification failed" }, 422);
+      }
+
       const sourceCurrency = String(payload.source_currency ?? "").toUpperCase();
       const sourceAmount = payload.source_amount;
-      if (!transactionReference || sourceCurrency !== "USD" || !sameAmount(sourceAmount, Number(payment.amount_usd))) {
+      if (sourceCurrency !== "USD" || !sameAmount(sourceAmount, Number(payment.amount_usd))) {
         const message = "Completed callback did not match the stored invoice currency or USD amount.";
         await updatePaymentStatus(client, payment.id, "underpaid", message, payload);
         await recordPaymentEvent(client, payment.id, provider, "verification_error", message, {

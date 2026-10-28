@@ -78,7 +78,7 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
 
 ### Configure the project
 
-1. Create or select a Supabase project and configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the frontend hosting environment (or copy `.env.example` to `.env.local`). Vite explicitly maps only these two values into its client bundle; the publishable key is intended for browser use, and database access is restricted by RLS. The equivalent `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` names are also supported.
+1. Create or select a Supabase project and configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the frontend hosting environment (Vercel) (or copy `.env.example` to `.env.local`). Vite explicitly maps only these two values into its client bundle; the publishable key is intended for browser use, and database access is restricted by RLS. The equivalent `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` names are also supported. Payment-provider variables do not belong in Vercel: configure them as Supabase Edge Function secrets in step 4.
 2. In Supabase Authentication, enable Google and configure the Google OAuth client. Add the Supabase callback URL (`https://<project-ref>.supabase.co/auth/v1/callback`) in Google Cloud, and allow the deployed app URL plus `http://localhost:5173/account` in Supabase redirect URLs.
 3. Link the Supabase CLI to the project and apply the database migration:
 
@@ -95,13 +95,11 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
    supabase secrets set SASAPAY_CLIENT_ID=<rotated-SasaPay-client-id>
    supabase secrets set SASAPAY_CLIENT_SECRET=<rotated-SasaPay-client-secret>
    supabase secrets set SASAPAY_MERCHANT_CODE=<merchant-code>
-   supabase secrets set SASAPAY_NETWORK_CODE=<M-Pesa-network-code>
    supabase secrets set SASAPAY_KES_PER_USD=129
-   supabase secrets set PLISIO_API_KEY=<rotated-Plisio-API-key>
-   supabase secrets set PLISIO_IPN_SECRET=<rotated-Plisio-IPN-secret>
+   supabase secrets set PLISIO_API_KEY=<Plisio-API-key>
    ```
 
-   The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using `SASAPAY_KES_PER_USD`; the configured rate above is 129 KES per USD. Use the production base URL documented for your SasaPay merchant. The default status path is `payments/transaction-status/`; if your merchant's active API documents a different path, set optional `SASAPAY_STATUS_PATH`. The SasaPay merchant network code is also required. Plisio invoices use USD and its hosted invoice lists enabled crypto options; its callback signature must be verified with the separate `PLISIO_IPN_SECRET`. The Edge Function constructs the callback URL for this Supabase project; do not configure a callback URL belonging to a different application.
+   The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using `SASAPAY_KES_PER_USD`; the configured rate above is 129 KES per USD. Set `SASAPAY_BASE_URL` to the production API host; the function adds `/api/v1` automatically if it is not already present. The default M-Pesa network code is `63902` (Safaricom); set optional `SASAPAY_NETWORK_CODE` if your merchant requires a different code. The default status path is `payments/transaction-status/`; if your merchant's active API documents a different path, set optional `SASAPAY_STATUS_PATH`. Plisio invoices use USD and its hosted invoice lists enabled crypto options. Plisio's documented callback signature uses the same API key configured as `PLISIO_API_KEY`. The Edge Function constructs the callback URL for this Supabase project; do not configure a callback URL belonging to a different application.
 5. Deploy the Edge Functions:
 
    ```sh

@@ -45,7 +45,7 @@ Deno.serve(async (request: Request) => {
     if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
       return jsonResponse({ error: "SasaPay checkout is not configured with a valid KES-per-USD rate." }, 503);
     }
-    if (!Deno.env.get("SASAPAY_MERCHANT_CODE") || !Deno.env.get("SASAPAY_NETWORK_CODE")) {
+    if (!Deno.env.get("SASAPAY_MERCHANT_CODE")) {
       return jsonResponse({ error: "SasaPay merchant settings are not configured." }, 503);
     }
     const phone = (body.phoneNumber ?? "").replace(/[^\d+]/g, "").replace(/^\+/, "");
@@ -122,7 +122,7 @@ Deno.serve(async (request: Request) => {
     const token = await getSasapayToken();
     const response = await sasapayRequest("payments/request-payment/", token, {
       MerchantCode: Deno.env.get("SASAPAY_MERCHANT_CODE"),
-      NetworkCode: Deno.env.get("SASAPAY_NETWORK_CODE"),
+      NetworkCode: Deno.env.get("SASAPAY_NETWORK_CODE") ?? "63902",
       PhoneNumber: normalizedPhone,
       Currency: "KES",
       Amount: amountDue,

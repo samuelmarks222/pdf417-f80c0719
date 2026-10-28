@@ -21,7 +21,7 @@ export function preflight(request: Request) {
 
 export function serviceClient(): SupabaseClient {
   const url = Deno.env.get("SUPABASE_URL");
-  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY");
   if (!url || !key) throw new Error("Supabase service configuration is missing");
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
@@ -30,7 +30,7 @@ export async function authenticatedUser(request: Request) {
   const authorization = request.headers.get("Authorization");
   const token = authorization?.replace(/^Bearer\s+/i, "");
   const url = Deno.env.get("SUPABASE_URL");
-  const key = Deno.env.get("SUPABASE_ANON_KEY");
+  const key = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
   if (!token || !url || !key) return null;
 
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });

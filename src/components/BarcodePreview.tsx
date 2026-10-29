@@ -52,7 +52,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         columns: 8,
         rowmult: 3,
         eclevel: 5,
-        paddingwidth: 16,
+        paddingwidth: 6,
         paddingheight: 12,
         backgroundcolor: "FFFFFF",
         barcolor: "000000",
@@ -155,7 +155,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
           <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted/45 p-5 sm:min-h-[240px]">
             <canvas
               ref={canvasRef}
-              className={generated ? "block h-auto max-h-40 w-full max-w-[600px] rounded-lg bg-white object-contain" : "hidden"}
+              className={generated ? "block h-auto max-h-40 w-full max-w-none rounded-lg bg-white object-contain" : "hidden"}
               width={600}
               height={200}
               style={{ imageRendering: "pixelated" }}

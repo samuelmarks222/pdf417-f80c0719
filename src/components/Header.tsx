@@ -35,9 +35,9 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-transparent bg-transparent">
-      <div className="container my-3 flex h-16 max-w-7xl items-center justify-between gap-5 rounded-full border border-white/80 bg-white/95 px-4 shadow-[0_8px_30px_rgba(27,45,38,0.08)] backdrop-blur-xl sm:px-6">
-        <Link to="/" aria-label={`${settings.site_name} home`} className="flex shrink-0 items-center gap-2.5">
+    <header className="sticky top-0 z-40 hidden w-full border-transparent bg-transparent sm:block">
+      <div className="mx-auto my-0 flex h-16 w-full max-w-7xl items-center justify-between gap-2 border-b border-white/80 bg-white/95 px-3 shadow-[0_8px_30px_rgba(27,45,38,0.08)] backdrop-blur-xl sm:my-3 sm:gap-5 sm:rounded-full sm:border sm:px-6">
+        <Link to="/" aria-label={`${settings.site_name} home`} className="flex min-w-0 shrink items-center gap-2.5">
           {settings.logo_url ? (
             <img src={settings.logo_url} alt="" className="h-9 max-w-36 object-contain" />
           ) : (

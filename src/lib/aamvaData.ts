@@ -250,7 +250,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     licenseNumber: generateLicenseNumber(stateCode),
     issueDate: `${issueMonth}${issueDay}${issueYear}`,
     expirationDate: `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: generateDD(stateCode, `${issueMonth}${issueDay}${issueYear}`),
+    documentDiscriminator: generateDD(stateCode, `${issueMonth}${issueDay}${issueYear}`, `${issueMonth}${issueDay}${expYear}`),
     inventoryControlNumber: generateICN(stateCode, generateLicenseNumber(stateCode), `${issueMonth}${issueDay}${issueYear}`),
   };
 }

@@ -31,7 +31,7 @@ function parseDateParts(issueDate?: string) {
 // ===================== DOCUMENT DISCRIMINATOR (DD / DCF) =====================
 // Based on real barcode calibration sheets from state DMVs and AAMVA CDS specs
 
-export function generateDD(stateCode: string, issueDate?: string): string {
+export function generateDD(stateCode: string, issueDate?: string, expirationDate?: string): string {
   const { month, day, year, shortYear } = parseDateParts(issueDate);
 
   switch (stateCode) {
@@ -51,9 +51,13 @@ export function generateDD(stateCode: string, issueDate?: string): string {
     case "AR":
       return randomDigits(9);
 
-    // California: MM/DD/YYYYnnnnn/LLLL/nn (per real CA DMV barcode scans)
+    // California: MM/DD/YYYYnnnnn/AAFD/YY
     case "CA":
-      return `${month}/${day}/${year}${randomDigits(5)}/${randomLetters(4)}/${padZero(randomNum(10, 99))}`;
+      return `${month}/${day}/${year}${randomDigits(5)}/AAFD/${
+        expirationDate && expirationDate.length === 8
+          ? expirationDate.substring(6, 8)
+          : shortYear
+      }`;
 
     // Colorado: nnnnnnnnnn (10 digits)
     case "CO":

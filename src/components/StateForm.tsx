@@ -83,7 +83,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
   const handleGenerateDD = () => {
     if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
-    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate));
+    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate, data.expirationDate));
   };
 
   const handleGenerateICN = () => {

@@ -8,9 +8,10 @@ interface BarcodePreviewProps {
   code128Text?: string;
   onCode128TextChange?: (value: string) => void;
   onGenerate?: (generationId: string, dataDigest: string) => Promise<boolean>;
+  isAdmin?: boolean;
 }
 
-export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -145,7 +146,9 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
               <p className="mt-0.5 text-xs text-muted-foreground">State-specific format</p>
             </div>
           </div>
-          <span className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">1 credit per generation</span>
+          <span className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold ${isAdmin ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}`}>
+            {isAdmin ? "Always free for admins" : "1 credit per generation"}
+          </span>
         </div>
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">

@@ -104,7 +104,7 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="text-muted-foreground">
-                Code 128 is always free. {user ? "PDF417 generation uses one credit." : "Sign in to generate a credit-based PDF417 barcode."}
+                Code 128 is always free. {profile?.is_admin ? "Admin PDF417 generation is free." : user ? "PDF417 generation uses one credit." : "Sign in to generate a credit-based PDF417 barcode."}
               </span>
               <Button asChild size="sm" variant="outline" className="rounded-full"><Link to="/account">Manage credits</Link></Button>
             </div>
@@ -124,6 +124,7 @@ const Index = () => {
               code128Text={code128Text}
               onCode128TextChange={setCode128Text}
               onGenerate={handleGenerate}
+              isAdmin={Boolean(profile?.is_admin)}
             />
           </div>
 

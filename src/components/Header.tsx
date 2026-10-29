@@ -23,7 +23,7 @@ export function Header() {
         to={path}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+          "shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium transition-colors sm:px-3.5",
           active
             ? "bg-[#eaf4ee] text-[#07584e]"
             : "text-[#52615d] hover:bg-[#f1f5f1] hover:text-[#07584e]",
@@ -35,7 +35,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 hidden w-full border-transparent bg-transparent sm:block">
+    <header className="sticky top-0 z-40 w-full border-transparent bg-transparent">
       <div className="mx-auto my-0 flex h-16 w-full max-w-7xl items-center justify-between gap-2 border-b border-white/80 bg-white/95 px-3 shadow-[0_8px_30px_rgba(27,45,38,0.08)] backdrop-blur-xl sm:my-3 sm:gap-5 sm:rounded-full sm:border sm:px-6">
         <Link to="/" aria-label={`${settings.site_name} home`} className="flex min-w-0 shrink items-center gap-2.5">
           {settings.logo_url ? (
@@ -45,14 +45,6 @@ export function Header() {
               {settings.site_name.charAt(0).toUpperCase()}
             </span>
           )}
-          <span className="flex min-w-0 flex-col">
-            <span className="text-[15px] font-bold leading-tight tracking-tight text-foreground">
-              {settings.site_name}
-            </span>
-            <span className="hidden truncate text-[10px] leading-tight text-muted-foreground sm:block">
-              {settings.site_tagline}
-            </span>
-          </span>
         </Link>
 
         <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
@@ -97,7 +89,7 @@ export function Header() {
           )}
         </div>
       </div>
-      <nav aria-label="Mobile navigation" className="container flex max-w-7xl gap-1 overflow-x-auto pb-2 md:hidden">
+      <nav aria-label="Mobile navigation" className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-center gap-1 px-0 pb-2 md:hidden">
         {navItems.map((item) => navLink(item.path, item.label))}
         {navLink("/account", "Credits")}
         {profile?.is_admin && navLink("/admin", "Admin")}

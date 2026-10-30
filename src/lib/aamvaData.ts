@@ -270,9 +270,9 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
 
   return {
     firstName,
-    middleName,
+    middleName: "",
     lastName: randomChoice(lastNames),
-    firstMiddleName: `${firstName},${middleName}`,
+    firstMiddleName: firstName,
     streetAddress: `${randomNum(100, 9999)} ${randomChoice(streets)}`,
     city: randomChoice(cities),
     postalCode: `${randomNum(10000, 99999)}${randomNum(1000, 9999)}`,

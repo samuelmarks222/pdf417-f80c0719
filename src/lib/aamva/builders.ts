@@ -155,7 +155,7 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   elements.push(`DDA${allowedCompliance.includes(compliance) ? compliance : AAMVA_REAL_ID_COMPLIANCE}`);
   elements.push(`DDB${revisionDate}`);
   elements.push(`DCI${sanitizeUpper(fullStateName, 40)}`);
-  elements.push(`DDK${inventoryControlNumber}`);
+  elements.push(`DCK${inventoryControlNumber}`);
 
   if (dlClass) {
     elements.push(`DCA${dlClass}`);

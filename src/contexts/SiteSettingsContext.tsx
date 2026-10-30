@@ -94,7 +94,15 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         document.head.appendChild(icon);
       }
       icon.href = settings.favicon_url;
-    } else document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')?.remove();
+    } else {
+      let icon = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
+      if (!icon) {
+        icon = document.createElement("link");
+        icon.rel = "icon";
+        document.head.appendChild(icon);
+      }
+      icon.href = "/favicon.ico";
+    }
   }, [location.pathname, settings]);
 
   const value = useMemo(

@@ -61,15 +61,15 @@ export function StateForm({ data, onChange }: StateFormProps) {
     if (config) {
       const rev = config.revisions[0];
       const revDateClean = rev.revisionDate.replace(/\//g, "");
-      const albertaDefaults = stateCode === "AB" ? {
+      const stateDefaults = stateCode === "AB" ? {
         firstName: "LARRY", middleName: "PETER", lastName: "TERRELL", firstMiddleName: "",
         streetAddress: "452 SCIMITAR BAY NW", city: "CALGARY", postalCode: "T3L 1S7",
         dateOfBirth: "19890819", issueDate: "20210114", expirationDate: "20260819",
         licenseNumber: "165785-754", dlClass: "5", gender: "1", height: "175", weight: "169",
         documentDiscriminator: "0571-54946", restrictions: "NONE", endorsement: "NONE",
         eyeColor: "BRO", hairColor: "BRO", hairColorOnDL: "BRO",
-      } : {};
-      onChange({ ...data, ...albertaDefaults, stateCode, revisionId: rev.id, revisionDate: revDateClean });
+      } : generateRandomData(stateCode);
+      onChange({ ...data, ...stateDefaults, stateCode, revisionId: rev.id, revisionDate: revDateClean });
     }
   };
 

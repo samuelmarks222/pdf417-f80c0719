@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StateForm } from "@/components/StateForm";
 import { BarcodePreview } from "@/components/BarcodePreview";
-import { AAMVAData, DEFAULT_AAMVA_DATA } from "@/lib/aamvaData";
+import { AAMVAData, DEFAULT_AAMVA_DATA, generateRandomData } from "@/lib/aamvaData";
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
 import { useSearchParams } from "react-router-dom";
@@ -25,6 +25,7 @@ const Index = () => {
       const revDateClean = rev.revisionDate.replace(/\//g, "");
       return {
         ...DEFAULT_AAMVA_DATA,
+        ...generateRandomData(initialState),
         stateCode: initialState,
         revisionId: rev.id,
         revisionDate: revDateClean,

@@ -277,6 +277,10 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "AL":
       return `0000000000${randomDigits(10)}`;
 
+    // Louisiana: fixed 00700 prefix followed by 11 random digits
+    case "LA":
+      return `00700${randomDigits(11)}`;
+
     // Manitoba: nine numeric characters
     case "MB":
       return randomDigits(9);

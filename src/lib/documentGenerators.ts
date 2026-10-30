@@ -462,9 +462,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "TN":
       return randomDigits(18);
 
-    // Texas: 11 digits (e.g., 10000492102)
+    // Texas: fixed 10000 prefix followed by six random digits
     case "TX":
-      return randomDigits(11);
+      return `10000${randomDigits(6)}`;
 
     // Utah: 18 digits
     case "UT":

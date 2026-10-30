@@ -366,10 +366,6 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "KY":
       return `${randomLetters(2)}${randomDigits(16)}`;
 
-    // Louisiana: 18 digits starting with 0
-    case "LA":
-      return `0${randomDigits(17)}`;
-
     // Maine: 18 digits
     case "ME":
       return randomDigits(18);

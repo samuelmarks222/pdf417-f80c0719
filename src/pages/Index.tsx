@@ -59,7 +59,6 @@ const Index = () => {
       ? { ...formData, inventoryControlNumber: generateICN(formData.stateCode, formData.licenseNumber, formData.issueDate) }
       : formData;
     setFormData(nextData);
-    setCode128Text(nextData.licenseNumber);
     setCreateRequest((request) => request + 1);
   };
 
@@ -139,7 +138,6 @@ const Index = () => {
               onGenerate={handleGenerate}
               isAdmin={Boolean(profile?.is_admin)}
               createRequest={createRequest}
-              canGenerateCode128={Boolean(getRevision(formData.revisionId)?.revision.fields.hasICN)}
             />
           </div>
 

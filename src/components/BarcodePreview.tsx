@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
-import { Barcode, Download } from "lucide-react";
+import { Barcode, Download, Sparkles } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
@@ -10,10 +10,9 @@ interface BarcodePreviewProps {
   onGenerate?: (generationId: string, dataDigest: string) => Promise<boolean>;
   isAdmin?: boolean;
   createRequest?: number;
-  canGenerateCode128?: boolean;
 }
 
-export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false, createRequest = 0, canGenerateCode128 = true }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false, createRequest = 0 }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -138,7 +137,6 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
     if (!createRequest) return;
     const runCreate = async () => {
       await generateBarcode();
-      if (canGenerateCode128) await generateCode128();
     };
     void runCreate();
   }, [createRequest]);
@@ -156,7 +154,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
   return (
     <div className="grid items-stretch gap-5 lg:grid-cols-2">
-      {canGenerateCode128 && <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
+      <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -197,7 +195,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
           {generated && <div className="mt-4 flex flex-wrap justify-end gap-2"><Button size="sm" onClick={() => downloadBarcode("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button><Button variant="outline" size="sm" onClick={() => downloadBarcode("jpeg")} className="gap-2 rounded-full">JPEG</Button></div>}
         </div>
-      </section>}
+      </section>
 
       <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
@@ -234,7 +232,22 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             )}
           </div>
 
-          {generated2 && <div className="mt-4 flex flex-wrap justify-end gap-2"><Button size="sm" onClick={() => downloadCode128("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button><Button variant="outline" size="sm" onClick={() => downloadCode128("jpeg")} className="rounded-full">JPEG</Button></div>}
+          <div className="mt-4">
+            <label htmlFor="code128-text" className="mb-2 block text-xs font-semibold text-foreground">Text to encode</label>
+            <textarea id="code128-text" value={code128Text} onChange={(e) => onCode128TextChange?.(e.target.value)} placeholder="Type or paste your text here…" className="min-h-20 w-full resize-y rounded-xl border border-input bg-card px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary focus:ring-4 focus:ring-primary/10" rows={2} />
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-xs text-muted-foreground">{generated2 ? "Preview ready" : `${code128Text.length} characters`}</div>
+            {generated2 ? (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={generateCode128} disabled={isGenerating} className="gap-2 rounded-full">Generate again</Button>
+                <Button size="sm" onClick={() => downloadCode128("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button>
+                <Button variant="outline" size="sm" onClick={() => downloadCode128("jpeg")} className="rounded-full">JPEG</Button>
+              </div>
+            ) : (
+              <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 rounded-full px-5"><Sparkles className="h-3.5 w-3.5" />Create Code 128</Button>
+            )}
+          </div>
         </div>
       </section>
     </div>

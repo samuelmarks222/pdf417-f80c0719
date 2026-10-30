@@ -268,7 +268,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     height: usesCanadianMetric ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
     licenseNumber,
-    dlClass: stateCode === "AB" ? "5" : stateCode === "ON" ? "G" : "C",
+    dlClass: stateCode === "AL" ? "D" : stateCode === "AB" ? "5" : stateCode === "ON" ? "G" : "C",
     issueDate,
     expirationDate,
     documentDiscriminator: generateDD(stateCode, issueDate, expirationDate, licenseNumber),

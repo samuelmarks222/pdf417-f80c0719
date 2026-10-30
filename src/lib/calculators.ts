@@ -40,7 +40,7 @@ export function generateDLNumber(stateCode: string): string {
     case "AB": return `1${randomNum(10000, 99999)}-${randomNum(100, 999)}`;
     case "MB": return `${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000, 99999)}`;
     case "ON": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
-    case "QC": return `R${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
+    case "QC": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
     case "SK": return `${randomNum(10000000, 99999999)}`;
     case "YT": return `${randomNum(100000, 999999)}`;
     case "AL": return `${randomNum(1000000, 9999999)}`;

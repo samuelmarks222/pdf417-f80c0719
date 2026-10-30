@@ -10,9 +10,11 @@ import {
   sanitizeAamvaCode,
   sanitizeUpper,
 } from "./formatters";
+import { getStateConfig } from "../stateConfigs";
 
 export interface AamvaEncodeInput {
   stateCode: string;
+  revisionId?: string;
   firstName: string;
   middleName: string;
   lastName: string;
@@ -26,6 +28,7 @@ export interface AamvaEncodeInput {
   gender: string;
   eyeColor: string;
   hairColor: string;
+  hairColorOnDL?: string;
   height: string;
   weight: string;
   race: string;
@@ -49,6 +52,9 @@ interface BuildDlSubfileArgs {
 
 export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): string {
   const stateCode = normalizeStateCode(data.stateCode);
+  const stateConfig = getStateConfig(stateCode);
+  const revision = stateConfig?.revisions.find((item) => item.id === data.revisionId) ?? stateConfig?.revisions[0];
+  const fields = revision?.fields;
   const [combinedFirstNameRaw = "", combinedMiddleNameRaw = ""] = sanitizeUpper(data.firstMiddleName || "", 81)
     .split(",")
     .map((part) => part.trim());
@@ -122,8 +128,13 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
     elements.push(`DAW${weight}`);
   }
 
-  if (data.hairColor) {
-    elements.push(`DAZ${sanitizeUpper(data.hairColor, 3)}`);
+  const hairColor = fields?.hasHairColor
+    ? data.hairColor
+    : fields?.hasHairColorOnDL
+      ? data.hairColorOnDL
+      : "";
+  if (hairColor) {
+    elements.push(`DAZ${sanitizeUpper(hairColor, 3)}`);
   }
 
   // Address

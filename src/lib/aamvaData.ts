@@ -222,7 +222,9 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const birthMonth = padZero(randomNum(1, 12), 2);
   const birthDay = padZero(randomNum(1, 28), 2);
   
-  const issueYear = randomNum(2020, 2024);
+  const issueYear = stateCode === "NH"
+    ? randomNum(2025, new Date().getFullYear())
+    : randomNum(2020, 2024);
   const issueMonth = padZero(randomNum(1, 12), 2);
   const issueDay = padZero(randomNum(1, 28), 2);
   

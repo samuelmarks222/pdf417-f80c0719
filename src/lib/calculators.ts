@@ -160,7 +160,7 @@ export function generateDLNumber(stateCode: string): string {
 // Generate a random issue date between 2021 and current year
 export function calculateIssueDate(stateCode?: string): string {
   const currentYear = new Date().getFullYear();
-  const minYear = 2021;
+  const minYear = stateCode === "NH" ? 2025 : 2021;
   const maxYear = Math.min(currentYear, 2026);
   const year = randomNum(minYear, maxYear);
   const month = randomNum(1, 12);

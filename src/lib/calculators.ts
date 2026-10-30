@@ -76,7 +76,7 @@ export function generateDLNumber(stateCode: string): string {
       const letter = String.fromCharCode(65 + randomNum(0, 25));
       return `${letter}${randomNum(10, 99)}-${randomNum(100, 999)}-${randomNum(100, 999)}`;
     }
-    case "LA": return `0${randomNum(0, 1)}${randomNum(100000, 999999)}`;
+    case "LA": return `0${randomNum(10000000, 99999999)}`;
     case "ME": return `${randomNum(1000000, 9999999)}`;
     case "MD": {
       const letter = String.fromCharCode(65 + randomNum(0, 25));

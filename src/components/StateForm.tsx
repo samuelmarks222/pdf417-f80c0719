@@ -64,7 +64,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
       const albertaDefaults = stateCode === "AB" ? {
         firstName: "LARRY", middleName: "PETER", lastName: "TERRELL", firstMiddleName: "",
         streetAddress: "452 SCIMITAR BAY NW", city: "CALGARY", postalCode: "T3L 1S7",
-        dateOfBirth: "19800708", issueDate: "20210114", expirationDate: "20260708",
+        dateOfBirth: "19890819", issueDate: "20210114", expirationDate: "20260819",
         licenseNumber: "165785-754", dlClass: "5", gender: "1", height: "175", weight: "169",
         documentDiscriminator: "0571-54946", restrictions: "NONE", endorsement: "NONE",
         eyeColor: "BRO", hairColor: "BRO", hairColorOnDL: "BRO",
@@ -363,7 +363,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
             <Label className="text-xs flex items-center">
               Birth date <InfoIcon text={`${fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"} format`} /> <CalcIcon onClick={() => {}} />
             </Label>
-            <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "19800708" : "01151970"} maxLength={8} className="h-9 text-sm mt-1" />
+            <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "19890819" : "01151970"} maxLength={8} className="h-9 text-sm mt-1" />
           </div>
           <div>
             <Label className="text-xs flex items-center">

@@ -185,7 +185,7 @@ export function calculateExpiryDate(issueDate: string, stateCode: string, dateOf
     GA: 8, HI: 8, ID: 8, IL: 4, IN: 6, IA: 8, KS: 6, KY: 8, LA: 6, ME: 6,
     MD: 8, MA: 5, MI: 4, MN: 4, MS: 4, MO: 6, MT: 8, NE: 5, NV: 8, NH: 5,
     NJ: 4, NM: 4, NY: 8, NC: 8, ND: 6, OH: 4, OK: 4, OR: 8, PA: 4, RI: 5,
-    SC: 10, SD: 5, TN: 8, TX: 6, UT: 5, VT: 4, VA: 8, WA: 6, WV: 8, WI: 8, WY: 4,
+    SC: 10, SD: 5, TN: 8, TX: 8, UT: 5, VT: 4, VA: 8, WA: 6, WV: 8, WI: 8, WY: 4,
   };
   
   const years = validityPeriods[stateCode] || 5;

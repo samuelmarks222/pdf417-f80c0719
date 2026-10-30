@@ -68,7 +68,8 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
 
   const lastName = sourceLastName.substring(0, 40);
   const firstName = sourceFirstName.substring(0, 40);
-  const middleName = sourceMiddleName.substring(0, 40);
+  const supportsMiddleName = fields ? fields.hasMiddleName || fields.hasFirstMiddleCombined : true;
+  const middleName = supportsMiddleName ? sourceMiddleName.substring(0, 40) : "";
 
   const issueDate = ensureDateMMDDYYYY(data.issueDate, FALLBACKS.ISSUE);
   const dob = ensureDateMMDDYYYY(data.dateOfBirth, FALLBACKS.DOB);

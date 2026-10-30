@@ -37,6 +37,8 @@ interface StateFormProps {
   onCreate?: () => void;
 }
 
+const randomDigits = (length: number) => Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+
 export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   const [stateConfig, setStateConfig] = useState<StateConfig | null>(null);
   const [revision, setRevision] = useState<StateRevision | null>(null);
@@ -109,6 +111,8 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   const handleCalcMiddleName = () => updateField("middleName", generateMiddleName(data.gender));
   const handleCalcLastName = () => updateField("lastName", generateLastName());
   const handleCalcFirstMiddleName = () => updateField("firstMiddleName", generateFirstMiddleName(data.gender));
+  const handleCalcAuditInfo = () => updateField("auditInfo", randomDigits(4));
+  const handleCalcIssuingOffice = () => updateField("issuingOffice", `0${randomDigits(2)}`);
   const handleCalcBirthDate = () => {
     const generated = generateRandomData(data.stateCode);
     if (generated.dateOfBirth) updateField("dateOfBirth", generated.dateOfBirth);
@@ -406,7 +410,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           )}
           {fields?.hasAuditInfo && (
             <div>
-              <Label className="text-xs flex items-center">Audit info <InfoIcon text="Louisiana audit information" /> <CalcIcon onClick={() => updateField("auditInfo", data.auditInfo || "4174")} /></Label>
+              <Label className="text-xs flex items-center">Audit info <InfoIcon text="Louisiana audit information" /> <CalcIcon onClick={handleCalcAuditInfo} /></Label>
               <Input value={data.auditInfo} onChange={(e) => updateField("auditInfo", e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="4174" maxLength={4} className="h-9 text-[11px] mt-1" />
             </div>
           )}
@@ -544,8 +548,11 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           )}
           {fields?.hasIssuingOffice && (
             <div>
-              <Label className="text-xs flex items-center">Issuing Office <InfoIcon text="Louisiana issuing office" /> <CalcIcon onClick={() => updateField("issuingOffice", data.issuingOffice || "033")} /></Label>
-              <Input value={data.issuingOffice} onChange={(e) => updateField("issuingOffice", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="033" maxLength={3} className="h-9 text-sm mt-1" />
+              <Label className="text-xs flex items-center">Issuing Office <InfoIcon text="Louisiana issuing office; starts with 0" /> <CalcIcon onClick={handleCalcIssuingOffice} /></Label>
+              <Input value={data.issuingOffice} onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, "");
+                updateField("issuingOffice", `0${digits.replace(/^0/, "")}`.slice(0, 3));
+              }} placeholder="033" maxLength={3} className="h-9 text-sm mt-1" />
             </div>
           )}
           {fields?.hasParish && (

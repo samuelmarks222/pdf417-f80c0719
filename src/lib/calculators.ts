@@ -38,6 +38,11 @@ export function generateFirstMiddleName(gender?: string): string {
 export function generateDLNumber(stateCode: string): string {
   switch (stateCode) {
     case "AB": return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
+    case "MB": return `${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000, 99999)}`;
+    case "ON": return `R${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
+    case "QC": return `R${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
+    case "SK": return `${randomNum(10000000, 99999999)}`;
+    case "YT": return `${randomNum(100000, 999999)}`;
     case "AL": return `${randomNum(1000000, 9999999)}`;
     case "AK": return `${randomNum(1000000, 9999999)}`;
     case "AZ": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000000, 99999999)}`;
@@ -168,10 +173,10 @@ export function calculateIssueDate(stateCode?: string): string {
 export function calculateExpiryDate(issueDate: string, stateCode: string, dateOfBirth?: string): string {
   if (issueDate.length !== 8) return "";
   
-  const isAlberta = stateCode === "AB";
-  const issueMonth = parseInt(isAlberta ? issueDate.substring(4, 6) : issueDate.substring(0, 2));
-  const issueDay = parseInt(isAlberta ? issueDate.substring(6, 8) : issueDate.substring(2, 4));
-  const issueYear = parseInt(isAlberta ? issueDate.substring(0, 4) : issueDate.substring(4, 8));
+  const isCanadianDate = ["AB", "MB", "ON", "QC", "SK", "YT"].includes(stateCode);
+  const issueMonth = parseInt(isCanadianDate ? issueDate.substring(4, 6) : issueDate.substring(0, 2));
+  const issueDay = parseInt(isCanadianDate ? issueDate.substring(6, 8) : issueDate.substring(2, 4));
+  const issueYear = parseInt(isCanadianDate ? issueDate.substring(0, 4) : issueDate.substring(4, 8));
   
   // State-specific validity periods (years)
   const validityPeriods: Record<string, number> = {
@@ -185,11 +190,11 @@ export function calculateExpiryDate(issueDate: string, stateCode: string, dateOf
   const years = validityPeriods[stateCode] || 5;
   
   // Some states expire on birthday - use DOB month/day if available
-  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
-    const dobMonth = parseInt(isAlberta ? dateOfBirth.substring(4, 6) : dateOfBirth.substring(0, 2));
-    const dobDay = parseInt(isAlberta ? dateOfBirth.substring(6, 8) : dateOfBirth.substring(2, 4));
+  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "MB", "ON", "QC", "SK", "YT", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
+    const dobMonth = isCanadianDate ? parseInt(dateOfBirth.substring(4, 6)) : parseInt(dateOfBirth.substring(0, 2));
+    const dobDay = isCanadianDate ? parseInt(dateOfBirth.substring(6, 8)) : parseInt(dateOfBirth.substring(2, 4));
     let expiryYear = issueYear + years;
-    if (isAlberta) return `${expiryYear}${padZero(dobMonth)}${padZero(dobDay)}`;
+    if (isCanadianDate) return `${expiryYear}${padZero(dobMonth)}${padZero(dobDay)}`;
     return `${padZero(dobMonth)}${padZero(dobDay)}${expiryYear}`;
   }
   

@@ -104,6 +104,10 @@ export function StateForm({ data, onChange }: StateFormProps) {
   const handleCalcMiddleName = () => updateField("middleName", generateMiddleName(data.gender));
   const handleCalcLastName = () => updateField("lastName", generateLastName());
   const handleCalcFirstMiddleName = () => updateField("firstMiddleName", generateFirstMiddleName(data.gender));
+  const handleCalcBirthDate = () => {
+    const generated = generateRandomData(data.stateCode);
+    if (generated.dateOfBirth) updateField("dateOfBirth", generated.dateOfBirth);
+  };
 
   const handleCalcIssueDate = () => {
     const issueDate = calculateIssueDate(data.stateCode);
@@ -361,7 +365,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         <div className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${fields?.ddInDetailsRow ? "lg:grid-cols-3" : "lg:grid-cols-5"}`}>
           <div>
             <Label className="text-xs flex items-center">
-              Birth date <InfoIcon text={`${fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"} format`} /> <CalcIcon onClick={() => {}} />
+              Birth date <InfoIcon text={`${fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"} format`} /> <CalcIcon onClick={handleCalcBirthDate} />
             </Label>
             <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "19890819" : "01151970"} maxLength={8} className="h-9 text-sm mt-1" />
           </div>

@@ -1148,7 +1148,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Manitoba",
     iin: "600003",
     country: "Canada",
-    revisions: [{ id: "MB", name: "Manitoba", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasWeight: false, hasICN: true, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "MB", name: "Manitoba", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasWeight: false, hasICN: true, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "NB",
@@ -1195,7 +1195,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Ontario",
     iin: "600009",
     country: "Canada",
-    revisions: [{ id: "ON", name: "Ontario", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasMiddleName: false, hasFirstMiddleCombined: true, hasDonor: false, hasWeight: false, hasICN: true, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "ON", name: "Ontario", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasMiddleName: false, hasFirstMiddleCombined: true, hasDonor: false, hasWeight: false, hasICN: true, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "PE",
@@ -1209,21 +1209,21 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Quebec",
     iin: "600011",
     country: "Canada",
-    revisions: [{ id: "QC", name: "Quebec", year: "2015", revisionDate: "2015-08-01", aamvaVersion: "04", jurisdictionVersion: "01", realIdCompliant: false, displayRevision: true, fields: { ...defaultFields, hasDonor: false, hasICN: true, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "QC", name: "Quebec", year: "2015", revisionDate: "2015-08-01", aamvaVersion: "04", jurisdictionVersion: "01", realIdCompliant: false, displayRevision: true, fields: { ...defaultFields, hasDonor: false, hasICN: true, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "SK",
     name: "Saskatchewan",
     iin: "600012",
     country: "Canada",
-    revisions: [{ id: "SK", name: "Saskatchewan", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: true, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "SK", name: "Saskatchewan", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: true, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "YT",
     name: "Yukon",
     iin: "600013",
     country: "Canada",
-    revisions: [{ id: "YT", name: "Yukon", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: true, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "YT", name: "Yukon", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: true, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
 ];
 

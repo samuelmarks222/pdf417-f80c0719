@@ -38,6 +38,16 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     // Alberta: four digits, hyphen, five digits (e.g. 0571-54946)
     case "AB":
       return `${randomDigits(4)}-${randomDigits(5)}`;
+    case "MB":
+      return randomDigits(9);
+    case "ON":
+      return `GR${randomDigits(7)}`;
+    case "QC":
+      return `PEUS${randomDigits(2)}YRZ`;
+    case "SK":
+      return randomDigits(10);
+    case "YT":
+      return `${randomDigits(6)}${randomLetter()}${randomDigits(1)}`;
     // Alabama: 2 letters + 8 digits
     case "AL":
       return `${randomLetters(2)}${randomDigits(8)}`;

@@ -212,6 +212,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   
   const expYear = issueYear + randomNum(4, 8);
   const isAlberta = stateCode === "AB";
+  const usesCanadianDateOrder = ["AB", "MB", "ON", "QC", "SK", "YT"].includes(stateCode);
   
   const firstName = randomChoice(firstNames);
   const middleName = randomChoice(middleNames);
@@ -224,6 +225,16 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
         return `D${randomNum(1000000, 9999999)}`;
       case "AB":
         return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
+      case "MB":
+        return `EJ-QV-BP-V${randomNum(100, 999)}${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1, 9)}`;
+      case "ON":
+        return `R${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
+      case "QC":
+        return `R${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
+      case "SK":
+        return `${randomNum(10000000, 99999999)}`;
+      case "YT":
+        return `${randomNum(100000, 999999)}`;
       case "TX":
         return `${randomNum(10000000, 99999999)}`;
       case "FL":
@@ -243,7 +254,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     streetAddress: `${randomNum(100, 9999)} ${randomChoice(streets)}`,
     city: randomChoice(cities),
     postalCode: `${randomNum(10000, 99999)}${randomNum(1000, 9999)}`,
-    dateOfBirth: isAlberta ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`,
+    dateOfBirth: usesCanadianDateOrder ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`,
     gender: randomChoice(GENDER_OPTIONS).code,
     eyeColor: randomChoice(EYE_COLORS).code,
     eyeColorOnDL: randomChoice(EYE_COLORS_ON_DL).code,
@@ -252,9 +263,9 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     height: isAlberta ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
     licenseNumber: generateLicenseNumber(stateCode),
-    issueDate: isAlberta ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`,
-    expirationDate: isAlberta ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: generateDD(stateCode, isAlberta ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`, isAlberta ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`),
+    issueDate: usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`,
+    expirationDate: usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`,
+    documentDiscriminator: generateDD(stateCode, usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`, usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`),
     inventoryControlNumber: generateICN(stateCode, generateLicenseNumber(stateCode), `${issueMonth}${issueDay}${issueYear}`),
   };
 }

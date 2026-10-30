@@ -97,6 +97,15 @@ export const COMPLIANCE_TYPES = [
   { code: "V", name: "V - Virginia" },
 ] as const;
 
+const DEFAULT_DL_CLASSES: Record<string, string> = {
+  AL: "D", AK: "D", AZ: "D", AR: "D", CA: "C", CO: "R", CT: "D", DE: "D", DC: "D",
+  FL: "E", GA: "C", HI: "3", ID: "D", IL: "D", IN: "C", IA: "C", KS: "C", KY: "D",
+  LA: "E", ME: "C", MD: "C", MA: "D", MI: "O", MN: "D", MS: "R", MO: "F", MT: "D",
+  NE: "O", NV: "C", NH: "D", NJ: "D", NM: "D", NY: "D", NC: "C", ND: "D", OH: "D",
+  OK: "D", OR: "C", PA: "C", RI: "10", SC: "D", SD: "1", TN: "D", TX: "C", UT: "D",
+  VT: "D", VA: "D", WA: "NONE", WV: "E", WI: "D", WY: "C",
+};
+
 
 export interface AAMVAData {
   // State/Revision info
@@ -268,7 +277,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     height: usesCanadianMetric ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
     licenseNumber,
-    dlClass: stateCode === "AL" ? "D" : stateCode === "AB" ? "5" : stateCode === "ON" ? "G" : "C",
+    dlClass: stateCode === "AB" ? "5" : stateCode === "ON" ? "G" : DEFAULT_DL_CLASSES[stateCode] || "C",
     issueDate,
     expirationDate,
     documentDiscriminator: generateDD(stateCode, issueDate, expirationDate, licenseNumber),

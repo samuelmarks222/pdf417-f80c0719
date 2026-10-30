@@ -28,7 +28,7 @@ const Index = () => {
         ...generateRandomData(initialState),
         stateCode: initialState,
         revisionId: rev.id,
-        revisionDate: revDateClean,
+        revisionDate: rev.fields.hasRevisionDate && rev.fields.revisionDates ? "" : revDateClean,
       };
     }
     return DEFAULT_AAMVA_DATA;

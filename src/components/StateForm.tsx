@@ -81,7 +81,13 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
         documentDiscriminator: "0571-54946", restrictions: "NONE", endorsement: "NONE",
         eyeColor: "BRO", hairColor: "BRO", hairColorOnDL: "BRO",
       } : generateRandomData(stateCode);
-      onChange({ ...data, ...stateDefaults, stateCode, revisionId: rev.id, revisionDate: revDateClean });
+      onChange({
+        ...data,
+        ...stateDefaults,
+        stateCode,
+        revisionId: rev.id,
+        revisionDate: rev.fields.hasRevisionDate && rev.fields.revisionDates ? "" : revDateClean,
+      });
     }
   };
 
@@ -91,7 +97,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
       if (rev) {
         setRevision(rev);
         const revDateClean = rev.revisionDate.replace(/\//g, "");
-        onChange({ ...data, revisionId, revisionDate: revDateClean });
+        onChange({ ...data, revisionId, revisionDate: rev.fields.hasRevisionDate && rev.fields.revisionDates ? "" : revDateClean });
       }
     }
   };

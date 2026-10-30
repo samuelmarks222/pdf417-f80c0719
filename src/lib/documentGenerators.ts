@@ -273,9 +273,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
   const cleanDL = (dlNumber || "").replace(/[^A-Z0-9]/gi, "");
 
   switch (stateCode) {
-    // Alabama: 18 digits
+    // Alabama: 10 fixed zeroes followed by 10 random digits
     case "AL":
-      return randomDigits(18);
+      return `0000000000${randomDigits(10)}`;
 
     // Manitoba: nine numeric characters
     case "MB":

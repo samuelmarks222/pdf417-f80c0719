@@ -135,8 +135,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
   ];
 
   return (
-    <div className="surface-panel overflow-hidden">
-      <div className="border-b border-border/70 bg-gradient-to-br from-primary/[0.07] via-transparent to-amber-400/[0.06] px-4 pb-5 pt-6 text-center sm:px-6">
+    <div className="overflow-visible font-mono">
+      <div className="bg-white px-4 pb-7 pt-7 text-center sm:px-6">
         {/* State & revision selector row */}
         <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
           <Select value={data.stateCode} onValueChange={handleStateChange}>
@@ -170,11 +170,11 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* State name heading */}
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{stateConfig?.name || "Select State"}</h2>
+        <h2 className="text-3xl font-medium tracking-tight text-slate-800 sm:text-4xl">{stateConfig?.name || "Select State"}</h2>
         
         {/* Revision info with gold star */}
         {revision && (
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="mt-2 text-base text-slate-700">
             Rev. {revision.revisionDate} ({revision.aamvaVersion}{revision.jurisdictionVersion})
             {revision.realIdCompliant && (
               <span
@@ -207,7 +207,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
       </div>
 
       {/* Form fields - matching pdf417.pro exact layout */}
-      <div className="space-y-4 p-4 sm:p-6">
+      <div className="space-y-5 rounded-md border border-slate-300 bg-slate-50 p-4 sm:p-6 lg:p-7">
         
         {/* Row 1: DL Number | First name | Last name | Middle name */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

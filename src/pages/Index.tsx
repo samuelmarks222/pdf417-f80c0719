@@ -83,9 +83,9 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-1 py-8 sm:py-12">
-        <div className="container max-w-6xl">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <main className="flex-1 bg-white py-8 sm:py-10">
+        <div className="container max-w-7xl">
+          <div className="hidden">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Barcode workspace</p>
               <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Create a barcode</h1>
@@ -97,7 +97,7 @@ const Index = () => {
               </Link>
             </div>
           </div>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card px-4 py-3.5 shadow-sm sm:px-5">
+          <div className="hidden">
             <div className="text-sm">
               <span className="font-medium text-muted-foreground">Signed in as </span>
               <strong className="font-semibold">{user?.email ?? "Guest"}</strong>

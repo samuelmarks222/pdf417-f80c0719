@@ -25,8 +25,8 @@ export function Header() {
         className={cn(
           "shrink-0 whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium transition-colors sm:px-3.5",
           active
-            ? "bg-[#eaf4ee] text-[#07584e]"
-            : "text-[#52615d] hover:bg-[#f1f5f1] hover:text-[#07584e]",
+            ? "bg-white/10 text-white"
+            : "text-[#aeb5ba] hover:bg-white/10 hover:text-white",
         )}
       >
         {label}
@@ -35,8 +35,8 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-transparent bg-transparent">
-      <div className="mx-auto my-0 flex h-16 w-full max-w-7xl items-center justify-between gap-2 border-b border-white/80 bg-white/95 px-3 shadow-[0_8px_30px_rgba(27,45,38,0.08)] backdrop-blur-xl sm:my-3 sm:gap-5 sm:rounded-full sm:border sm:px-6">
+    <header className="sticky top-0 z-40 w-full bg-[#202427] text-white shadow-sm">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-3 sm:gap-5 sm:px-6">
         <Link to="/" aria-label={`${settings.site_name} home`} className="flex min-w-0 shrink items-center gap-2.5">
           {settings.logo_url ? (
             <img src={settings.logo_url} alt="" className="h-9 max-w-36 object-contain" />
@@ -45,6 +45,7 @@ export function Header() {
               {settings.site_name.charAt(0).toUpperCase()}
             </span>
           )}
+          <span className="truncate text-lg font-bold tracking-tight text-white">{settings.site_name}</span>
         </Link>
 
         <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
@@ -58,7 +59,7 @@ export function Header() {
             <>
               <Link
                 to="/account"
-                className="hidden rounded-full border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:border-primary/40 sm:inline-flex"
+                className="hidden rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-white hover:border-white/30 sm:inline-flex"
               >
                 {profile?.credit_balance ?? "—"} credits
               </Link>
@@ -69,7 +70,7 @@ export function Header() {
                   if (error) toast.error(error);
                 }}
                 title={user.email ?? undefined}
-                className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="rounded-full px-3 py-2 text-sm font-medium text-[#aeb5ba] hover:bg-white/10 hover:text-white"
               >
                 Sign out
               </button>
@@ -82,14 +83,14 @@ export function Header() {
                 const error = await signInWithGoogle();
                 if (error) toast.error(error);
               }}
-              className="rounded-full bg-[#07584e] px-4 text-white hover:bg-[#06483f]"
+              className="rounded-md bg-blue-600 px-4 text-white hover:bg-blue-500"
             >
               Sign in
             </Button>
           )}
         </div>
       </div>
-      <nav aria-label="Mobile navigation" className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-center gap-1 px-0 pb-2 md:hidden">
+      <nav aria-label="Mobile navigation" className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-center gap-1 border-t border-white/10 px-2 py-2 md:hidden">
         {navItems.map((item) => navLink(item.path, item.label))}
         {navLink("/account", "Credits")}
         {profile?.is_admin && navLink("/admin", "Admin")}

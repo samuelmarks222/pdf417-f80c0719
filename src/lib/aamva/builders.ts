@@ -60,11 +60,15 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
     .map((part) => part.trim());
 
   const sourceLastName = sanitizeUpper(data.lastName || "", 128);
+  const usesCombinedName = fields?.hasFirstMiddleCombined ?? false;
   const sourceFirstName = sanitizeUpper(
-    combinedFirstNameRaw || data.firstName || "",
+    (usesCombinedName ? combinedFirstNameRaw || data.firstName : data.firstName) || "",
     128,
   );
-  const sourceMiddleName = sanitizeUpper(combinedMiddleNameRaw || data.middleName || "", 128);
+  const sourceMiddleName = sanitizeUpper(
+    (usesCombinedName ? combinedMiddleNameRaw || data.middleName : data.middleName) || "",
+    128,
+  );
 
   const lastName = sourceLastName.substring(0, 40);
   const firstName = sourceFirstName.substring(0, 40);

@@ -174,7 +174,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
         <h2 className="text-3xl font-medium tracking-tight text-slate-800 sm:text-4xl">{stateConfig?.name || "Select State"}</h2>
         
         {/* Revision info with gold star */}
-        {revision && (
+        {revision && revision.displayRevision !== false && revision.revisionDate && (
           <p className="mt-2 text-base text-slate-700">
             Rev. {revision.revisionDate} ({revision.aamvaVersion}{revision.jurisdictionVersion})
             {revision.realIdCompliant && (
@@ -279,12 +279,6 @@ export function StateForm({ data, onChange }: StateFormProps) {
             <Label className="text-xs">Address</Label>
             <Input value={data.streetAddress} onChange={(e) => updateField("streetAddress", e.target.value.toUpperCase())} placeholder="516 Anson Ct" className="h-9 text-sm mt-1" />
           </div>
-          {fields?.hasAddressLine2 && (
-            <div className="col-span-2 lg:col-span-2">
-              <Label className="text-xs">Address (2nd line)</Label>
-              <Input value={data.addressLine2 ?? ""} onChange={(e) => updateField("addressLine2", e.target.value.toUpperCase())} placeholder="Unit 4" className="h-9 text-sm mt-1" />
-            </div>
-          )}
           <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">City</Label>
             <Input value={data.city} onChange={(e) => updateField("city", e.target.value.toUpperCase())} placeholder="Ronhert Park" className="h-9 text-sm mt-1" />
@@ -481,6 +475,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+          {fields?.hasAddressLine2 && (
+            <div>
+              <Label className="text-xs">Address (2nd line)</Label>
+              <Input value={data.addressLine2 ?? ""} onChange={(e) => updateField("addressLine2", e.target.value.toUpperCase())} placeholder="Unit 4" className="h-9 text-sm mt-1" />
             </div>
           )}
         </div>

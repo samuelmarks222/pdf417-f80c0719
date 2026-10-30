@@ -6,7 +6,6 @@ import { BarcodePreview } from "@/components/BarcodePreview";
 import { AAMVAData, DEFAULT_AAMVA_DATA, generateRandomData } from "@/lib/aamvaData";
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
-import { generateICN } from "@/lib/documentGenerators";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -54,11 +53,6 @@ const Index = () => {
   };
 
   const handleCreate = () => {
-    const revisionData = getRevision(formData.revisionId);
-    const nextData = revisionData?.revision.fields.hasICN
-      ? { ...formData, inventoryControlNumber: generateICN(formData.stateCode, formData.licenseNumber, formData.issueDate) }
-      : formData;
-    setFormData(nextData);
     setCreateRequest((request) => request + 1);
   };
 

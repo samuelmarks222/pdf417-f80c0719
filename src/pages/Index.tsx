@@ -139,6 +139,7 @@ const Index = () => {
               onGenerate={handleGenerate}
               isAdmin={Boolean(profile?.is_admin)}
               createRequest={createRequest}
+              canGenerateCode128={Boolean(getRevision(formData.revisionId)?.revision.fields.hasICN)}
             />
           </div>
 

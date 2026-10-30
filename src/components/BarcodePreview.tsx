@@ -10,9 +10,10 @@ interface BarcodePreviewProps {
   onGenerate?: (generationId: string, dataDigest: string) => Promise<boolean>;
   isAdmin?: boolean;
   createRequest?: number;
+  canGenerateCode128?: boolean;
 }
 
-export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false, createRequest = 0 }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false, createRequest = 0, canGenerateCode128 = true }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -137,7 +138,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
     if (!createRequest) return;
     const runCreate = async () => {
       await generateBarcode();
-      await generateCode128();
+      if (canGenerateCode128) await generateCode128();
     };
     void runCreate();
   }, [createRequest]);
@@ -155,7 +156,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
   return (
     <div className="grid items-stretch gap-5 lg:grid-cols-2">
-      <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
+      {canGenerateCode128 && <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -196,7 +197,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
           {generated && <div className="mt-4 flex flex-wrap justify-end gap-2"><Button size="sm" onClick={() => downloadBarcode("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button><Button variant="outline" size="sm" onClick={() => downloadBarcode("jpeg")} className="gap-2 rounded-full">JPEG</Button></div>}
         </div>
-      </section>
+      </section>}
 
       <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
         <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">

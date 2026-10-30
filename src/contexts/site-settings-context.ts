@@ -24,7 +24,7 @@ export const defaultSiteSettings: SiteSettings = {
   site_tagline: "",
   logo_url: "",
   favicon_url: "",
-  meta_title: "PDF417 Barcode Generator for USA & Canada | PDF417.LIVE",
+  meta_title: "US Driver's License Barcode Generator · PDF417.LIVE",
   meta_description: "Create and download PDF417 and Code 128 barcodes for U.S. driver's licenses and Canadian licence formats. Explore state, province, and territory barcode tools online.",
   meta_keywords: "PDF417 barcode generator, USA driver's license barcode generator, U.S. DL PDF417, AAMVA PDF417 barcode, state driver's license barcode, Canada driver's licence barcode, Canadian DL barcode generator, Canadian province barcode, Canadian territory barcode, Alberta PDF417, Manitoba PDF417, Ontario PDF417, Quebec PDF417, Saskatchewan PDF417, Yukon PDF417, Code 128 barcode generator, PDF417 barcode image, PDF417 PNG download",
   canonical_url: "https://pdf417.live",

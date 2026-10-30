@@ -152,7 +152,9 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
   elements.push(`DAK${normalizePostalCode(data.postalCode)}`);
 
   // Standard/REAL ID
-  elements.push(`DCF${documentDiscriminator}`);
+  if (fields?.hasDD !== false) {
+    elements.push(`DCF${documentDiscriminator}`);
+  }
   elements.push("DCGUSA");
   const compliance = (data.complianceType || "").toUpperCase().substring(0, 1);
   const allowedCompliance = ["A", "B", "F", "Q", "V"];

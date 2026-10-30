@@ -229,7 +229,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
       case "MB":
         return `EJ-QV-BP-V${randomNum(100, 999)}${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1, 9)}`;
       case "ON":
-        return `R${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
+        return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
       case "QC":
         return `R${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
       case "SK":

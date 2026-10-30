@@ -112,6 +112,7 @@ export interface AAMVAData {
   
   // Address
   streetAddress: string;
+  addressLine2?: string;
   city: string;
   postalCode: string;
   

@@ -109,6 +109,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
   };
 
   const fields = revision?.fields;
+  const isCanadian = stateConfig?.country === "Canada";
 
   const CalcIcon = ({ onClick }: { onClick: () => void }) => (
     <button onClick={onClick} className="inline-flex ml-1 text-muted-foreground hover:text-primary" type="button">
@@ -278,13 +279,19 @@ export function StateForm({ data, onChange }: StateFormProps) {
             <Label className="text-xs">Address</Label>
             <Input value={data.streetAddress} onChange={(e) => updateField("streetAddress", e.target.value.toUpperCase())} placeholder="516 Anson Ct" className="h-9 text-sm mt-1" />
           </div>
+          {fields?.hasAddressLine2 && (
+            <div className="col-span-2 lg:col-span-2">
+              <Label className="text-xs">Address (2nd line)</Label>
+              <Input value={data.addressLine2 ?? ""} onChange={(e) => updateField("addressLine2", e.target.value.toUpperCase())} placeholder="Unit 4" className="h-9 text-sm mt-1" />
+            </div>
+          )}
           <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">City</Label>
             <Input value={data.city} onChange={(e) => updateField("city", e.target.value.toUpperCase())} placeholder="Ronhert Park" className="h-9 text-sm mt-1" />
           </div>
           <div className="col-span-1 lg:col-span-2">
             <Label className="text-xs">Zip code</Label>
-            <Input value={data.postalCode} onChange={(e) => updateField("postalCode", e.target.value.replace(/\D/g, "").slice(0, 9))} placeholder="875420000" maxLength={9} className="h-9 text-sm mt-1" />
+            <Input value={data.postalCode} onChange={(e) => updateField("postalCode", isCanadian ? e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, "").slice(0, 7) : e.target.value.replace(/\D/g, "").slice(0, 9))} placeholder={isCanadian ? "A1A 1A1" : "875420000"} maxLength={isCanadian ? 7 : 9} className="h-9 text-sm mt-1" />
           </div>
           {fields?.hasDLClass && (
             <div className="col-span-1 lg:col-span-1">
@@ -322,7 +329,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </p>
             </div>
           )}
-          <div className="col-span-2 lg:col-span-2">
+          <div className="hidden">
             <Label className="text-xs">Compliance Type</Label>
             <Select value={data.complianceType} onValueChange={(v) => updateField("complianceType", v)}>
               <SelectTrigger className="h-9 text-sm mt-1" aria-label="Compliance Type">
@@ -393,21 +400,21 @@ export function StateForm({ data, onChange }: StateFormProps) {
             </div>
           )}
           <div>
-            <Label className="text-xs">Height (in.)</Label>
+            <Label className="text-xs">Height ({fields?.heightUnit === "cm" ? "cm" : "in."})</Label>
             <div className="relative">
-              <Input value={data.height} onChange={(e) => updateField("height", e.target.value.replace(/\D/g, "").slice(0, 2))} placeholder="69" maxLength={2} className="h-9 text-sm mt-1 pr-16" />
+              <Input value={data.height} onChange={(e) => updateField("height", e.target.value.replace(/\D/g, "").slice(0, fields?.heightUnit === "cm" ? 3 : 2))} placeholder={fields?.heightUnit === "cm" ? "175" : "69"} maxLength={fields?.heightUnit === "cm" ? 3 : 2} className="h-9 text-sm mt-1 pr-16" />
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground mt-0.5">
-                ≈ {inchesToCm(parseInt(data.height) || 0)} cm
+                {fields?.heightUnit === "cm" ? "cm" : `≈ ${inchesToCm(parseInt(data.height) || 0)} cm`}
               </span>
             </div>
           </div>
           {fields?.hasWeight && (
             <div>
-              <Label className="text-xs">Weight (lb.)</Label>
+            <Label className="text-xs">Weight ({fields?.weightUnit === "kg" ? "kg." : "lb."})</Label>
               <div className="relative">
                 <Input value={data.weight} onChange={(e) => updateField("weight", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="169" maxLength={3} className="h-9 text-sm mt-1 pr-16" />
                 <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground mt-0.5">
-                  ≈ {lbsToKg(parseInt(data.weight) || 0)} kg
+                  {fields?.weightUnit === "kg" ? "kg" : `≈ ${lbsToKg(parseInt(data.weight) || 0)} kg`}
                 </span>
               </div>
             </div>

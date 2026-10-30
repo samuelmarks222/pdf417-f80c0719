@@ -19,6 +19,7 @@ export interface AamvaEncodeInput {
   firstMiddleName: string;
   nameSuffix: string;
   streetAddress: string;
+  addressLine2?: string;
   city: string;
   postalCode: string;
   dateOfBirth: string;
@@ -127,6 +128,9 @@ export function buildDlSubfile({ data, fullStateName }: BuildDlSubfileArgs): str
 
   // Address
   elements.push(`DAG${sanitizeUpper(data.streetAddress || FALLBACKS.STREET, 80)}`);
+  if (data.addressLine2) {
+    elements.push(`DAH${sanitizeUpper(data.addressLine2, 80)}`);
+  }
   elements.push(`DAI${sanitizeUpper(data.city || FALLBACKS.CITY, 40)}`);
   elements.push(`DAJ${stateCode}`);
   elements.push(`DAK${normalizePostalCode(data.postalCode)}`);

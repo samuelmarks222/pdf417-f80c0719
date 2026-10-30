@@ -404,6 +404,12 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
               <Input value={data.inventoryControlNumber} onChange={(e) => updateField("inventoryControlNumber", e.target.value)} placeholder="Click calculator" className="h-9 text-[11px] mt-1" />
             </div>
           )}
+          {fields?.hasAuditInfo && (
+            <div>
+              <Label className="text-xs flex items-center">Audit info <InfoIcon text="Louisiana audit information" /> <CalcIcon onClick={() => updateField("auditInfo", data.auditInfo || "4174")} /></Label>
+              <Input value={data.auditInfo} onChange={(e) => updateField("auditInfo", e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="4174" maxLength={4} className="h-9 text-[11px] mt-1" />
+            </div>
+          )}
         </div>
 
         {/* Row 4: Restrictions | Endorsement | Height | Weight */}
@@ -534,6 +540,18 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
             <div>
               <Label className="text-xs">Address (2nd line)</Label>
               <Input value={data.addressLine2 ?? ""} onChange={(e) => updateField("addressLine2", e.target.value.toUpperCase())} placeholder="Unit 4" className="h-9 text-sm mt-1" />
+            </div>
+          )}
+          {fields?.hasIssuingOffice && (
+            <div>
+              <Label className="text-xs flex items-center">Issuing Office <InfoIcon text="Louisiana issuing office" /> <CalcIcon onClick={() => updateField("issuingOffice", data.issuingOffice || "033")} /></Label>
+              <Input value={data.issuingOffice} onChange={(e) => updateField("issuingOffice", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="033" maxLength={3} className="h-9 text-sm mt-1" />
+            </div>
+          )}
+          {fields?.hasParish && (
+            <div>
+              <Label className="text-xs">Parish</Label>
+              <Input value={data.parish} onChange={(e) => updateField("parish", e.target.value.replace(/\D/g, "").slice(0, 2))} placeholder="52" maxLength={2} className="h-9 text-sm mt-1" />
             </div>
           )}
         </div>

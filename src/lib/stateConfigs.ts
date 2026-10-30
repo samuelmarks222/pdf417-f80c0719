@@ -31,6 +31,9 @@ export interface StateFieldConfig {
   hasNameSuffix: boolean;
   hasSafeDriver: boolean;
   hasRevisionDate: boolean;
+  hasAuditInfo?: boolean;
+  hasIssuingOffice?: boolean;
+  hasParish?: boolean;
   hasAddressLine2?: boolean;
   heightUnit?: "in" | "cm";
   weightUnit?: "lb" | "kg";
@@ -465,7 +468,7 @@ export const STATE_CONFIGS: StateConfig[] = [
         aamvaVersion: "08",
         jurisdictionVersion: "00",
         realIdCompliant: false,
-        fields: { ...defaultFields },
+        fields: { ...defaultFields, hasDD: false, hasAuditInfo: true, hasIssuingOffice: true, hasParish: true, hasNameSuffix: true },
       },
     ],
   },

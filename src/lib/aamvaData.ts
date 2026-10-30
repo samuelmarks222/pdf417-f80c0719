@@ -143,6 +143,9 @@ export interface AAMVAData {
   expirationDate: string;
   documentDiscriminator: string;
   inventoryControlNumber: string;
+  auditInfo: string;
+  issuingOffice: string;
+  parish: string;
   restrictions: string;
   complianceType: string;
   endorsement: string;
@@ -183,6 +186,9 @@ export const DEFAULT_AAMVA_DATA: AAMVAData = {
   expirationDate: "01152026",
   documentDiscriminator: "39JVRM7512",
   inventoryControlNumber: "A8F9G2H1J3K",
+  auditInfo: "",
+  issuingOffice: "",
+  parish: "",
   restrictions: "NONE",
   endorsement: "NONE",
   complianceType: "F",
@@ -284,6 +290,9 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     expirationDate,
     documentDiscriminator: generateDD(stateCode, issueDate, expirationDate, licenseNumber),
     inventoryControlNumber: generateICN(stateCode, licenseNumber, issueDate),
+    auditInfo: stateCode === "LA" ? "4174" : "",
+    issuingOffice: stateCode === "LA" ? "033" : "",
+    parish: stateCode === "LA" ? "52" : "",
   };
 }
 

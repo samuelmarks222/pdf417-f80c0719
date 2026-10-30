@@ -1142,7 +1142,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600002",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "BC", name: "British Columbia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasAddressLine2: true, hasHairColor: true, hasHairColorOnDL: true, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "BC", name: "British Columbia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasAddressLine2: true, hasHairColor: true, hasHairColorOnDL: true, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "MB",
@@ -1157,7 +1157,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600004",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "NB", name: "New Brunswick", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "NB", name: "New Brunswick", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "NL",
@@ -1165,7 +1165,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600005",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "NL", name: "Newfoundland and Labrador", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "NL", name: "Newfoundland and Labrador", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "NS",
@@ -1173,7 +1173,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600006",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "NS", name: "Nova Scotia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "NS", name: "Nova Scotia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "NT",
@@ -1181,7 +1181,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600007",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "NT", name: "Northwest Territories", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "NT", name: "Northwest Territories", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "NU",
@@ -1189,7 +1189,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     iin: "600008",
     country: "Canada",
     comingSoon: true,
-    revisions: [{ id: "NU", name: "Nunavut", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "NU", name: "Nunavut", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "ON",
@@ -1203,7 +1203,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Prince Edward Island",
     iin: "600010",
     country: "Canada",
-    revisions: [{ id: "PE", name: "Prince Edward Island", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
+    revisions: [{ id: "PE", name: "Prince Edward Island", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg", dateFormat: "YYYYMMDD" } }],
   },
   {
     code: "QC",

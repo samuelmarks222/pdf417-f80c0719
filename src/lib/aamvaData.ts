@@ -212,7 +212,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   
   const expYear = issueYear + randomNum(4, 8);
   const isAlberta = stateCode === "AB";
-  const usesCanadianDateOrder = ["AB", "MB", "ON", "QC", "SK", "YT"].includes(stateCode);
+  const usesCanadianDateOrder = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"].includes(stateCode);
   const usesCanadianMetric = usesCanadianDateOrder;
   
   const firstName = randomChoice(firstNames);

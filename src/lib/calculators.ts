@@ -165,7 +165,8 @@ export function calculateIssueDate(stateCode?: string): string {
   const year = randomNum(minYear, maxYear);
   const month = randomNum(1, 12);
   const day = randomNum(1, 28);
-  return stateCode === "AB" ? `${year}${padZero(month)}${padZero(day)}` : `${padZero(month)}${padZero(day)}${year}`;
+  const canadianStates = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
+  return canadianStates.includes(stateCode || "") ? `${year}${padZero(month)}${padZero(day)}` : `${padZero(month)}${padZero(day)}${year}`;
 }
 
 // Calculate expiry date based on issue date and state rules
@@ -173,7 +174,7 @@ export function calculateIssueDate(stateCode?: string): string {
 export function calculateExpiryDate(issueDate: string, stateCode: string, dateOfBirth?: string): string {
   if (issueDate.length !== 8) return "";
   
-  const isCanadianDate = ["AB", "MB", "ON", "QC", "SK", "YT"].includes(stateCode);
+  const isCanadianDate = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"].includes(stateCode);
   const issueMonth = parseInt(isCanadianDate ? issueDate.substring(4, 6) : issueDate.substring(0, 2));
   const issueDay = parseInt(isCanadianDate ? issueDate.substring(6, 8) : issueDate.substring(2, 4));
   const issueYear = parseInt(isCanadianDate ? issueDate.substring(0, 4) : issueDate.substring(4, 8));
@@ -190,7 +191,7 @@ export function calculateExpiryDate(issueDate: string, stateCode: string, dateOf
   const years = validityPeriods[stateCode] || 5;
   
   // Some states expire on birthday - use DOB month/day if available
-  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "MB", "ON", "QC", "SK", "YT", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
+  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
     const dobMonth = isCanadianDate ? parseInt(dateOfBirth.substring(4, 6)) : parseInt(dateOfBirth.substring(0, 2));
     const dobDay = isCanadianDate ? parseInt(dateOfBirth.substring(6, 8)) : parseInt(dateOfBirth.substring(2, 4));
     let expiryYear = issueYear + years;

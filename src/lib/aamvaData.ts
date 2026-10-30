@@ -1,6 +1,7 @@
 // AAMVA Driver License/ID Data Structure
 import { generateDD, generateICN } from "./documentGenerators";
 import { getStateConfig } from "./stateConfigs";
+import { calculateExpiryDate } from "./calculators";
 
 export const EYE_COLORS = [
   { code: "BLK", name: "Black" },
@@ -225,8 +226,6 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const issueMonth = padZero(randomNum(1, 12), 2);
   const issueDay = padZero(randomNum(1, 28), 2);
   
-  const expYear = issueYear + randomNum(4, 8);
-  const isAlberta = stateCode === "AB";
   const usesCanadianDateOrder = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"].includes(stateCode);
   const usesCanadianMetric = usesCanadianDateOrder;
   
@@ -266,7 +265,8 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
 
   const licenseNumber = generateLicenseNumber(stateCode);
   const issueDate = usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`;
-  const expirationDate = usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`;
+  const dateOfBirth = usesCanadianDateOrder ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`;
+  const expirationDate = calculateExpiryDate(issueDate, stateCode, dateOfBirth);
 
   return {
     firstName,
@@ -276,7 +276,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     streetAddress: `${randomNum(100, 9999)} ${randomChoice(streets)}`,
     city: randomChoice(cities),
     postalCode: `${randomNum(10000, 99999)}${randomNum(1000, 9999)}`,
-    dateOfBirth: usesCanadianDateOrder ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`,
+    dateOfBirth,
     gender: randomChoice(GENDER_OPTIONS).code,
     eyeColor: randomChoice(EYE_COLORS).code,
     eyeColorOnDL: randomChoice(EYE_COLORS_ON_DL).code,

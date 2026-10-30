@@ -169,36 +169,78 @@ export function calculateIssueDate(stateCode?: string): string {
   return canadianStates.includes(stateCode || "") ? `${year}${padZero(month)}${padZero(day)}` : `${padZero(month)}${padZero(day)}${year}`;
 }
 
-// Calculate expiry date based on issue date and state rules
-// Most states have 4-8 year validity periods
+type ExpirationAnchor = "issue-date" | "birthday" | "day-after-birthday" | "end-of-month" | "age-65";
+
+interface ExpirationRule {
+  anchor: ExpirationAnchor;
+  years: number;
+}
+
+const EXPIRATION_RULES: Record<string, ExpirationRule> = {
+  AL: { anchor: "issue-date", years: 4 }, AK: { anchor: "birthday", years: 5 }, AZ: { anchor: "age-65", years: 0 },
+  AR: { anchor: "birthday", years: 8 }, CA: { anchor: "birthday", years: 5 }, CO: { anchor: "birthday", years: 5 },
+  CT: { anchor: "birthday", years: 6 }, DE: { anchor: "birthday", years: 8 }, DC: { anchor: "birthday", years: 8 },
+  FL: { anchor: "birthday", years: 8 }, GA: { anchor: "birthday", years: 8 }, HI: { anchor: "birthday", years: 8 },
+  ID: { anchor: "birthday", years: 8 }, IL: { anchor: "birthday", years: 4 }, IN: { anchor: "birthday", years: 6 },
+  IA: { anchor: "birthday", years: 5 }, KS: { anchor: "birthday", years: 6 }, KY: { anchor: "issue-date", years: 4 },
+  LA: { anchor: "birthday", years: 6 }, ME: { anchor: "birthday", years: 6 }, MD: { anchor: "birthday", years: 8 },
+  MA: { anchor: "birthday", years: 5 }, MI: { anchor: "birthday", years: 4 }, MN: { anchor: "birthday", years: 4 },
+  MS: { anchor: "issue-date", years: 4 }, MO: { anchor: "birthday", years: 6 }, MT: { anchor: "birthday", years: 8 },
+  NE: { anchor: "birthday", years: 5 }, NV: { anchor: "birthday", years: 8 }, NH: { anchor: "birthday", years: 5 },
+  NJ: { anchor: "birthday", years: 4 }, NM: { anchor: "birthday", years: 4 }, NY: { anchor: "birthday", years: 8 },
+  NC: { anchor: "birthday", years: 8 }, ND: { anchor: "birthday", years: 6 }, OH: { anchor: "birthday", years: 4 },
+  OK: { anchor: "end-of-month", years: 4 }, OR: { anchor: "birthday", years: 8 }, PA: { anchor: "day-after-birthday", years: 4 },
+  RI: { anchor: "birthday", years: 5 }, SC: { anchor: "birthday", years: 8 }, SD: { anchor: "birthday", years: 5 },
+  TN: { anchor: "birthday", years: 8 }, TX: { anchor: "birthday", years: 8 }, UT: { anchor: "birthday", years: 5 },
+  VT: { anchor: "birthday", years: 4 }, VA: { anchor: "birthday", years: 8 }, WA: { anchor: "birthday", years: 6 },
+  WV: { anchor: "end-of-month", years: 5 }, WI: { anchor: "birthday", years: 8 }, WY: { anchor: "birthday", years: 5 },
+};
+
+const CANADIAN_CODES = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
+
+function formatCalculatedDate(date: Date, canadian: boolean): string {
+  const year = date.getFullYear().toString();
+  const month = padZero(date.getMonth() + 1);
+  const day = padZero(date.getDate());
+  return canadian ? `${year}${month}${day}` : `${month}${day}${year}`;
+}
+
+function addYears(date: Date, years: number): Date {
+  const result = new Date(date.getFullYear() + years, date.getMonth(), date.getDate());
+  if (result.getMonth() !== date.getMonth()) result.setDate(0);
+  return result;
+}
+
+// Calculate expiry date using each jurisdiction's supplied anchor and validity rule.
 export function calculateExpiryDate(issueDate: string, stateCode: string, dateOfBirth?: string): string {
   if (issueDate.length !== 8) return "";
-  
-  const isCanadianDate = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"].includes(stateCode);
+
+  const isCanadianDate = CANADIAN_CODES.includes(stateCode);
   const issueMonth = parseInt(isCanadianDate ? issueDate.substring(4, 6) : issueDate.substring(0, 2));
   const issueDay = parseInt(isCanadianDate ? issueDate.substring(6, 8) : issueDate.substring(2, 4));
   const issueYear = parseInt(isCanadianDate ? issueDate.substring(0, 4) : issueDate.substring(4, 8));
-  
-  // State-specific validity periods (years)
-  const validityPeriods: Record<string, number> = {
-    AB: 5, AL: 4, AK: 5, AZ: 8, AR: 8, CA: 5, CO: 5, CT: 6, DE: 8, DC: 8, FL: 8,
-    GA: 8, HI: 8, ID: 8, IL: 4, IN: 6, IA: 8, KS: 6, KY: 8, LA: 6, ME: 6,
-    MD: 8, MA: 5, MI: 4, MN: 4, MS: 4, MO: 6, MT: 8, NE: 5, NV: 8, NH: 5,
-    NJ: 4, NM: 4, NY: 8, NC: 8, ND: 6, OH: 4, OK: 4, OR: 8, PA: 4, RI: 5,
-    SC: 10, SD: 5, TN: 8, TX: 8, UT: 5, VT: 4, VA: 8, WA: 6, WV: 8, WI: 8, WY: 4,
-  };
-  
-  const years = validityPeriods[stateCode] || 5;
-  
-  // Some states expire on birthday - use DOB month/day if available
-  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
-    const dobMonth = isCanadianDate ? parseInt(dateOfBirth.substring(4, 6)) : parseInt(dateOfBirth.substring(0, 2));
-    const dobDay = isCanadianDate ? parseInt(dateOfBirth.substring(6, 8)) : parseInt(dateOfBirth.substring(2, 4));
-    let expiryYear = issueYear + years;
-    if (isCanadianDate) return `${expiryYear}${padZero(dobMonth)}${padZero(dobDay)}`;
-    return `${padZero(dobMonth)}${padZero(dobDay)}${expiryYear}`;
+
+  const suppliedRule = EXPIRATION_RULES[stateCode];
+  const rule = suppliedRule || (isCanadianDate ? { anchor: "birthday" as const, years: 5 } : { anchor: "issue-date" as const, years: 5 });
+  const issue = new Date(issueYear, issueMonth - 1, issueDay);
+  if (!dateOfBirth || dateOfBirth.length !== 8) {
+    return formatCalculatedDate(addYears(issue, rule.years || 5), isCanadianDate);
   }
-  
-  const expiryYear = issueYear + years;
-  return `${padZero(issueMonth)}${padZero(issueDay)}${expiryYear}`;
+
+  const dobMonth = isCanadianDate ? parseInt(dateOfBirth.substring(4, 6)) : parseInt(dateOfBirth.substring(0, 2));
+  const dobDay = isCanadianDate ? parseInt(dateOfBirth.substring(6, 8)) : parseInt(dateOfBirth.substring(2, 4));
+  const dobYear = isCanadianDate ? parseInt(dateOfBirth.substring(0, 4)) : parseInt(dateOfBirth.substring(4, 8));
+
+  if (rule.anchor === "issue-date") return formatCalculatedDate(addYears(issue, rule.years), isCanadianDate);
+
+  if (rule.anchor === "age-65") {
+    let targetYear = dobYear + 65;
+    while (targetYear <= issueYear) targetYear += 5;
+    return formatCalculatedDate(new Date(targetYear, dobMonth - 1, dobDay), isCanadianDate);
+  }
+
+  let target = new Date(issueYear + rule.years, dobMonth - 1, dobDay);
+  if (rule.anchor === "end-of-month") target = new Date(issueYear + rule.years, dobMonth, 0);
+  if (rule.anchor === "day-after-birthday") target.setDate(target.getDate() + 1);
+  return formatCalculatedDate(target, isCanadianDate);
 }

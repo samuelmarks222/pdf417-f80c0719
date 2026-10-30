@@ -31,7 +31,7 @@ function parseDateParts(issueDate?: string) {
 // ===================== DOCUMENT DISCRIMINATOR (DD / DCF) =====================
 // Based on real barcode calibration sheets from state DMVs and AAMVA CDS specs
 
-export function generateDD(stateCode: string, issueDate?: string, expirationDate?: string): string {
+export function generateDD(stateCode: string, issueDate?: string, expirationDate?: string, licenseNumber?: string): string {
   const { month, day, year, shortYear } = parseDateParts(issueDate);
 
   switch (stateCode) {
@@ -47,7 +47,7 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "SK":
       return randomDigits(10);
     case "YT":
-      return `${randomDigits(6)}${randomLetter()}${randomDigits(1)}`;
+      return `${(licenseNumber || randomDigits(6)).replace(/\D/g, "") || randomDigits(6)}R0`;
     // Alabama: 2 letters + 8 digits
     case "AL":
       return `${randomLetters(2)}${randomDigits(8)}`;

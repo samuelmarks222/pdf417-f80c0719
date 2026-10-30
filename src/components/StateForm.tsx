@@ -54,6 +54,10 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   }, [data.stateCode]);
 
   const updateField = (field: keyof AAMVAData, value: string) => {
+    if (field === "licenseNumber" && data.stateCode === "YT") {
+      onChange({ ...data, licenseNumber: value, documentDiscriminator: `${value.replace(/\D/g, "") || value}R0` });
+      return;
+    }
     onChange({ ...data, [field]: value });
   };
 
@@ -92,7 +96,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
 
   const handleGenerateDD = () => {
     if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
-    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate, data.expirationDate));
+    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate, data.expirationDate, data.licenseNumber));
   };
 
   const handleGenerateICN = () => {

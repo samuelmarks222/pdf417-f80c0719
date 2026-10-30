@@ -247,6 +247,10 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     }
   };
 
+  const licenseNumber = generateLicenseNumber(stateCode);
+  const issueDate = usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`;
+  const expirationDate = usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`;
+
   return {
     firstName,
     middleName,
@@ -263,12 +267,12 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     hairColorOnDL: randomChoice(HAIR_COLORS_ON_DL).code,
     height: usesCanadianMetric ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
-    licenseNumber: generateLicenseNumber(stateCode),
+    licenseNumber,
     dlClass: stateCode === "ON" ? "G" : "C",
-    issueDate: usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`,
-    expirationDate: usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: generateDD(stateCode, usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`, usesCanadianDateOrder ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`),
-    inventoryControlNumber: generateICN(stateCode, generateLicenseNumber(stateCode), `${issueMonth}${issueDay}${issueYear}`),
+    issueDate,
+    expirationDate,
+    documentDiscriminator: generateDD(stateCode, issueDate, expirationDate, licenseNumber),
+    inventoryControlNumber: generateICN(stateCode, licenseNumber, issueDate),
   };
 }
 

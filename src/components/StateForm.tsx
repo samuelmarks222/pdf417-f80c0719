@@ -38,6 +38,7 @@ interface StateFormProps {
 }
 
 const randomDigits = (length: number) => Array.from({ length }, () => Math.floor(Math.random() * 10)).join("");
+const LOUISIANA_ISSUING_OFFICES = ["022", "021", "025", "032", "027", "029", "033", "026", "035", "031", "024", "023", "034"];
 
 export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   const [stateConfig, setStateConfig] = useState<StateConfig | null>(null);
@@ -112,7 +113,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   const handleCalcLastName = () => updateField("lastName", generateLastName());
   const handleCalcFirstMiddleName = () => updateField("firstMiddleName", generateFirstMiddleName(data.gender));
   const handleCalcAuditInfo = () => updateField("auditInfo", randomDigits(4));
-  const handleCalcIssuingOffice = () => updateField("issuingOffice", `0${randomDigits(2)}`);
+  const handleCalcIssuingOffice = () => updateField("issuingOffice", LOUISIANA_ISSUING_OFFICES[Math.floor(Math.random() * LOUISIANA_ISSUING_OFFICES.length)]);
   const handleCalcBirthDate = () => {
     const generated = generateRandomData(data.stateCode);
     if (generated.dateOfBirth) updateField("dateOfBirth", generated.dateOfBirth);

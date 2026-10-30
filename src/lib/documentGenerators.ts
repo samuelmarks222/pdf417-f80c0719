@@ -43,7 +43,7 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "ON":
       return `G${randomLetter()}${randomDigits(7)}`;
     case "QC":
-      return `PEUS${randomDigits(2)}YRZ`;
+      return `PE${randomLetters(2)}${randomDigits(2)}${randomLetters(2)}${randomLetter()}`;
     case "SK":
       return randomDigits(10);
     case "YT":
@@ -284,6 +284,14 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     // Ontario: seven numeric characters
     case "ON":
       return randomDigits(7);
+
+    // Quebec: seven numeric characters
+    case "QC":
+      return randomDigits(7);
+
+    // Saskatchewan: one letter followed by eight numeric characters
+    case "SK":
+      return `${randomLetter()}${randomDigits(8)}`;
 
     // Alaska: 15 alphanumeric
     case "AK":

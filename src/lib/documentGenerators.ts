@@ -35,6 +35,9 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
   const { month, day, year, shortYear } = parseDateParts(issueDate);
 
   switch (stateCode) {
+    // Alberta: four digits, hyphen, five digits (e.g. 0571-54946)
+    case "AB":
+      return `${randomDigits(4)}-${randomDigits(5)}`;
     // Alabama: 2 letters + 8 digits
     case "AL":
       return `${randomLetters(2)}${randomDigits(8)}`;

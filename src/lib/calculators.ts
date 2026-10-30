@@ -37,6 +37,7 @@ export function generateFirstMiddleName(gender?: string): string {
 // State-specific DL number formats
 export function generateDLNumber(stateCode: string): string {
   switch (stateCode) {
+    case "AB": return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
     case "AL": return `${randomNum(1000000, 9999999)}`;
     case "AK": return `${randomNum(1000000, 9999999)}`;
     case "AZ": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000000, 99999999)}`;
@@ -152,14 +153,14 @@ export function generateDLNumber(stateCode: string): string {
 // ===================== DATE CALCULATORS =====================
 
 // Generate a random issue date between 2021 and current year
-export function calculateIssueDate(): string {
+export function calculateIssueDate(stateCode?: string): string {
   const currentYear = new Date().getFullYear();
   const minYear = 2021;
   const maxYear = Math.min(currentYear, 2026);
   const year = randomNum(minYear, maxYear);
   const month = randomNum(1, 12);
   const day = randomNum(1, 28);
-  return `${padZero(month)}${padZero(day)}${year}`;
+  return stateCode === "AB" ? `${year}${padZero(month)}${padZero(day)}` : `${padZero(month)}${padZero(day)}${year}`;
 }
 
 // Calculate expiry date based on issue date and state rules
@@ -167,13 +168,14 @@ export function calculateIssueDate(): string {
 export function calculateExpiryDate(issueDate: string, stateCode: string, dateOfBirth?: string): string {
   if (issueDate.length !== 8) return "";
   
-  const issueMonth = parseInt(issueDate.substring(0, 2));
-  const issueDay = parseInt(issueDate.substring(2, 4));
-  const issueYear = parseInt(issueDate.substring(4, 8));
+  const isAlberta = stateCode === "AB";
+  const issueMonth = parseInt(isAlberta ? issueDate.substring(4, 6) : issueDate.substring(0, 2));
+  const issueDay = parseInt(isAlberta ? issueDate.substring(6, 8) : issueDate.substring(2, 4));
+  const issueYear = parseInt(isAlberta ? issueDate.substring(0, 4) : issueDate.substring(4, 8));
   
   // State-specific validity periods (years)
   const validityPeriods: Record<string, number> = {
-    AL: 4, AK: 5, AZ: 8, AR: 8, CA: 5, CO: 5, CT: 6, DE: 8, DC: 8, FL: 8,
+    AB: 5, AL: 4, AK: 5, AZ: 8, AR: 8, CA: 5, CO: 5, CT: 6, DE: 8, DC: 8, FL: 8,
     GA: 8, HI: 8, ID: 8, IL: 4, IN: 6, IA: 8, KS: 6, KY: 8, LA: 6, ME: 6,
     MD: 8, MA: 5, MI: 4, MN: 4, MS: 4, MO: 6, MT: 8, NE: 5, NV: 8, NH: 5,
     NJ: 4, NM: 4, NY: 8, NC: 8, ND: 6, OH: 4, OK: 4, OR: 8, PA: 4, RI: 5,
@@ -183,10 +185,11 @@ export function calculateExpiryDate(issueDate: string, stateCode: string, dateOf
   const years = validityPeriods[stateCode] || 5;
   
   // Some states expire on birthday - use DOB month/day if available
-  if (dateOfBirth && dateOfBirth.length === 8 && ["CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
-    const dobMonth = parseInt(dateOfBirth.substring(0, 2));
-    const dobDay = parseInt(dateOfBirth.substring(2, 4));
+  if (dateOfBirth && dateOfBirth.length === 8 && ["AB", "CA", "NY", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"].includes(stateCode)) {
+    const dobMonth = parseInt(isAlberta ? dateOfBirth.substring(4, 6) : dateOfBirth.substring(0, 2));
+    const dobDay = parseInt(isAlberta ? dateOfBirth.substring(6, 8) : dateOfBirth.substring(2, 4));
     let expiryYear = issueYear + years;
+    if (isAlberta) return `${expiryYear}${padZero(dobMonth)}${padZero(dobDay)}`;
     return `${padZero(dobMonth)}${padZero(dobDay)}${expiryYear}`;
   }
   

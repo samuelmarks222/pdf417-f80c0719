@@ -34,6 +34,9 @@ export interface StateFieldConfig {
   hasAddressLine2?: boolean;
   heightUnit?: "in" | "cm";
   weightUnit?: "lb" | "kg";
+  dateFormat?: "MMDDYYYY" | "YYYYMMDD";
+  ddInDetailsRow?: boolean;
+  weightInAppearanceRow?: boolean;
   revisionDates?: string[];
 }
 
@@ -1130,7 +1133,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Alberta",
     iin: "600001",
     country: "Canada",
-    revisions: [{ id: "AB", name: "Alberta", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasAddressLine2: true, hasHairColor: true, hasHairColorOnDL: true, heightUnit: "cm", weightUnit: "lb" } }],
+    revisions: [{ id: "AB", name: "Alberta", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasAddressLine2: true, hasHairColor: true, hasHairColorOnDL: true, heightUnit: "cm", weightUnit: "lb", dateFormat: "YYYYMMDD", ddInDetailsRow: true, weightInAppearanceRow: true } }],
   },
   {
     code: "BC",

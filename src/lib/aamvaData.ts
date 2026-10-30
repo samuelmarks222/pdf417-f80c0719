@@ -211,6 +211,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const issueDay = padZero(randomNum(1, 28), 2);
   
   const expYear = issueYear + randomNum(4, 8);
+  const isAlberta = stateCode === "AB";
   
   const firstName = randomChoice(firstNames);
   const middleName = randomChoice(middleNames);
@@ -221,6 +222,8 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     switch (state) {
       case "CA":
         return `D${randomNum(1000000, 9999999)}`;
+      case "AB":
+        return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
       case "TX":
         return `${randomNum(10000000, 99999999)}`;
       case "FL":
@@ -240,18 +243,18 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     streetAddress: `${randomNum(100, 9999)} ${randomChoice(streets)}`,
     city: randomChoice(cities),
     postalCode: `${randomNum(10000, 99999)}${randomNum(1000, 9999)}`,
-    dateOfBirth: `${birthMonth}${birthDay}${birthYear}`,
+    dateOfBirth: isAlberta ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`,
     gender: randomChoice(GENDER_OPTIONS).code,
     eyeColor: randomChoice(EYE_COLORS).code,
     eyeColorOnDL: randomChoice(EYE_COLORS_ON_DL).code,
     hairColor: randomChoice(HAIR_COLORS).code,
     hairColorOnDL: randomChoice(HAIR_COLORS_ON_DL).code,
-    height: randomNum(60, 78).toString(),
+    height: isAlberta ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
     licenseNumber: generateLicenseNumber(stateCode),
-    issueDate: `${issueMonth}${issueDay}${issueYear}`,
-    expirationDate: `${issueMonth}${issueDay}${expYear}`,
-    documentDiscriminator: generateDD(stateCode, `${issueMonth}${issueDay}${issueYear}`, `${issueMonth}${issueDay}${expYear}`),
+    issueDate: isAlberta ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`,
+    expirationDate: isAlberta ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`,
+    documentDiscriminator: generateDD(stateCode, isAlberta ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`, isAlberta ? `${issueYear + 5}${birthMonth}${birthDay}` : `${issueMonth}${issueDay}${expYear}`),
     inventoryControlNumber: generateICN(stateCode, generateLicenseNumber(stateCode), `${issueMonth}${issueDay}${issueYear}`),
   };
 }

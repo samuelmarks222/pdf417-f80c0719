@@ -61,7 +61,15 @@ export function StateForm({ data, onChange }: StateFormProps) {
     if (config) {
       const rev = config.revisions[0];
       const revDateClean = rev.revisionDate.replace(/\//g, "");
-      onChange({ ...data, stateCode, revisionId: rev.id, revisionDate: revDateClean });
+      const albertaDefaults = stateCode === "AB" ? {
+        firstName: "LARRY", middleName: "PETER", lastName: "TERRELL", firstMiddleName: "",
+        streetAddress: "452 SCIMITAR BAY NW", city: "CALGARY", postalCode: "T3L 1S7",
+        dateOfBirth: "19800708", issueDate: "20210114", expirationDate: "20260708",
+        licenseNumber: "165785-754", dlClass: "5", gender: "1", height: "175", weight: "169",
+        documentDiscriminator: "0571-54946", restrictions: "NONE", endorsement: "NONE",
+        eyeColor: "BRO", hairColor: "BRO", hairColorOnDL: "BRO",
+      } : {};
+      onChange({ ...data, ...albertaDefaults, stateCode, revisionId: rev.id, revisionDate: revDateClean });
     }
   };
 
@@ -98,7 +106,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
   const handleCalcFirstMiddleName = () => updateField("firstMiddleName", generateFirstMiddleName(data.gender));
 
   const handleCalcIssueDate = () => {
-    const issueDate = calculateIssueDate();
+    const issueDate = calculateIssueDate(data.stateCode);
     onChange({ ...data, issueDate, expirationDate: calculateExpiryDate(issueDate, data.stateCode, data.dateOfBirth) });
   };
 
@@ -110,6 +118,14 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
   const fields = revision?.fields;
   const isCanadian = stateConfig?.country === "Canada";
+  const formatAlbertaLicense = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 9);
+    return digits.length > 6 ? `${digits.slice(0, 6)}-${digits.slice(6)}` : digits;
+  };
+  const formatAlbertaDD = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 9);
+    return digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
+  };
 
   const CalcIcon = ({ onClick }: { onClick: () => void }) => (
     <button onClick={onClick} className="inline-flex ml-1 text-muted-foreground hover:text-primary" type="button">
@@ -218,8 +234,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
             </Label>
             <Input
               value={data.licenseNumber}
-              onChange={(e) => updateField("licenseNumber", e.target.value.toUpperCase())}
-              placeholder="D1234567"
+              onChange={(e) => updateField("licenseNumber", data.stateCode === "AB" ? formatAlbertaLicense(e.target.value) : e.target.value.toUpperCase())}
+              placeholder={data.stateCode === "AB" ? "165785-754" : "D1234567"}
               className="h-9 text-sm mt-1"
             />
           </div>
@@ -342,31 +358,31 @@ export function StateForm({ data, onChange }: StateFormProps) {
         </div>
 
         {/* Row 3: Birth date | Issue date | Expiry date | DD | ICN */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${fields?.ddInDetailsRow ? "lg:grid-cols-3" : "lg:grid-cols-5"}`}>
           <div>
             <Label className="text-xs flex items-center">
-              Birth date <InfoIcon text="MMDDYYYY format" /> <CalcIcon onClick={() => {}} />
+              Birth date <InfoIcon text={`${fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"} format`} /> <CalcIcon onClick={() => {}} />
             </Label>
-            <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="01151970" maxLength={8} className="h-9 text-sm mt-1" />
+            <Input value={data.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "19800708" : "01151970"} maxLength={8} className="h-9 text-sm mt-1" />
           </div>
           <div>
             <Label className="text-xs flex items-center">
-              Issue date <InfoIcon text="MMDDYYYY" /> <CalcIcon onClick={handleCalcIssueDate} />
+              Issue date <InfoIcon text={fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"} /> <CalcIcon onClick={handleCalcIssueDate} />
             </Label>
-            <Input value={data.issueDate} onChange={(e) => updateField("issueDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="08262021" maxLength={8} className="h-9 text-sm mt-1" />
+            <Input value={data.issueDate} onChange={(e) => updateField("issueDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "20210114" : "08262021"} maxLength={8} className="h-9 text-sm mt-1" />
           </div>
           <div>
             <Label className="text-xs flex items-center">
-              Expiry date <InfoIcon text="Auto-calculate from issue date" /> <CalcIcon onClick={handleCalcExpiryDate} />
+              Expiry date <InfoIcon text={`${fields?.dateFormat === "YYYYMMDD" ? "YYYYMMDD" : "MMDDYYYY"}; auto-calculated`} /> <CalcIcon onClick={handleCalcExpiryDate} />
             </Label>
-            <Input value={data.expirationDate} onChange={(e) => updateField("expirationDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder="01152026" maxLength={8} className="h-9 text-sm mt-1" />
+            <Input value={data.expirationDate} onChange={(e) => updateField("expirationDate", e.target.value.replace(/\D/g, "").slice(0, 8))} placeholder={fields?.dateFormat === "YYYYMMDD" ? "20260708" : "01152026"} maxLength={8} className="h-9 text-sm mt-1" />
           </div>
-          {fields?.hasDD && (
+          {fields?.hasDD && !fields?.ddInDetailsRow && (
             <div>
               <Label className="text-xs flex items-center">
                 DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} />
               </Label>
-              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", e.target.value)} placeholder="Click calculator" className="h-9 text-[11px] mt-1" />
+              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder={data.stateCode === "AB" ? "0571-54946" : "Click calculator"} className="h-9 text-[11px] mt-1" />
             </div>
           )}
           {fields?.hasICN && (
@@ -381,6 +397,12 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
         {/* Row 4: Restrictions | Endorsement | Height | Weight */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {fields?.hasDD && fields?.ddInDetailsRow && (
+            <div>
+              <Label className="text-xs flex items-center">DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} /></Label>
+              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder="0571-54946" className="h-9 text-[11px] mt-1" />
+            </div>
+          )}
           {fields?.hasRestrictions && (
             <div>
               <Label className="text-xs">Restrictions</Label>
@@ -402,7 +424,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </span>
             </div>
           </div>
-          {fields?.hasWeight && (
+          {fields?.hasWeight && !fields?.weightInAppearanceRow && (
             <div>
             <Label className="text-xs">Weight ({fields?.weightUnit === "kg" ? "kg." : "lb."})</Label>
               <div className="relative">
@@ -417,6 +439,15 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
         {/* Row 5: Eye/Hair Colors - 4 cols like pdf417.pro */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {fields?.hasWeight && fields?.weightInAppearanceRow && (
+            <div>
+              <Label className="text-xs">Weight ({fields?.weightUnit === "kg" ? "kg." : "lb."})</Label>
+              <div className="relative">
+                <Input value={data.weight} onChange={(e) => updateField("weight", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="169" maxLength={3} className="h-9 text-sm mt-1 pr-16" />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground mt-0.5">≈ {lbsToKg(parseInt(data.weight) || 0)} kg</span>
+              </div>
+            </div>
+          )}
           {fields?.hasEyeColorOnDL && (
             <div>
               <Label className="text-xs">Eye (as on DL)</Label>

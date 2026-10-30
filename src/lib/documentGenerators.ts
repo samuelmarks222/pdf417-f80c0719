@@ -41,7 +41,7 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "MB":
       return randomDigits(9);
     case "ON":
-      return `GR${randomDigits(7)}`;
+      return `G${randomLetter()}${randomDigits(7)}`;
     case "QC":
       return `PEUS${randomDigits(2)}YRZ`;
     case "SK":

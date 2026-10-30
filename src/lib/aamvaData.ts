@@ -271,10 +271,10 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const issueDate = usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`;
   const dateOfBirth = usesCanadianDateOrder ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`;
   const expirationDate = calculateExpiryDate(issueDate, stateCode, dateOfBirth);
-  const documentDiscriminator = generateDD(stateCode, issueDate, expirationDate, licenseNumber);
-  const inventoryControlNumber = stateCode === "NH"
-    ? documentDiscriminator
-    : generateICN(stateCode, licenseNumber, issueDate);
+  const inventoryControlNumber = generateICN(stateCode, licenseNumber, issueDate);
+  const documentDiscriminator = stateCode === "NH"
+    ? inventoryControlNumber
+    : generateDD(stateCode, issueDate, expirationDate, licenseNumber);
 
   return {
     firstName,

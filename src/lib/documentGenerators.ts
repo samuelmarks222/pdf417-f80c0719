@@ -8,6 +8,7 @@ const padZero = (num: number, len: number = 2) => num.toString().padStart(len, "
 const randomLetter = () => String.fromCharCode(65 + randomNum(0, 25));
 const randomLetters = (n: number) => Array.from({ length: n }, randomLetter).join("");
 const randomDigits = (n: number) => Array.from({ length: n }, () => randomNum(0, 9)).join("");
+export const generateNewHampshireIdentifier = () => `${randomDigits(3)}00000${randomDigits(8)}`;
 
 // Parse issue date components from MMDDYYYY format
 function parseDateParts(issueDate?: string) {
@@ -170,7 +171,7 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
 
     // New Hampshire: fixed 0 followed by 7 random digits
     case "NH":
-      return `0${randomDigits(7)}`;
+      return generateNewHampshireIdentifier();
 
     // New Jersey: 16 digits
     case "NJ":
@@ -408,7 +409,7 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
 
     // New Hampshire: fixed 0 followed by 7 random digits
     case "NH":
-      return `0${randomDigits(7)}`;
+      return generateNewHampshireIdentifier();
 
     // New Jersey: 20 digits
     case "NJ":

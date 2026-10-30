@@ -38,7 +38,7 @@ export function generateFirstMiddleName(gender?: string): string {
 export function generateDLNumber(stateCode: string): string {
   switch (stateCode) {
     case "AB": return `1${randomNum(10000, 99999)}-${randomNum(100, 999)}`;
-    case "MB": return `${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000, 99999)}`;
+    case "MB": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(100, 999)}${String.fromCharCode(65 + randomNum(0, 25))}${Math.random() < 0.5 ? String.fromCharCode(65 + randomNum(0, 25)) : randomNum(0, 9)}`;
     case "ON": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
     case "QC": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;
     case "SK": return `${randomNum(10000000, 99999999)}`;

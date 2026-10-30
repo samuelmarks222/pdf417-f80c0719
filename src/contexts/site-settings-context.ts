@@ -21,12 +21,12 @@ export interface SiteSettings {
 
 export const defaultSiteSettings: SiteSettings = {
   site_name: "PDF417.PRO",
-  site_tagline: "A practical barcode workspace",
+  site_tagline: "",
   logo_url: "",
   favicon_url: "",
-  meta_title: "PDF417 Barcode Generator for USA & Canada | PDF417.PRO",
-  meta_description: "Create, preview, and download PDF417 barcode images for USA and Canada workflows. Explore available U.S. state formats and generate Code 128 barcodes for free.",
-  meta_keywords: "PDF417 barcode generator, USA PDF417, Canada PDF417, barcode generator, Code 128",
+  meta_title: "USA DL PDF417 Barcode Generator | U.S. Driver's License Barcodes",
+  meta_description: "Generate and download PDF417 barcode images for U.S. driver's license formats. Explore supported barcode formats and create downloadable barcode images with our online USA DL PDF417 barcode generator.",
+  meta_keywords: "PDF417 barcode generator, USA DL barcode generator, U.S. driver's license barcode, USA driver's license PDF417, PDF417 barcode generator USA, driver's license barcode format, AAMVA PDF417 standard, PDF417 barcode image generator, DL barcode scanner, PDF417 PNG generator",
   canonical_url: "https://pdf417.live",
   meta_robots: "index,follow",
   og_image_url: "",
@@ -34,7 +34,7 @@ export const defaultSiteSettings: SiteSettings = {
   hero_badge: "PDF417 BARCODE GENERATOR · USA & CANADA",
   hero_title: "PDF417 barcode generator",
   hero_highlight: "for USA & Canada.",
-  hero_description: "Create and download PDF417 barcode previews for USA and Canada workflows. Explore available U.S. state formats, review your barcode, and export a PNG.",
+  hero_description: "Create PDF417 barcode previews for AAMVA and U.S. state formats. Review your fields, explore state-specific formats, and export a PNG for educational and testing use.",
   footer_notice: "For educational and testing use only.",
 };
 

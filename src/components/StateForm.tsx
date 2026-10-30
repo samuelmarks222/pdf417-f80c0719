@@ -428,6 +428,17 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </span>
             </div>
           </div>
+          {fields?.hasEyeColor && fields?.eyeInDetailsRow && (
+            <div>
+              <Label className="text-xs">Eye (ANSI D-20)</Label>
+              <Select value={data.eyeColor} onValueChange={(v) => updateField("eyeColor", v)}>
+                <SelectTrigger className="h-9 text-xs mt-1"><SelectValue placeholder="== Select ==" /></SelectTrigger>
+                <SelectContent>
+                  {EYE_COLORS.map((c) => <SelectItem key={c.code} value={c.code}>{c.code} ({c.name})</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {fields?.hasWeight && !fields?.weightInAppearanceRow && (
             <div>
             <Label className="text-xs">Weight ({fields?.weightUnit === "kg" ? "kg." : "lb."})</Label>
@@ -467,7 +478,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               </Select>
             </div>
           )}
-          {fields?.hasEyeColor && (
+          {fields?.hasEyeColor && !fields?.eyeInDetailsRow && (
             <div>
               <Label className="text-xs">Eye (ANSI D-20)</Label>
               <Select value={data.eyeColor} onValueChange={(v) => updateField("eyeColor", v)}>

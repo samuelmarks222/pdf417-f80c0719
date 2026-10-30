@@ -277,6 +277,10 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "AL":
       return randomDigits(18);
 
+    // Manitoba: nine numeric characters
+    case "MB":
+      return randomDigits(9);
+
     // Alaska: 15 alphanumeric
     case "AK":
       return `${randomLetters(2)}${randomDigits(13)}`;

@@ -213,6 +213,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const expYear = issueYear + randomNum(4, 8);
   const isAlberta = stateCode === "AB";
   const usesCanadianDateOrder = ["AB", "MB", "ON", "QC", "SK", "YT"].includes(stateCode);
+  const usesCanadianMetric = usesCanadianDateOrder;
   
   const firstName = randomChoice(firstNames);
   const middleName = randomChoice(middleNames);
@@ -260,7 +261,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     eyeColorOnDL: randomChoice(EYE_COLORS_ON_DL).code,
     hairColor: randomChoice(HAIR_COLORS).code,
     hairColorOnDL: randomChoice(HAIR_COLORS_ON_DL).code,
-    height: isAlberta ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
+    height: usesCanadianMetric ? randomNum(160, 195).toString() : randomNum(60, 78).toString(),
     weight: randomNum(120, 250).toString(),
     licenseNumber: generateLicenseNumber(stateCode),
     issueDate: usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`,

@@ -128,7 +128,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
     return digits.length > 6 ? `${digits.slice(0, 6)}-${digits.slice(6)}` : digits;
   };
   const formatAlbertaDD = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 9);
+    const enteredDigits = value.replace(/\D/g, "");
+    const digits = (enteredDigits.startsWith("0") ? enteredDigits : `0${enteredDigits}`).slice(0, 9);
     return digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
   };
 

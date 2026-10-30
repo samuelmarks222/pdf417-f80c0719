@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
-import { Barcode, Check, Download, RefreshCw, Sparkles } from "lucide-react";
+import { Barcode, Download } from "lucide-react";
 
 interface BarcodePreviewProps {
   data: string;
@@ -9,9 +9,10 @@ interface BarcodePreviewProps {
   onCode128TextChange?: (value: string) => void;
   onGenerate?: (generationId: string, dataDigest: string) => Promise<boolean>;
   isAdmin?: boolean;
+  createRequest?: number;
 }
 
-export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false }: BarcodePreviewProps) {
+export function BarcodePreview({ data, code128Text = "", onCode128TextChange, onGenerate, isAdmin = false, createRequest = 0 }: BarcodePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -54,7 +55,6 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
         eclevel: 5,
         paddingwidth: 6,
         paddingheight: 12,
-        backgroundcolor: "FFFFFF",
         barcolor: "000000",
       });
 
@@ -76,12 +76,26 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
     }
   };
 
-  const downloadBarcode = () => {
-    if (!canvasRef.current || !generated) return;
+  const downloadCanvas = (canvas: HTMLCanvasElement, name: string, type: "png" | "jpeg") => {
+    const output = document.createElement("canvas");
+    output.width = canvas.width;
+    output.height = canvas.height;
+    const context = output.getContext("2d");
+    if (!context) return;
+    if (type === "jpeg") {
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, output.width, output.height);
+    }
+    context.drawImage(canvas, 0, 0);
     const link = document.createElement("a");
-    link.download = `pdf417-barcode-${Date.now()}.png`;
-    link.href = canvasRef.current.toDataURL("image/png");
+    link.download = `${name}-${Date.now()}.${type}`;
+    link.href = output.toDataURL(type === "png" ? "image/png" : "image/jpeg", 0.92);
     link.click();
+  };
+
+  const downloadBarcode = (type: "png" | "jpeg") => {
+    if (!canvasRef.current || !generated) return;
+    downloadCanvas(canvasRef.current, "pdf417-barcode", type);
   };
 
   const generateCode128 = async () => {
@@ -114,13 +128,19 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
     }
   };
 
-  const downloadCode128 = () => {
+  const downloadCode128 = (type: "png" | "jpeg") => {
     if (!canvasRef2.current || !generated2) return;
-    const link = document.createElement("a");
-    link.download = `code128-barcode-${Date.now()}.png`;
-    link.href = canvasRef2.current.toDataURL("image/png");
-    link.click();
+    downloadCanvas(canvasRef2.current, "code128-barcode", type);
   };
+
+  useEffect(() => {
+    if (!createRequest) return;
+    const runCreate = async () => {
+      await generateBarcode();
+      await generateCode128();
+    };
+    void runCreate();
+  }, [createRequest]);
 
   useEffect(() => {
     if (!data) {
@@ -174,32 +194,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             )}
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              {generated ? (
-                <><span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-700"><Check className="h-3 w-3" /></span> Preview ready</>
-              ) : (
-                <><Sparkles className="h-4 w-4 text-primary" /> Ready to create</>
-              )}
-            </div>
-            {generated ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={generateBarcode} disabled={isGenerating} className="gap-2 rounded-full">
-                  <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
-                  Generate again
-                </Button>
-                <Button size="sm" onClick={downloadBarcode} className="gap-2 rounded-full">
-                  <Download className="h-3.5 w-3.5" />
-                  Download
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" onClick={generateBarcode} disabled={isGenerating || !data} className="gap-2 rounded-full px-5">
-                <Sparkles className="h-3.5 w-3.5" />
-                {isGenerating ? "Generating…" : "Create PDF417"}
-              </Button>
-            )}
-          </div>
+          {generated && <div className="mt-4 flex flex-wrap justify-end gap-2"><Button size="sm" onClick={() => downloadBarcode("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button><Button variant="outline" size="sm" onClick={() => downloadBarcode("jpeg")} className="gap-2 rounded-full">JPEG</Button></div>}
         </div>
       </section>
 
@@ -238,40 +233,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             )}
           </div>
 
-          <div className="mt-4">
-            <label htmlFor="code128-text" className="mb-2 block text-xs font-semibold text-foreground">Text to encode</label>
-            <textarea
-              id="code128-text"
-              value={code128Text}
-              onChange={(e) => onCode128TextChange?.(e.target.value)}
-              placeholder="Type or paste your text here…"
-              className="min-h-20 w-full resize-y rounded-xl border border-input bg-card px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary focus:ring-4 focus:ring-primary/10"
-              rows={2}
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="text-xs text-muted-foreground">
-              {generated2 ? "Preview ready" : `${code128Text.length} characters`}
-            </div>
-            {generated2 ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={generateCode128} disabled={isGenerating} className="gap-2 rounded-full">
-                  <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
-                  Generate again
-                </Button>
-                <Button size="sm" onClick={downloadCode128} className="gap-2 rounded-full">
-                  <Download className="h-3.5 w-3.5" />
-                  Download
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" onClick={generateCode128} disabled={!code128Text || isGenerating} className="gap-2 rounded-full px-5">
-                <Sparkles className="h-3.5 w-3.5" />
-                {isGenerating ? "Generating…" : "Create Code 128"}
-              </Button>
-            )}
-          </div>
+          {generated2 && <div className="mt-4 flex flex-wrap justify-end gap-2"><Button size="sm" onClick={() => downloadCode128("png")} className="gap-2 rounded-full"><Download className="h-3.5 w-3.5" />PNG</Button><Button variant="outline" size="sm" onClick={() => downloadCode128("jpeg")} className="rounded-full">JPEG</Button></div>}
         </div>
       </section>
     </div>

@@ -34,9 +34,10 @@ import {
 interface StateFormProps {
   data: AAMVAData;
   onChange: (data: AAMVAData) => void;
+  onCreate?: () => void;
 }
 
-export function StateForm({ data, onChange }: StateFormProps) {
+export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   const [stateConfig, setStateConfig] = useState<StateConfig | null>(null);
   const [revision, setRevision] = useState<StateRevision | null>(null);
 
@@ -600,7 +601,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
 
         {/* Create button - centered like pdf417.pro */}
         <div className="flex justify-center pt-4 pb-2">
-          <Button className="h-11 rounded-full px-10 text-sm font-semibold shadow-md shadow-primary/20">
+          <Button type="button" onClick={onCreate} className="h-11 rounded-full px-10 text-sm font-semibold shadow-md shadow-primary/20">
             Create
           </Button>
         </div>

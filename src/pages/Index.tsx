@@ -6,6 +6,7 @@ import { BarcodePreview } from "@/components/BarcodePreview";
 import { AAMVAData, DEFAULT_AAMVA_DATA, generateRandomData } from "@/lib/aamvaData";
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
+import { generateICN } from "@/lib/documentGenerators";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
@@ -37,6 +38,7 @@ const Index = () => {
   const [encodedData, setEncodedData] = useState<string>("");
   const [code128Text, setCode128Text] = useState<string>("");
   const [showRawData, setShowRawData] = useState(false);
+  const [createRequest, setCreateRequest] = useState(0);
 
   useEffect(() => {
     const revisionData = getRevision(formData.revisionId);
@@ -49,6 +51,16 @@ const Index = () => {
 
   const handleFormChange = (data: AAMVAData) => {
     setFormData(data);
+  };
+
+  const handleCreate = () => {
+    const revisionData = getRevision(formData.revisionId);
+    const nextData = revisionData?.revision.fields.hasICN
+      ? { ...formData, inventoryControlNumber: generateICN(formData.stateCode, formData.licenseNumber, formData.issueDate) }
+      : formData;
+    setFormData(nextData);
+    setCode128Text(nextData.licenseNumber);
+    setCreateRequest((request) => request + 1);
   };
 
   const handleGenerate = useCallback(async (generationId: string, dataDigest: string) => {
@@ -116,7 +128,7 @@ const Index = () => {
             </div>
           )}
           {/* Form */}
-          <StateForm data={formData} onChange={handleFormChange} />
+          <StateForm data={formData} onChange={handleFormChange} onCreate={handleCreate} />
 
           {/* Barcode Preview - below form like pdf417.pro */}
           <div className="mt-6">
@@ -126,6 +138,7 @@ const Index = () => {
               onCode128TextChange={setCode128Text}
               onGenerate={handleGenerate}
               isAdmin={Boolean(profile?.is_admin)}
+              createRequest={createRequest}
             />
           </div>
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -325,7 +325,7 @@ const Admin = () => {
                 </div>
                 <div className="flex gap-2">
                   <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-background px-3 text-sm">
-                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option>
+                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option><option value="nowpayments">NOWPayments (legacy)</option>
                   </select>
                   <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)} className="h-10 rounded border border-input bg-background px-3 text-sm">
                     <option value="">All statuses</option>
@@ -379,10 +379,37 @@ const Admin = () => {
   );
 };
 
+function getImageSettingLabel(setting: "logo_url" | "favicon_url" | "og_image_url") {
+  if (setting === "logo_url") return "logo";
+  if (setting === "favicon_url") return "favicon";
+  return "social sharing image";
+}
+
+function getImageExtension(mimeType: string) {
+  const extensions: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/svg+xml": "svg",
+    "image/avif": "avif",
+    "image/x-icon": "ico",
+    "image/vnd.microsoft.icon": "ico",
+  };
+  return extensions[mimeType] ?? "png";
+}
+
 function SiteSettingsPanel() {
   const { settings, loading, error: settingsError, refresh } = useSiteSettings();
+  const { user } = useAuth();
   const [draft, setDraft] = useState(settings);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  const [uploadingSocialImage, setUploadingSocialImage] = useState(false);
+  const logoFileInput = useRef<HTMLInputElement>(null);
+  const faviconFileInput = useRef<HTMLInputElement>(null);
+  const socialImageFileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setDraft(settings);
@@ -390,6 +417,57 @@ function SiteSettingsPanel() {
 
   const update = (key: keyof SiteSettings, value: string) => {
     setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const uploadBrandImage = async (
+    event: ChangeEvent<HTMLInputElement>,
+    setting: "logo_url" | "favicon_url" | "og_image_url",
+  ) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (!supabase || !user) {
+      toast.error(`Sign in as an administrator to upload the ${getImageSettingLabel(setting)}.`);
+      return;
+    }
+    const isFavicon = setting === "favicon_url";
+    const allowedTypes = isFavicon
+      ? ["image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"]
+      : ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml", "image/avif"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(isFavicon
+        ? "Choose a PNG, SVG, or ICO favicon image."
+        : "Choose a PNG, JPEG, WebP, GIF, SVG, or AVIF image.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(`${getImageSettingLabel(setting)} images must be 2 MB or smaller.`);
+      return;
+    }
+
+    if (setting === "logo_url") setUploadingLogo(true);
+    else if (isFavicon) setUploadingFavicon(true);
+    else setUploadingSocialImage(true);
+    const extension = getImageExtension(file.type);
+    const folder = setting === "logo_url" ? "logos" : isFavicon ? "favicons" : "social-images";
+    const objectPath = `${folder}/${user.id}/${crypto.randomUUID()}.${extension}`;
+    const { error } = await supabase.storage
+      .from("site-assets")
+      .upload(objectPath, file, { contentType: file.type, cacheControl: "3600" });
+    if (error) {
+      if (setting === "logo_url") setUploadingLogo(false);
+      else if (isFavicon) setUploadingFavicon(false);
+      else setUploadingSocialImage(false);
+      toast.error(`Could not upload ${getImageSettingLabel(setting)}: ${error.message}`);
+      return;
+    }
+
+    const { data } = supabase.storage.from("site-assets").getPublicUrl(objectPath);
+    update(setting, data.publicUrl);
+    if (setting === "logo_url") setUploadingLogo(false);
+    else if (isFavicon) setUploadingFavicon(false);
+    else setUploadingSocialImage(false);
+    toast.success(`${getImageSettingLabel(setting)} uploaded. Click Save and publish to use it on the site.`);
   };
 
   const save = async () => {
@@ -461,9 +539,54 @@ function SiteSettingsPanel() {
         <h3 className="mb-3 text-sm font-semibold">Branding</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <SettingsInput label="Site name" value={draft.site_name} onChange={(value) => update("site_name", value)} />
-          <SettingsInput label="Tagline" value={draft.site_tagline} onChange={(value) => update("site_tagline", value)} />
-          <SettingsInput label="Logo image URL (HTTPS)" value={draft.logo_url} onChange={(value) => update("logo_url", value)} placeholder="https://example.com/logo.png" />
-          <SettingsInput label="Favicon URL (HTTPS)" value={draft.favicon_url} onChange={(value) => update("favicon_url", value)} placeholder="https://example.com/favicon.png" />
+          <div className="grid gap-2 text-sm font-medium">
+            <span>Logo image</span>
+            <div className="flex flex-wrap items-center gap-3">
+              {draft.logo_url && (
+                <img src={draft.logo_url} alt="Current site logo preview" className="h-12 max-w-36 rounded border border-border object-contain p-1" />
+              )}
+              <input
+                ref={logoFileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/avif"
+                onChange={(event) => void uploadBrandImage(event, "logo_url")}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => logoFileInput.current?.click()}
+                disabled={uploadingLogo || loading || Boolean(settingsError)}
+              >
+                {uploadingLogo ? "Uploading…" : draft.logo_url ? "Replace logo" : "Upload logo"}
+              </Button>
+              <span className="text-xs font-normal text-muted-foreground">PNG, JPEG, or WebP · up to 2 MB</span>
+            </div>
+          </div>
+          <div className="grid gap-2 text-sm font-medium">
+            <span>Favicon image</span>
+            <div className="flex flex-wrap items-center gap-3">
+              {draft.favicon_url && (
+                <img src={draft.favicon_url} alt="Current favicon preview" className="h-10 w-10 rounded border border-border object-contain p-1" />
+              )}
+              <input
+                ref={faviconFileInput}
+                type="file"
+                accept="image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico,.svg"
+                onChange={(event) => void uploadBrandImage(event, "favicon_url")}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => faviconFileInput.current?.click()}
+                disabled={uploadingFavicon || loading || Boolean(settingsError)}
+              >
+                {uploadingFavicon ? "Uploading…" : draft.favicon_url ? "Replace favicon" : "Upload favicon"}
+              </Button>
+              <span className="text-xs font-normal text-muted-foreground">PNG or ICO · up to 2 MB</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -485,7 +608,31 @@ function SiteSettingsPanel() {
           <SettingsInput label="Canonical site origin" value={draft.canonical_url} onChange={(value) => update("canonical_url", value)} placeholder="https://pdf417.live" />
           <SettingsTextarea label="SEO description" value={draft.meta_description} onChange={(value) => update("meta_description", value)} />
           <SettingsTextarea label="SEO keywords" value={draft.meta_keywords} onChange={(value) => update("meta_keywords", value)} />
-          <SettingsInput label="Social sharing image URL (HTTPS)" value={draft.og_image_url} onChange={(value) => update("og_image_url", value)} placeholder="https://example.com/social-image.png" />
+          <div className="grid gap-2 text-sm font-medium">
+            <span>Social sharing image</span>
+            <div className="flex flex-wrap items-center gap-3">
+              {draft.og_image_url && (
+                <img src={draft.og_image_url} alt="Current social sharing image preview" className="h-12 max-w-36 rounded border border-border object-contain p-1" />
+              )}
+              <input
+                ref={socialImageFileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/avif"
+                onChange={(event) => void uploadBrandImage(event, "og_image_url")}
+                className="hidden"
+                disabled={uploadingSocialImage || loading || Boolean(settingsError)}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => socialImageFileInput.current?.click()}
+                disabled={uploadingSocialImage || loading || Boolean(settingsError)}
+              >
+                {uploadingSocialImage ? "Uploading…" : draft.og_image_url ? "Replace image" : "Upload image"}
+              </Button>
+              <span className="text-xs font-normal text-muted-foreground">PNG, JPEG, WebP, GIF, SVG, or AVIF · up to 2 MB</span>
+            </div>
+          </div>
           <SettingsInput label="X/Twitter handle" value={draft.twitter_handle} onChange={(value) => update("twitter_handle", value)} placeholder="@yourhandle" />
           <label className="grid gap-1.5 text-sm font-medium">
             Search engine indexing

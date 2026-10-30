@@ -168,9 +168,9 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "NV":
       return randomDigits(10);
 
-    // New Hampshire: 2 letters + 8 digits
+    // New Hampshire: fixed 0 followed by 7 random digits
     case "NH":
-      return `${randomLetters(2)}${randomDigits(8)}`;
+      return `0${randomDigits(7)}`;
 
     // New Jersey: 16 digits
     case "NJ":
@@ -406,9 +406,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "NV":
       return randomDigits(18);
 
-    // New Hampshire: 18 alphanumeric
+    // New Hampshire: fixed 0 followed by 7 random digits
     case "NH":
-      return `${randomLetters(2)}${randomDigits(16)}`;
+      return `0${randomDigits(7)}`;
 
     // New Jersey: 20 digits
     case "NJ":

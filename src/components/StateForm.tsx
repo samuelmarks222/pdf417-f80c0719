@@ -57,6 +57,10 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
   }, [data.stateCode]);
 
   const updateField = (field: keyof AAMVAData, value: string) => {
+    if (data.stateCode === "NH" && (field === "documentDiscriminator" || field === "inventoryControlNumber")) {
+      onChange({ ...data, documentDiscriminator: value, inventoryControlNumber: value });
+      return;
+    }
     if (field === "licenseNumber" && data.stateCode === "YT") {
       onChange({ ...data, licenseNumber: value, documentDiscriminator: `${value.replace(/\D/g, "") || value}R0` });
       return;
@@ -99,12 +103,19 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
 
   const handleGenerateDD = () => {
     if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
-    updateField("documentDiscriminator", generateDD(data.stateCode, data.issueDate, data.expirationDate, data.licenseNumber));
+    const value = generateDD(data.stateCode, data.issueDate, data.expirationDate, data.licenseNumber);
+    if (data.stateCode === "NH") onChange({ ...data, documentDiscriminator: value, inventoryControlNumber: value });
+    else updateField("documentDiscriminator", value);
   };
 
   const handleGenerateICN = () => {
     if (!data.licenseNumber) { alert("Please enter DL Number first."); return; }
-    updateField("inventoryControlNumber", generateICN(data.stateCode, data.licenseNumber, data.issueDate));
+    if (data.stateCode === "NH") {
+      const value = data.documentDiscriminator || generateICN(data.stateCode, data.licenseNumber, data.issueDate);
+      onChange({ ...data, documentDiscriminator: value, inventoryControlNumber: value });
+    } else {
+      updateField("inventoryControlNumber", generateICN(data.stateCode, data.licenseNumber, data.issueDate));
+    }
   };
 
   const handleCalcDLNumber = () => updateField("licenseNumber", generateDLNumber(data.stateCode));

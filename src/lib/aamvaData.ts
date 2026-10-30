@@ -269,6 +269,10 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
   const issueDate = usesCanadianDateOrder ? `${issueYear}${issueMonth}${issueDay}` : `${issueMonth}${issueDay}${issueYear}`;
   const dateOfBirth = usesCanadianDateOrder ? `${birthYear}${birthMonth}${birthDay}` : `${birthMonth}${birthDay}${birthYear}`;
   const expirationDate = calculateExpiryDate(issueDate, stateCode, dateOfBirth);
+  const documentDiscriminator = generateDD(stateCode, issueDate, expirationDate, licenseNumber);
+  const inventoryControlNumber = stateCode === "NH"
+    ? documentDiscriminator
+    : generateICN(stateCode, licenseNumber, issueDate);
 
   return {
     firstName,
@@ -290,8 +294,8 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
     dlClass: stateCode === "AB" ? "5" : stateCode === "ON" ? "G" : DEFAULT_DL_CLASSES[stateCode] || "C",
     issueDate,
     expirationDate,
-    documentDiscriminator: generateDD(stateCode, issueDate, expirationDate, licenseNumber),
-    inventoryControlNumber: generateICN(stateCode, licenseNumber, issueDate),
+    documentDiscriminator,
+    inventoryControlNumber,
     auditInfo: stateCode === "LA" ? "4174" : "",
     issuingOffice: stateCode === "LA" ? "033" : "",
     parish: stateCode === "LA" ? "52" : "",

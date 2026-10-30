@@ -225,7 +225,7 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
       case "CA":
         return `D${randomNum(1000000, 9999999)}`;
       case "AB":
-        return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
+        return `1${randomNum(10000, 99999)}-${randomNum(100, 999)}`;
       case "MB":
         return `EJ-QV-BP-V${randomNum(100, 999)}${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1, 9)}`;
       case "ON":

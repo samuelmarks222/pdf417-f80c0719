@@ -123,7 +123,8 @@ export function StateForm({ data, onChange }: StateFormProps) {
   const fields = revision?.fields;
   const isCanadian = stateConfig?.country === "Canada";
   const formatAlbertaLicense = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 9);
+    const enteredDigits = value.replace(/\D/g, "");
+    const digits = (enteredDigits.startsWith("1") ? enteredDigits : `1${enteredDigits}`).slice(0, 9);
     return digits.length > 6 ? `${digits.slice(0, 6)}-${digits.slice(6)}` : digits;
   };
   const formatAlbertaDD = (value: string) => {

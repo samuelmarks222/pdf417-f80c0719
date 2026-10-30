@@ -37,7 +37,7 @@ export function generateFirstMiddleName(gender?: string): string {
 // State-specific DL number formats
 export function generateDLNumber(stateCode: string): string {
   switch (stateCode) {
-    case "AB": return `${randomNum(100000, 999999)}-${randomNum(100, 999)}`;
+    case "AB": return `1${randomNum(10000, 99999)}-${randomNum(100, 999)}`;
     case "MB": return `${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${String.fromCharCode(65 + randomNum(0, 25))}-${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(10000, 99999)}`;
     case "ON": return `R${randomNum(1000, 9999)}-${randomNum(10000, 99999)}-${randomNum(10000, 99999)}`;
     case "QC": return `R${randomNum(1000, 9999)}-${randomNum(100000, 999999)}-${randomNum(10, 99)}`;

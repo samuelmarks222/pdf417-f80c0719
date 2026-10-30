@@ -20,7 +20,6 @@ import {
 } from "@/lib/aamvaData";
 import { generateDD, generateICN } from "@/lib/documentGenerators";
 import { STATE_CONFIGS, StateConfig, StateRevision, getStateConfig } from "@/lib/stateConfigs";
-import { getDDFormat, sanitizeDD } from "@/lib/ddFormats";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   generateDLNumber,
@@ -138,9 +137,6 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
     const digits = (enteredDigits.startsWith("0") ? enteredDigits : `0${enteredDigits}`).slice(0, 9);
     return digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
   };
-  const formatDDInput = (value: string) => data.stateCode === "AB"
-    ? formatAlbertaDD(value)
-    : sanitizeDD(value, getDDFormat(data.stateCode));
 
   const CalcIcon = ({ onClick }: { onClick: () => void }) => (
     <button onClick={onClick} className="inline-flex ml-1 text-muted-foreground hover:text-primary" type="button">
@@ -397,7 +393,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
               <Label className="text-xs flex items-center">
                 DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} />
               </Label>
-              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", formatDDInput(e.target.value))} placeholder={data.stateCode === "AB" ? "0571-54946" : "Click calculator"} maxLength={getDDFormat(data.stateCode)?.length ?? undefined} className="h-9 text-[11px] mt-1" />
+              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder={data.stateCode === "AB" ? "0571-54946" : "Click calculator"} className="h-9 text-[11px] mt-1" />
             </div>
           )}
           {fields?.hasICN && (
@@ -415,7 +411,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           {fields?.hasDD && fields?.ddInDetailsRow && (
             <div>
               <Label className="text-xs flex items-center">DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} /></Label>
-              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", formatDDInput(e.target.value))} placeholder="0571-54946" maxLength={getDDFormat(data.stateCode)?.length ?? undefined} className="h-9 text-[11px] mt-1" />
+              <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder="0571-54946" className="h-9 text-[11px] mt-1" />
             </div>
           )}
           {fields?.hasRestrictions && (

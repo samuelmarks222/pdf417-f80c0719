@@ -3,23 +3,11 @@
 // DCF = Document Discriminator (unique per card issuance)
 // DCK = Inventory Control Number (card production tracking / 1D barcode)
 
-import { getDDFormat } from "./ddFormats";
-
 const randomNum = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const padZero = (num: number, len: number = 2) => num.toString().padStart(len, "0");
 const randomLetter = () => String.fromCharCode(65 + randomNum(0, 25));
 const randomLetters = (n: number) => Array.from({ length: n }, randomLetter).join("");
 const randomDigits = (n: number) => Array.from({ length: n }, () => randomNum(0, 9)).join("");
-const randomAlphaNumeric = (n: number) => Array.from({ length: n }, () => Math.random() < 0.5 ? randomLetter() : randomNum(0, 9)).join("");
-
-// The supplied structures are metadata only until an authoritative specification
-// provides component lengths and ordering. This fallback enforces the configured
-// type and length without claiming to reproduce an official document number.
-function generateConfiguredDD(stateCode: string): string | undefined {
-  const format = getDDFormat(stateCode);
-  if (!format) return undefined;
-  return format.characterType === "numeric" ? randomDigits(format.length) : randomAlphaNumeric(format.length);
-}
 
 // Parse issue date components from MMDDYYYY format
 function parseDateParts(issueDate?: string) {
@@ -44,8 +32,6 @@ function parseDateParts(issueDate?: string) {
 // Based on real barcode calibration sheets from state DMVs and AAMVA CDS specs
 
 export function generateDD(stateCode: string, issueDate?: string, expirationDate?: string, licenseNumber?: string): string {
-  const configuredDD = generateConfiguredDD(stateCode);
-  if (configuredDD) return configuredDD;
   const { month, day, year, shortYear } = parseDateParts(issueDate);
 
   switch (stateCode) {

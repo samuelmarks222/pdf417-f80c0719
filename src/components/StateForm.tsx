@@ -145,7 +145,7 @@ export function StateForm({ data, onChange }: StateFormProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
-              {STATE_CONFIGS.map((state) => (
+              {STATE_CONFIGS.filter((state) => !state.comingSoon).map((state) => (
                 <SelectItem key={state.code} value={state.code}>
                   {state.name} ({state.code})
                 </SelectItem>

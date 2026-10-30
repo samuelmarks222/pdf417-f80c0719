@@ -126,9 +126,16 @@ const States = () => {
                 <ul className="surface-panel divide-y divide-border/70 overflow-hidden">
                   {column.map((state) => (
                     <li key={state.code} className="bg-card">
-                      <Link to={`/generator?state=${state.code}`} className="flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-muted/50">
-                        <span className="text-sm font-medium text-primary">{state.name}</span>
-                      </Link>
+                      {state.comingSoon ? (
+                        <div className="flex items-center justify-between px-3 py-2.5 text-muted-foreground">
+                          <span className="text-sm font-medium">{state.name}</span>
+                          <span className="text-xs">Coming soon</span>
+                        </div>
+                      ) : (
+                        <Link to={`/generator?state=${state.code}`} className="flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-muted/50">
+                          <span className="text-sm font-medium text-primary">{state.name}</span>
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>

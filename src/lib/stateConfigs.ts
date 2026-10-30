@@ -42,6 +42,7 @@ export interface StateConfig {
   name: string;
   iin: string;
   country?: "USA" | "Canada";
+  comingSoon?: boolean;
   revisions: StateRevision[];
 }
 
@@ -1136,6 +1137,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "British Columbia",
     iin: "600002",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "BC", name: "British Columbia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasAddressLine2: true, hasHairColor: true, hasHairColorOnDL: true, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {
@@ -1150,6 +1152,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "New Brunswick",
     iin: "600004",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "NB", name: "New Brunswick", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {
@@ -1157,6 +1160,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Newfoundland and Labrador",
     iin: "600005",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "NL", name: "Newfoundland and Labrador", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {
@@ -1164,6 +1168,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Nova Scotia",
     iin: "600006",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "NS", name: "Nova Scotia", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {
@@ -1171,6 +1176,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Northwest Territories",
     iin: "600007",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "NT", name: "Northwest Territories", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {
@@ -1178,6 +1184,7 @@ export const STATE_CONFIGS: StateConfig[] = [
     name: "Nunavut",
     iin: "600008",
     country: "Canada",
+    comingSoon: true,
     revisions: [{ id: "NU", name: "Nunavut", year: "2025", revisionDate: "", aamvaVersion: "", jurisdictionVersion: "", realIdCompliant: false, displayRevision: false, fields: { ...defaultFields, hasDonor: false, hasICN: false, hasWeight: false, heightUnit: "cm", weightUnit: "kg" } }],
   },
   {

@@ -56,11 +56,6 @@ const Home = () => {
 
           <div className="container grid max-w-7xl items-center gap-8 pb-14 pt-10 sm:gap-12 sm:pb-20 min-[1000px]:min-h-[650px] min-[1000px]:grid-cols-[0.95fr_1.05fr] min-[1000px]:gap-4 min-[1000px]:pb-24 min-[1000px]:pt-14">
             <div className="relative z-10 max-w-2xl lg:pl-8">
-              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#0b5149]/10 bg-white/70 px-3 py-2 text-[9px] font-bold leading-4 tracking-[0.06em] text-[#07584e] shadow-sm backdrop-blur sm:px-4 sm:text-[11px] sm:tracking-[0.12em]">
-                <span className="h-2 w-2 shrink-0 rounded-full bg-[#ed9e32]" />
-                <span className="min-w-0">{settings.hero_badge}</span>
-              </div>
-
               <h1 className="mt-7 max-w-[650px] text-[2.8rem] font-extrabold leading-[1.02] tracking-[-0.055em] text-[#171b1b] sm:text-6xl min-[1000px]:text-[4.3rem]">
                 {settings.hero_title}
                 {settings.hero_highlight && (

@@ -597,7 +597,6 @@ function SiteSettingsPanel() {
       <div>
         <h3 className="mb-3 text-sm font-semibold">Homepage content</h3>
         <div className="grid gap-4 sm:grid-cols-2">
-          <SettingsInput label="Hero badge" value={draft.hero_badge} onChange={(value) => update("hero_badge", value)} />
           <SettingsInput label="Main heading" value={draft.hero_title} onChange={(value) => update("hero_title", value)} />
           <SettingsInput label="Highlighted heading" value={draft.hero_highlight} onChange={(value) => update("hero_highlight", value)} />
           <SettingsInput label="Footer notice" value={draft.footer_notice} onChange={(value) => update("footer_notice", value)} />

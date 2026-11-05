@@ -568,6 +568,7 @@ function SiteSettingsPanel() {
           </div>
           <div className="grid gap-2 text-sm font-medium">
             <span>Favicon image</span>
+            <p className="text-xs font-normal text-muted-foreground">This icon appears in the browser tab and bookmarks. Recommended size: 32 × 32 or 48 × 48 pixels.</p>
             <div className="flex flex-wrap items-center gap-3">
               {draft.favicon_url && (
                 <img src={draft.favicon_url} alt="Current favicon preview" className="h-10 w-10 rounded border border-border object-contain p-1" />

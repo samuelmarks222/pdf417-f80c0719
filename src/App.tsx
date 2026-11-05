@@ -12,6 +12,7 @@ import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SiteSettingsProvider } from "./contexts/SiteSettingsContext";
+import { SiteSupportChat } from "./components/SiteSupportChat";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <SiteSupportChat />
           </SiteSettingsProvider>
         </BrowserRouter>
       </AuthProvider>

@@ -1,6 +1,10 @@
 import { sasapayApiUrl } from "./payment-utils.ts";
 
-export { normalizeSasapayBaseUrl, verifyPlisioCallback } from "./payment-utils.ts";
+export {
+  normalizeSasapayBaseUrl,
+  verifyNowPaymentsIpn,
+  verifyPlisioCallback,
+} from "./payment-utils.ts";
 
 export async function getSasapayToken() {
   const baseUrl = Deno.env.get("SASAPAY_BASE_URL");

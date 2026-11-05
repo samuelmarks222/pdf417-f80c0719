@@ -178,9 +178,9 @@ Deno.serve(async (request: Request) => {
       payload: {},
     });
     console.error(`${provider} checkout error:`, message);
-    const userMessage = provider === "plisio"
-      ? message
-      : "Could not start provider checkout. Please try again later.";
+    const userMessage = provider === "sasapay"
+      ? "Could not start provider checkout. Please try again later."
+      : message;
     return jsonResponse({ error: userMessage }, 502);
   }
 });

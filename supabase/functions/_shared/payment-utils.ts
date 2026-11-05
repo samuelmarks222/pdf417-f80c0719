@@ -7,6 +7,45 @@ export function sasapayApiUrl(baseUrl: string, path: string) {
   return `${normalizeSasapayBaseUrl(baseUrl)}/${path.replace(/^\/+/, "")}`;
 }
 
+function sortObjectKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortObjectKeys);
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value).sort().map(
+        (key) => [key, sortObjectKeys((value as Record<string, unknown>)[key])],
+      ),
+    );
+  }
+  return value;
+}
+
+export async function verifyNowPaymentsIpn(
+  payload: Record<string, unknown>,
+  signature: string | null,
+  ipnSecret: string,
+) {
+  if (!signature || !/^[a-f\d]{128}$/i.test(signature)) return false;
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(ipnSecret),
+    { name: "HMAC", hash: "SHA-512" },
+    false,
+    ["sign"],
+  );
+  const digest = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(JSON.stringify(sortObjectKeys(payload))),
+  );
+  const expected = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  let mismatch = 0;
+  for (let index = 0; index < expected.length; index += 1) {
+    mismatch |= expected.charCodeAt(index) ^ signature.toLowerCase().charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+
 export async function verifyPlisioCallback(payload: Record<string, unknown>, apiKey: string) {
   const signature = payload.verify_hash;
   if (typeof signature !== "string") return false;

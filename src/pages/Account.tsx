@@ -151,7 +151,10 @@ const Account = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      if (provider === "plisio" && data.checkoutUrl) {
+      if (provider === "plisio") {
+        if (typeof data.checkoutUrl !== "string") {
+          throw new Error("Plisio did not return a checkout URL. Please try again.");
+        }
         window.location.assign(data.checkoutUrl);
         return;
       }
@@ -178,6 +181,14 @@ const Account = () => {
             <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Credits &amp; payments</h1>
             <p className="mt-2 text-sm text-muted-foreground">Manage your balance, choose a package, and keep track of every transaction.</p>
           </div>
+          {profile?.is_admin && (
+            <Button asChild size="sm" variant="outline" className="rounded-full">
+              <Link to="/admin">
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Admin dashboard
+              </Link>
+            </Button>
+          )}
           {user && (
             <div className="min-w-44 rounded-2xl bg-nav-background px-5 py-4 text-right text-nav-foreground-active shadow-lg shadow-slate-900/10">
               <p className="text-xs font-medium text-nav-foreground">Available balance</p>
@@ -385,7 +396,7 @@ const Account = () => {
                       {payments.map((payment) => (
                         <tr key={payment.id} className="border-b border-border/60">
                           <td className="py-3 pr-3">{new Date(payment.created_at).toLocaleString()}</td>
-                          <td className="py-3 pr-3">{payment.provider === "sasapay" ? "SasaPay / M-Pesa" : "Plisio"}</td>
+                          <td className="py-3 pr-3">{payment.provider === "sasapay" ? "SasaPay / M-Pesa" : payment.provider === "nowpayments" ? "NOWPayments (legacy)" : "Plisio"}</td>
                           <td className="py-3 pr-3">{payment.currency === "USD" ? currency(Number(payment.amount_usd)) : `${payment.amount_due} ${payment.currency}`}</td>
                           <td className="py-3 pr-3"><span className={`rounded border px-2 py-1 ${statusClass(payment.status)}`}>{payment.status}</span></td>
                           <td className="max-w-40 truncate py-3 font-mono">
@@ -525,7 +536,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
 function SetupNotice() {
   return (
     <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
-      Supabase is not configured for this deployment. Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> (or the equivalent <code>VITE_*</code> variables) to the frontend environment, then deploy the database migration and Edge Functions before enabling credit checkout.
+      Supabase is not configured for this deployment. Add <code className="break-all">NEXT_PUBLIC_SUPABASE_URL</code> and <code className="break-all">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> (or the equivalent <code className="break-all">VITE_*</code> variables) to the frontend environment, then deploy the database migration and Edge Functions before enabling credit checkout.
     </div>
   );
 }

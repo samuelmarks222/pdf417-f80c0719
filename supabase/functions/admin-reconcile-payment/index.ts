@@ -71,7 +71,7 @@ Deno.serve(async (request: Request) => {
         await recordPaymentEvent(client, payment.id, "sasapay", "admin_reconciled_status", `Reconciled by ${user.email ?? user.id}: ${status}.`, response);
         return jsonResponse({ status, credited: false });
       }
-    } else {
+    } else if (payment.provider === "plisio") {
       const apiKey = Deno.env.get("PLISIO_API_KEY") ?? Deno.env.get("PLISIO_SECRET_KEY");
       if (!apiKey || !payment.provider_reference) {
         return jsonResponse({ error: "Plisio invoice verification is not configured." }, 503);
@@ -105,6 +105,45 @@ Deno.serve(async (request: Request) => {
         const paymentStatus = status === "mismatch" || status === "underpaid" ? "underpaid" : status === "error" ? "failed" : status;
         await updatePaymentStatus(client, payment.id, paymentStatus, `Plisio invoice status: ${status}.`, response);
         await recordPaymentEvent(client, payment.id, "plisio", "admin_reconciled_status", `Reconciled by ${user.email ?? user.id}: ${paymentStatus}.`, response);
+        return jsonResponse({ status: paymentStatus, credited: false });
+      }
+    } else {
+      const apiKey = Deno.env.get("NOWPAYMENTS_API_KEY");
+      if (!apiKey || !payment.provider_reference) {
+        return jsonResponse({ error: "NOWPayments invoice verification is not configured." }, 503);
+      }
+      const providerResponse = await fetch(
+        `https://api.nowpayments.io/v1/invoice/${encodeURIComponent(payment.provider_reference)}`,
+        { headers: { "x-api-key": apiKey, Accept: "application/json" } },
+      );
+      const result = await providerResponse.json().catch(() => null);
+      response = result?.data ?? result ?? {};
+      if (!providerResponse.ok || String(response.order_id ?? "") !== payment.id) {
+        throw new Error("NOWPayments could not verify this invoice.");
+      }
+
+      const status = String(response.invoice_status ?? response.payment_status ?? response.status ?? "").toLowerCase();
+      if (status === "finished") {
+        if (String(response.price_currency ?? "").toUpperCase() !== "USD"
+          || !sameAmount(response.price_amount, Number(payment.amount_usd))) {
+          await updatePaymentStatus(client, payment.id, "underpaid", "Provider status amount or currency did not match.", response);
+          await recordPaymentEvent(client, payment.id, "nowpayments", "reconciliation_mismatch", "Status amount or currency did not match.", response);
+          return jsonResponse({ status: "underpaid", credited: false });
+        }
+        const { data: credited, error: creditError } = await client.rpc("confirm_credit_payment", {
+          p_payment_id: payment.id,
+          p_provider_reference: payment.provider_reference,
+          p_provider_data: response,
+        });
+        if (creditError) throw creditError;
+        await recordPaymentEvent(client, payment.id, "nowpayments", "admin_reconciled_success", `Reconciled by ${user.email ?? user.id}.`, response);
+        return jsonResponse({ status: "successful", credited: Boolean(credited) });
+      }
+
+      if (status === "expired" || status === "partially_paid" || status === "failed" || status === "refunded") {
+        const paymentStatus = status === "partially_paid" ? "underpaid" : status === "refunded" ? "failed" : status;
+        await updatePaymentStatus(client, payment.id, paymentStatus, `NOWPayments invoice status: ${status}.`, response);
+        await recordPaymentEvent(client, payment.id, "nowpayments", "admin_reconciled_status", `Reconciled by ${user.email ?? user.id}: ${paymentStatus}.`, response);
         return jsonResponse({ status: paymentStatus, credited: false });
       }
     }

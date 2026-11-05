@@ -19,6 +19,39 @@ function removeMeta(attribute: "name" | "property", key: string) {
   document.head.querySelectorAll<HTMLMetaElement>(`meta[${attribute}="${key}"]`).forEach((element) => element.remove());
 }
 
+const routeMetadata: Record<string, { title: string; description: string; keywords: string; robots: string }> = {
+  "/generator": {
+    title: "PDF417 Barcode Generator | AAMVA & U.S. State Formats",
+    description: "Create PDF417 barcode previews for AAMVA and U.S. state formats, review structured fields, and export PNG images for educational and testing workflows.",
+    keywords: "PDF417 generator, AAMVA PDF417 generator, state barcode generator, driver license barcode testing, PDF417 PNG",
+    robots: "index,follow",
+  },
+  "/states": {
+    title: "U.S. State PDF417 Barcode Formats | AAMVA Revisions",
+    description: "Browse available U.S. state, District of Columbia, Canadian province, and territory PDF417 formats before opening the barcode generator.",
+    keywords: "state PDF417 formats, AAMVA state barcode formats, U.S. driver license barcode formats, PDF417 revisions",
+    robots: "index,follow",
+  },
+  "/features": {
+    title: "PDF417 Barcode Generator Features | Fields, Preview & PNG",
+    description: "Explore PDF417 and Code 128 barcode generator features, structured AAMVA fields, state-aware forms, previews, and PNG export tools.",
+    keywords: "PDF417 barcode features, AAMVA fields, barcode preview, Code 128 generator, PNG barcode export",
+    robots: "index,follow",
+  },
+  "/account": {
+    title: "Account & Credits | PDF417.LIVE",
+    description: "Manage your PDF417.LIVE account, credits, payments, and barcode generation history.",
+    keywords: "PDF417 account, barcode generator credits",
+    robots: "noindex,nofollow",
+  },
+  "/admin": {
+    title: "Admin Dashboard | PDF417.LIVE",
+    description: "Private administration dashboard for PDF417.LIVE.",
+    keywords: "",
+    robots: "noindex,nofollow",
+  },
+};
+
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState(defaultSiteSettings);
   const [loading, setLoading] = useState(true);
@@ -61,20 +94,31 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   useEffect(() => {
-    document.title = settings.meta_title || settings.site_name;
-    setMeta("name", "description", settings.meta_description);
-    setMeta("name", "keywords", settings.meta_keywords);
-    setMeta("name", "robots", settings.meta_robots);
-    setMeta("property", "og:title", settings.meta_title || settings.site_name);
-    setMeta("property", "og:description", settings.meta_description);
+    const metadata = routeMetadata[location.pathname] ?? {
+      title: settings.meta_title || settings.site_name,
+      description: settings.meta_description,
+      keywords: settings.meta_keywords,
+      robots: "noindex,nofollow",
+    };
+    const pageTitle = location.pathname === "/" ? settings.meta_title || settings.site_name : metadata.title;
+    const pageDescription = location.pathname === "/" ? settings.meta_description : metadata.description;
+    const pageKeywords = location.pathname === "/" ? settings.meta_keywords : metadata.keywords;
+    const pageRobots = location.pathname === "/" ? settings.meta_robots : metadata.robots;
+
+    document.title = pageTitle;
+    setMeta("name", "description", pageDescription);
+    setMeta("name", "keywords", pageKeywords);
+    setMeta("name", "robots", pageRobots);
+    setMeta("property", "og:title", pageTitle);
+    setMeta("property", "og:description", pageDescription);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:site_name", settings.site_name);
     setMeta("property", "og:url", new URL(location.pathname, `${settings.canonical_url.replace(/\/+$/, "")}/`).href);
     if (settings.og_image_url) setMeta("property", "og:image", settings.og_image_url);
     else removeMeta("property", "og:image");
     setMeta("name", "twitter:card", settings.og_image_url ? "summary_large_image" : "summary");
-    setMeta("name", "twitter:title", settings.meta_title || settings.site_name);
-    setMeta("name", "twitter:description", settings.meta_description);
+    setMeta("name", "twitter:title", pageTitle);
+    setMeta("name", "twitter:description", pageDescription);
     if (settings.twitter_handle) setMeta("name", "twitter:site", settings.twitter_handle);
     else removeMeta("name", "twitter:site");
     if (settings.og_image_url) setMeta("name", "twitter:image", settings.og_image_url);

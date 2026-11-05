@@ -612,7 +612,8 @@ function SiteSettingsPanel() {
           <SettingsTextarea label="SEO description" value={draft.meta_description} onChange={(value) => update("meta_description", value)} />
           <SettingsTextarea label="SEO keywords" value={draft.meta_keywords} onChange={(value) => update("meta_keywords", value)} />
           <div className="grid gap-2 text-sm font-medium">
-            <span>Social sharing image</span>
+            <span>Open Graph (OG) image</span>
+            <p className="text-xs font-normal text-muted-foreground">This image appears when your site is shared on social media. Recommended size: 1200 × 630 pixels.</p>
             <div className="flex flex-wrap items-center gap-3">
               {draft.og_image_url && (
                 <img src={draft.og_image_url} alt="Current social sharing image preview" className="h-12 max-w-36 rounded border border-border object-contain p-1" />

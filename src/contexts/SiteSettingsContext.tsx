@@ -86,23 +86,15 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     }
     canonical.href = new URL(location.pathname, `${settings.canonical_url.replace(/\/+$/, "")}/`).href;
 
-    if (settings.favicon_url) {
-      let icon = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
-      if (!icon) {
-        icon = document.createElement("link");
-        icon.rel = "icon";
-        document.head.appendChild(icon);
-      }
-      icon.href = settings.favicon_url;
-    } else {
-      let icon = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
-      if (!icon) {
-        icon = document.createElement("link");
-        icon.rel = "icon";
-        document.head.appendChild(icon);
-      }
-      icon.href = "/favicon.ico";
+    const faviconUrl = settings.favicon_url || "/favicon.ico";
+    const iconLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
+    const icon = iconLinks[0] ?? document.createElement("link");
+    if (!iconLinks.length) {
+      document.head.appendChild(icon);
     }
+    icon.rel = "icon";
+    icon.href = faviconUrl;
+    iconLinks.slice(1).forEach((link) => link.remove());
   }, [location.pathname, settings]);
 
   const value = useMemo(

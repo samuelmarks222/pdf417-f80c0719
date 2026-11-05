@@ -324,10 +324,10 @@ const Admin = () => {
                   <h2 className="mt-1 text-xl font-bold">Payments &amp; reconciliation</h2>
                 </div>
                 <div className="flex gap-2">
-                  <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-background px-3 text-sm">
+                  <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
                     <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option><option value="nowpayments">NOWPayments (legacy)</option>
                   </select>
-                  <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)} className="h-10 rounded border border-input bg-background px-3 text-sm">
+                  <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
                     <option value="">All statuses</option>
                     {["pending", "successful", "failed", "cancelled", "expired", "underpaid"].map((status) => <option key={status} value={status}>{status}</option>)}
                   </select>
@@ -639,7 +639,7 @@ function SiteSettingsPanel() {
             <select
               value={draft.meta_robots}
               onChange={(event) => update("meta_robots", event.target.value)}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm font-normal"
+              className="h-10 rounded-md border border-input bg-white px-3 text-sm font-normal"
             >
               <option value="index,follow">Allow indexing</option>
               <option value="noindex,nofollow">Prevent indexing</option>

@@ -265,6 +265,34 @@ const Home = () => {
           </div>
         </section>
 
+        <section className="border-y border-[#e8e9e2] bg-[#f6faf7]">
+          <div className="container max-w-4xl py-16 sm:py-20">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#087260]">Online barcode tools</p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#18211e] sm:text-4xl">
+              PDF417 barcode generation for AAMVA and U.S. state formats
+            </h2>
+            <div className="mt-5 space-y-4 text-base leading-7 text-[#596761]">
+              <p>
+                PDF417.LIVE is an online PDF417 barcode generator for structured AAMVA and U.S. state-format data. Choose a state format, enter test values, and review a barcode preview before exporting a PNG image.
+              </p>
+              <p>
+                Use the free Code 128 generator for quick barcode projects, or use the PDF417 workspace when you need a state-aware form and a clear preview workflow. Browse the available formats to compare revisions and field requirements before you begin.
+              </p>
+              <p className="text-sm text-[#6f7b75]">
+                This service is intended for educational, software testing, and development workflows. Generated barcodes are not official identification and must not be used to misrepresent identity or create fraudulent documents.
+              </p>
+            </div>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link to="/generator" className="inline-flex items-center gap-2 rounded-full bg-[#07584e] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#06483f]">
+                Open the PDF417 generator <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link to="/states" className="inline-flex items-center gap-2 rounded-full border border-[#b7d6ca] bg-white px-5 py-3 text-sm font-bold text-[#07584e] transition hover:bg-[#eaf4ee]">
+                Browse state formats <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <section id="faq" className="border-t border-[#e8e9e2] bg-white">
           <div className="container max-w-7xl py-16 sm:py-20">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

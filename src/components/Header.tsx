@@ -51,7 +51,6 @@ export function Header() {
         <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => navLink(item.path, item.label))}
           {navLink("/account", "Credits")}
-          {profile?.is_admin && navLink("/admin", "Admin")}
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
@@ -93,7 +92,6 @@ export function Header() {
       <nav aria-label="Mobile navigation" className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-center gap-1 border-t border-white/10 px-2 py-2 md:hidden">
         {navItems.map((item) => navLink(item.path, item.label))}
         {navLink("/account", "Credits")}
-        {profile?.is_admin && navLink("/admin", "Admin")}
       </nav>
     </header>
   );

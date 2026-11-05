@@ -104,14 +104,15 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const pageDescription = location.pathname === "/" ? settings.meta_description : metadata.description;
     const pageKeywords = location.pathname === "/" ? settings.meta_keywords : metadata.keywords;
     const pageRobots = location.pathname === "/" ? settings.meta_robots : metadata.robots;
-    const socialTitle = location.pathname === "/" ? "PDF417.LIVE – Online PDF417 Barcode Generator" : pageTitle;
+    const socialTitle = location.pathname === "/" ? "PDF417.LIVE – Online US Driver's License Barcode Generator" : pageTitle;
     const socialDescription = location.pathname === "/"
-      ? "Create and download standardized PDF417 barcode images online with PDF417.LIVE."
+      ? "Create PDF417 barcode images online with PDF417.LIVE. A simple and convenient platform for generating standardized PDF417 AAMVA barcode formats."
       : pageDescription;
 
     document.title = pageTitle;
     setMeta("name", "description", pageDescription);
     setMeta("name", "keywords", pageKeywords);
+    setMeta("name", "author", "PDF417.LIVE");
     setMeta("name", "robots", pageRobots);
     setMeta("property", "og:title", socialTitle);
     setMeta("property", "og:description", socialDescription);
@@ -121,7 +122,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     if (settings.og_image_url) setMeta("property", "og:image", settings.og_image_url);
     else removeMeta("property", "og:image");
     setMeta("name", "twitter:card", settings.og_image_url ? "summary_large_image" : "summary");
-    setMeta("name", "twitter:title", location.pathname === "/" ? "PDF417.LIVE – PDF417 Barcode Generator" : pageTitle);
+    setMeta("name", "twitter:title", location.pathname === "/" ? "PDF417.LIVE – PDF417 Barcode Generator USA" : pageTitle);
     setMeta("name", "twitter:description", location.pathname === "/"
       ? "Generate PDF417 barcode images online with a simple and convenient platform."
       : pageDescription);

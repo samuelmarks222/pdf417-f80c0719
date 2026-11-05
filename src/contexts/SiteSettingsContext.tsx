@@ -104,21 +104,27 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const pageDescription = location.pathname === "/" ? settings.meta_description : metadata.description;
     const pageKeywords = location.pathname === "/" ? settings.meta_keywords : metadata.keywords;
     const pageRobots = location.pathname === "/" ? settings.meta_robots : metadata.robots;
+    const socialTitle = location.pathname === "/" ? "PDF417.LIVE – Online PDF417 Barcode Generator" : pageTitle;
+    const socialDescription = location.pathname === "/"
+      ? "Create and download standardized PDF417 barcode images online with PDF417.LIVE."
+      : pageDescription;
 
     document.title = pageTitle;
     setMeta("name", "description", pageDescription);
     setMeta("name", "keywords", pageKeywords);
     setMeta("name", "robots", pageRobots);
-    setMeta("property", "og:title", pageTitle);
-    setMeta("property", "og:description", pageDescription);
+    setMeta("property", "og:title", socialTitle);
+    setMeta("property", "og:description", socialDescription);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:site_name", settings.site_name);
     setMeta("property", "og:url", new URL(location.pathname, `${settings.canonical_url.replace(/\/+$/, "")}/`).href);
     if (settings.og_image_url) setMeta("property", "og:image", settings.og_image_url);
     else removeMeta("property", "og:image");
     setMeta("name", "twitter:card", settings.og_image_url ? "summary_large_image" : "summary");
-    setMeta("name", "twitter:title", pageTitle);
-    setMeta("name", "twitter:description", pageDescription);
+    setMeta("name", "twitter:title", location.pathname === "/" ? "PDF417.LIVE – PDF417 Barcode Generator" : pageTitle);
+    setMeta("name", "twitter:description", location.pathname === "/"
+      ? "Generate PDF417 barcode images online with a simple and convenient platform."
+      : pageDescription);
     if (settings.twitter_handle) setMeta("name", "twitter:site", settings.twitter_handle);
     else removeMeta("name", "twitter:site");
     if (settings.og_image_url) setMeta("name", "twitter:image", settings.og_image_url);

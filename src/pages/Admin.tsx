@@ -24,7 +24,9 @@ interface UserRow {
   email: string | null;
   display_name: string | null;
   credit_balance: number;
+  is_admin: boolean;
   created_at: string;
+  last_sign_in_at: string | null;
 }
 
 interface PaymentRow {
@@ -91,7 +93,7 @@ const Admin = () => {
     if (!supabase || !profile?.is_admin) return;
     const [packageResult, userResult, paymentResult, eventResult, statsResult] = await Promise.all([
       supabase.from("credit_packages").select("id,name,credits,price_usd,active,recommended").order("sort_order"),
-      supabase.from("credit_profiles").select("id,email,display_name,credit_balance,created_at").order("created_at", { ascending: false }).limit(1000),
+      supabase.rpc("admin_list_users"),
       supabase.from("credit_payments").select("id,user_id,package_id,provider,provider_reference,amount_usd,amount_due,currency,status,verification_error,created_at").order("created_at", { ascending: false }).limit(1000),
       supabase.from("payment_events").select("id,payment_id,provider,event_type,message,payload,created_at").order("created_at", { ascending: false }).limit(500),
       supabase.rpc("admin_credit_dashboard_stats"),
@@ -292,12 +294,13 @@ const Admin = () => {
                 <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search email, payment, or user ID" className="max-w-sm" />
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px] text-left text-xs">
-                  <thead className="border-b border-border text-muted-foreground"><tr><th className="pb-2 pr-3">Email</th><th className="pb-2 pr-3">Name</th><th className="pb-2 pr-3">Credits</th><th className="pb-2 pr-3">Registered</th><th className="pb-2">History</th></tr></thead>
+                <table className="w-full min-w-[760px] text-left text-xs">
+                  <thead className="border-b border-border text-muted-foreground"><tr><th className="pb-2 pr-3">Email</th><th className="pb-2 pr-3">Name</th><th className="pb-2 pr-3">Credits</th><th className="pb-2 pr-3">Registered</th><th className="pb-2 pr-3">Last login</th><th className="pb-2">History</th></tr></thead>
                   <tbody>
                     {filteredUsers.map((item) => (
                       <tr key={item.id} className="border-b border-border/60">
                         <td className="py-2 pr-3">{item.email ?? "—"}</td><td className="py-2 pr-3">{item.display_name ?? "—"}</td><td className="py-2 pr-3">{item.credit_balance}</td><td className="py-2 pr-3">{new Date(item.created_at).toLocaleDateString()}</td>
+                        <td className="py-2 pr-3">{item.last_sign_in_at ? new Date(item.last_sign_in_at).toLocaleString() : "Never"}</td>
                         <td className="py-2"><Button size="sm" variant={selectedUser === item.id ? "default" : "outline"} onClick={() => setSelectedUser(item.id)}>Select</Button></td>
                       </tr>
                     ))}

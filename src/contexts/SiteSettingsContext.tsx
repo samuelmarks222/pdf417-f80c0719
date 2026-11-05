@@ -4,17 +4,19 @@ import { supabase } from "@/lib/supabase";
 import { SiteSettingsContext, defaultSiteSettings } from "@/contexts/site-settings-context";
 
 function setMeta(attribute: "name" | "property", key: string, value: string) {
-  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`);
+  const elements = Array.from(document.head.querySelectorAll<HTMLMetaElement>(`meta[${attribute}="${key}"]`));
+  let element = elements[0];
   if (!element) {
     element = document.createElement("meta");
     element.setAttribute(attribute, key);
     document.head.appendChild(element);
   }
+  elements.slice(1).forEach((duplicate) => duplicate.remove());
   element.content = value;
 }
 
 function removeMeta(attribute: "name" | "property", key: string) {
-  document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`)?.remove();
+  document.head.querySelectorAll<HTMLMetaElement>(`meta[${attribute}="${key}"]`).forEach((element) => element.remove());
 }
 
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
@@ -78,12 +80,14 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     if (settings.og_image_url) setMeta("name", "twitter:image", settings.og_image_url);
     else removeMeta("name", "twitter:image");
 
-    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const canonicalLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'));
+    let canonical = canonicalLinks[0];
     if (!canonical) {
       canonical = document.createElement("link");
       canonical.rel = "canonical";
       document.head.appendChild(canonical);
     }
+    canonicalLinks.slice(1).forEach((link) => link.remove());
     canonical.href = new URL(location.pathname, `${settings.canonical_url.replace(/\/+$/, "")}/`).href;
 
     const faviconUrl = settings.favicon_url || "/favicon.ico";

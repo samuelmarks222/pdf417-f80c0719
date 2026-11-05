@@ -34,7 +34,7 @@ const routeMetadata: Record<string, { title: string; description: string; keywor
   },
   "/features": {
     title: "PDF417 Barcode Generator Features | Fields, Preview & PNG",
-    description: "Create and download PDF417 and Code 128 barcodes for U.S. driver's licenses and Canadian licence formats. Explore state, province, and territory barcode tools online.",
+    description: "PDF417.LIVE is a fast and easy-to-use online PDF417 barcode generator for US Driver’s Licenses, designed to create AAMVA-compliant PDF417 barcodes with accurate formatting and reliable results.",
     keywords: "PDF417 barcode features, AAMVA fields, barcode preview, Code 128 generator, PNG barcode export",
     robots: "index,follow",
   },

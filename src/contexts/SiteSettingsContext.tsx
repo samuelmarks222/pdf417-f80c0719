@@ -141,7 +141,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     canonicalLinks.slice(1).forEach((link) => link.remove());
     canonical.href = new URL(location.pathname, `${settings.canonical_url.replace(/\/+$/, "")}/`).href;
 
-    const faviconUrl = settings.favicon_url || "/favicon.ico";
+    const faviconUrl = settings.favicon_url || "/favicon.svg";
     const iconLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
     const icon = iconLinks[0] ?? document.createElement("link");
     if (!iconLinks.length) {

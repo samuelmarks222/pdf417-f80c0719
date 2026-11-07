@@ -41,7 +41,7 @@ export async function authenticatedUser(request: Request) {
 export async function recordPaymentEvent(
   client: SupabaseClient,
   paymentId: string | null,
-  provider: "sasapay" | "nowpayments" | "plisio",
+  provider: "sasapay" | "plisio",
   eventType: string,
   message: string | null,
   payload: Record<string, unknown> = {},

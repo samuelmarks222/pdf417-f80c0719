@@ -4,12 +4,10 @@ import {
   matchesPlisioInvoiceReference,
   normalizeSasapayBaseUrl,
   sasapayApiUrl,
-  verifyNowPaymentsIpn,
   verifyPlisioCallback,
 } from "../../supabase/functions/_shared/payment-utils";
 
 const plisioApiKey = "test-plisio-api-key";
-const nowPaymentsIpnSecret = "test-nowpayments-ipn-secret";
 
 function signPlisioCallback(payload: Record<string, unknown>) {
   const callbackData = { ...payload };
@@ -30,23 +28,6 @@ function signPlisioJsonCallback(payload: Record<string, unknown>) {
   const callbackData = { ...payload };
   delete callbackData.verify_hash;
   return createHmac("sha1", plisioApiKey).update(JSON.stringify(callbackData)).digest("hex");
-}
-
-function sortNowPaymentsPayload(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortNowPaymentsPayload);
-  if (value !== null && typeof value === "object") {
-    return Object.fromEntries(
-      Object.keys(value).sort().map((key) => [
-        key,
-        sortNowPaymentsPayload((value as Record<string, unknown>)[key]),
-      ]),
-    );
-  }
-  return value;
-}
-
-function signNowPaymentsIpn(payload: Record<string, unknown>, secret = nowPaymentsIpnSecret) {
-  return createHmac("sha512", secret).update(JSON.stringify(sortNowPaymentsPayload(payload))).digest("hex");
 }
 
 describe("payment provider utilities", () => {
@@ -107,19 +88,4 @@ describe("payment provider utilities", () => {
     expect(matchesPlisioInvoiceReference("initial-invoice", null, "initial-invoice")).toBe(false);
   });
 
-  it("verifies NOWPayments IPNs using the sorted payload and IPN secret", async () => {
-    const payload = {
-      payment_status: "finished",
-      order_id: "payment-123",
-      payment_id: 456,
-      extra: { currency: "btc", amount: 0.001 },
-    };
-    const signature = signNowPaymentsIpn(payload);
-
-    expect(await verifyNowPaymentsIpn(payload, signature, nowPaymentsIpnSecret)).toBe(true);
-    expect(await verifyNowPaymentsIpn(payload, signature.toUpperCase(), nowPaymentsIpnSecret)).toBe(true);
-    expect(await verifyNowPaymentsIpn(payload, signature, "wrong-secret")).toBe(false);
-    expect(await verifyNowPaymentsIpn({ ...payload, payment_status: "waiting" }, signature, nowPaymentsIpnSecret)).toBe(false);
-    expect(await verifyNowPaymentsIpn(payload, "invalid", nowPaymentsIpnSecret)).toBe(false);
-  });
 });

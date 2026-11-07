@@ -7,18 +7,6 @@ export function sasapayApiUrl(baseUrl: string, path: string) {
   return `${normalizeSasapayBaseUrl(baseUrl)}/${path.replace(/^\/+/, "")}`;
 }
 
-function sortObjectKeys(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortObjectKeys);
-  if (value !== null && typeof value === "object") {
-    return Object.fromEntries(
-      Object.keys(value).sort().map(
-        (key) => [key, sortObjectKeys((value as Record<string, unknown>)[key])],
-      ),
-    );
-  }
-  return value;
-}
-
 function hexDigest(digest: ArrayBuffer) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
@@ -33,25 +21,15 @@ function hmacMatches(expected: string, signature: string) {
   return mismatch === 0;
 }
 
-async function hmacHex(algorithm: "SHA-1" | "SHA-512", secret: string, payload: string) {
+async function hmacHex(secret: string, payload: string) {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
-    { name: "HMAC", hash: algorithm },
+    { name: "HMAC", hash: "SHA-1" },
     false,
     ["sign"],
   );
   return hexDigest(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)));
-}
-
-export async function verifyNowPaymentsIpn(
-  payload: Record<string, unknown>,
-  signature: string | null,
-  ipnSecret: string,
-) {
-  if (!signature || !/^[a-f\d]{128}$/i.test(signature)) return false;
-  const expected = await hmacHex("SHA-512", ipnSecret, JSON.stringify(sortObjectKeys(payload)));
-  return hmacMatches(expected, signature);
 }
 
 export async function verifyPlisioCallback(payload: Record<string, unknown>, apiKey: string) {
@@ -79,8 +57,8 @@ export async function verifyPlisioCallback(payload: Record<string, unknown>, api
   // form for previously configured callbacks while evaluating both forms in
   // constant-time comparisons.
   const [receivedOrder, legacyOrder] = await Promise.all([
-    hmacHex("SHA-1", apiKey, JSON.stringify(callbackData)),
-    hmacHex("SHA-1", apiKey, JSON.stringify(legacyCallbackData)),
+    hmacHex(apiKey, JSON.stringify(callbackData)),
+    hmacHex(apiKey, JSON.stringify(legacyCallbackData)),
   ]);
   const receivedOrderMatches = hmacMatches(receivedOrder, signature);
   const legacyOrderMatches = hmacMatches(legacyOrder, signature);

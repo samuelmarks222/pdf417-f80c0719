@@ -328,7 +328,7 @@ const Admin = () => {
                 </div>
                 <div className="flex gap-2">
                   <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
-                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option><option value="nowpayments">NOWPayments (legacy)</option>
+                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option><option value="legacy">Legacy provider</option>
                   </select>
                   <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
                     <option value="">All statuses</option>

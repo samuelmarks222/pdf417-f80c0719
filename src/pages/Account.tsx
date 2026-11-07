@@ -399,7 +399,7 @@ const Account = () => {
                       {payments.map((payment) => (
                         <tr key={payment.id} className="border-b border-border/60">
                           <td className="py-3 pr-3">{new Date(payment.created_at).toLocaleString()}</td>
-                          <td className="py-3 pr-3">{payment.provider === "sasapay" ? "SasaPay / M-Pesa" : payment.provider === "nowpayments" ? "NOWPayments (legacy)" : "Plisio"}</td>
+                          <td className="py-3 pr-3">{payment.provider === "sasapay" ? "SasaPay / M-Pesa" : payment.provider === "legacy" ? "Legacy provider" : "Plisio"}</td>
                           <td className="py-3 pr-3">{payment.currency === "USD" ? currency(Number(payment.amount_usd)) : `${payment.amount_due} ${payment.currency}`}</td>
                           <td className="py-3 pr-3"><span className={`rounded border px-2 py-1 ${statusClass(payment.status)}`}>{payment.status}</span></td>
                           <td className="max-w-40 truncate py-3 font-mono">

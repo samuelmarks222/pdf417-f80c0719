@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { ArrowRight, Check, ChevronRight, CreditCard, ShieldCheck, Smartphone } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, ShieldCheck, Smartphone } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface CreditPackage {
@@ -56,7 +56,7 @@ const Account = () => {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [transactions, setTransactions] = useState<CreditRow[]>([]);
   const [selectedPackage, setSelectedPackage] = useState("");
-  const [provider, setProvider] = useState<"sasapay" | "plisio">("sasapay");
+  const [provider, setProvider] = useState<"sasapay" | "plisio">("plisio");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const paymentStatuses = useRef(new Map<string, string>());
@@ -265,6 +265,30 @@ const Account = () => {
                 <div className="grid gap-4 lg:grid-cols-2">
                   <button
                     type="button"
+                    aria-pressed={provider === "plisio"}
+                    onClick={() => setProvider("plisio")}
+                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
+                      provider === "plisio"
+                        ? "border-violet-500 ring-2 ring-violet-500/15 shadow-md shadow-violet-900/5"
+                        : "border-border hover:border-violet-300 hover:shadow-md"
+                    }`}
+                  >
+                    {provider === "plisio" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-violet-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
+                    <span className="grid h-16 w-20 shrink-0 grid-cols-2 place-items-center rounded-xl border border-violet-100 bg-violet-50/70 p-2">
+                      <CryptoLogo name="Bitcoin" src="https://cdn.simpleicons.org/bitcoin/F7931A" />
+                      <CryptoLogo name="Ethereum" src="https://cdn.simpleicons.org/ethereum/627EEA" />
+                      <CryptoLogo name="Tether" src="https://cdn.simpleicons.org/tether/50AF95" />
+                      <CryptoLogo name="Litecoin" src="https://cdn.simpleicons.org/litecoin/A6A9AA" />
+                    </span>
+                    <span className="min-w-0 flex-1 pr-7">
+                      <span className="block text-base font-bold">Cryptocurrency</span>
+                      <span className="mt-1 block text-sm text-muted-foreground">Bitcoin, Ethereum, stablecoins &amp; more</span>
+                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-violet-700">Secure hosted checkout by Plisio <ChevronRight className="h-3.5 w-3.5" /></span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
                     aria-pressed={provider === "sasapay"}
                     onClick={() => setProvider("sasapay")}
                     className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
@@ -286,27 +310,6 @@ const Account = () => {
                       <span className="block text-base font-bold">M-PESA</span>
                       <span className="mt-1 block text-sm text-muted-foreground">Mobile money · KES</span>
                       <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">Secure prompt by SasaPay <ChevronRight className="h-3.5 w-3.5" /></span>
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-pressed={provider === "plisio"}
-                    onClick={() => setProvider("plisio")}
-                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
-                      provider === "plisio"
-                        ? "border-violet-500 ring-2 ring-violet-500/15 shadow-md shadow-violet-900/5"
-                        : "border-border hover:border-violet-300 hover:shadow-md"
-                    }`}
-                  >
-                    {provider === "plisio" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-violet-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
-                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-violet-100 bg-violet-50/70 text-violet-700">
-                      <CreditCard className="h-7 w-7" />
-                    </span>
-                    <span className="min-w-0 flex-1 pr-7">
-                      <span className="block text-base font-bold">Cryptocurrency</span>
-                      <span className="mt-1 block text-sm text-muted-foreground">Pay with digital assets</span>
-                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-violet-700">Hosted checkout by Plisio <ChevronRight className="h-3.5 w-3.5" /></span>
                     </span>
                   </button>
                 </div>
@@ -506,6 +509,14 @@ function PackageCard({
       </span>
 
     </button>
+  );
+}
+
+function CryptoLogo({ name, src }: { name: string; src: string }) {
+  return (
+    <span title={name} className="grid h-7 w-7 place-items-center overflow-hidden rounded-full bg-card shadow-sm ring-1 ring-violet-200">
+      <img src={src} alt={`${name} logo`} className="h-5 w-5 object-contain" loading="lazy" />
+    </span>
   );
 }
 

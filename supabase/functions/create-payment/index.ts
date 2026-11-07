@@ -90,9 +90,8 @@ Deno.serve(async (request: Request) => {
         source_currency: "USD",
         source_amount: Number(pkg.price_usd).toFixed(2),
         callback_url: `${callbackUrl}?provider=plisio&json=true`,
-        success_callback_url: `${appOrigin}/account?payment=${paymentId}`,
-        fail_callback_url: `${appOrigin}/account?payment=${paymentId}`,
-        json: "true",
+        success_invoice_url: `${appOrigin}/account?payment=${paymentId}`,
+        fail_invoice_url: `${appOrigin}/account?payment=${paymentId}`,
       });
       const response = await fetch(`https://api.plisio.net/api/v1/invoices/new?${params}`);
       const result = await response.json().catch(() => null);

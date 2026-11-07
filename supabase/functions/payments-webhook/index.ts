@@ -7,6 +7,7 @@ import {
 } from "../_shared/http.ts";
 import {
   getSasapayToken,
+  matchesPlisioInvoiceReference,
   sasapayRequest,
   verifyNowPaymentsIpn,
   verifyPlisioCallback,
@@ -167,11 +168,13 @@ Deno.serve(async (request: Request) => {
     const status = String(payload.status ?? payload.Status ?? "").toLowerCase();
     const transactionReference = String(payload.txn_id ?? "");
     if (status === "completed") {
-      if (!transactionReference || transactionReference !== payment.provider_reference) {
+      const switchReference = typeof payload.switch_id === "string" ? payload.switch_id : null;
+      if (!matchesPlisioInvoiceReference(payment.provider_reference, transactionReference || null, switchReference)) {
         const message = "Completed callback transaction reference did not match the stored invoice.";
         await updatePaymentStatus(client, payment.id, "underpaid", message, payload);
         await recordPaymentEvent(client, payment.id, provider, "verification_error", message, {
           txn_id: transactionReference || null,
+          switch_id: switchReference,
         });
         return jsonResponse({ error: "Invoice reference verification failed" }, 422);
       }
@@ -204,7 +207,7 @@ Deno.serve(async (request: Request) => {
       ? "expired"
       : status === "mismatch" || status === "underpaid"
       ? "underpaid"
-      : status === "cancelled" || status === "cancelled duplicate"
+      : status === "cancelled"
       ? "cancelled"
       : status === "error" || status === "failed"
       ? "failed"

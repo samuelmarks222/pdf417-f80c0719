@@ -6,6 +6,49 @@ function sameAmount(actual: unknown, expected: number) {
   return Number.isFinite(parsed) && Math.abs(parsed - expected) < 0.005;
 }
 
+function asObject(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+async function getPlisioOperation(invoiceId: string, apiKey: string) {
+  const responseUrl = new URL(`https://api.plisio.net/api/v1/operations/${encodeURIComponent(invoiceId)}`);
+  responseUrl.searchParams.set("api_key", apiKey);
+  const providerResponse = await fetch(responseUrl);
+  const result = asObject(await providerResponse.json().catch(() => null));
+  const operation = asObject(result.data);
+  if (!providerResponse.ok || result.status !== "success") {
+    throw new Error("Plisio could not verify this invoice.");
+  }
+  return operation;
+}
+
+async function resolvePlisioOperation(invoiceId: string, apiKey: string) {
+  const originalOperation = await getPlisioOperation(invoiceId, apiKey);
+  if (String(originalOperation.status ?? "").toLowerCase() !== "cancelled duplicate") {
+    return originalOperation;
+  }
+
+  const childIds = Array.isArray(originalOperation.child_ids)
+    ? originalOperation.child_ids.filter((id): id is string => typeof id === "string" && id.length > 0)
+    : [];
+  if (childIds.length === 0) return originalOperation;
+
+  const childOperations = await Promise.all(
+    childIds.slice(0, 20).map(async (childId) => {
+      try {
+        return await getPlisioOperation(childId, apiKey);
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return childOperations.find((operation) => String(operation?.status ?? "").toLowerCase() === "completed")
+    ?? childOperations.find((operation) => String(operation?.status ?? "").toLowerCase() !== "cancelled duplicate")
+    ?? originalOperation;
+}
+
 Deno.serve(async (request: Request) => {
   const options = preflight(request);
   if (options) return options;
@@ -76,14 +119,7 @@ Deno.serve(async (request: Request) => {
       if (!apiKey || !payment.provider_reference) {
         return jsonResponse({ error: "Plisio invoice verification is not configured." }, 503);
       }
-      const responseUrl = new URL(`https://api.plisio.net/api/v1/operations/${encodeURIComponent(payment.provider_reference)}`);
-      responseUrl.searchParams.set("api_key", apiKey);
-      const providerResponse = await fetch(responseUrl);
-      const result = await providerResponse.json();
-      response = result?.data ?? {};
-      if (!providerResponse.ok || result?.status !== "success") {
-        throw new Error("Plisio could not verify this invoice.");
-      }
+      response = await resolvePlisioOperation(payment.provider_reference, apiKey);
       const status = String(response.status ?? "").toLowerCase();
       if (status === "completed") {
         if (String(response.source_currency ?? "").toUpperCase() !== "USD"
@@ -94,7 +130,7 @@ Deno.serve(async (request: Request) => {
         }
         const { data: credited, error: creditError } = await client.rpc("confirm_credit_payment", {
           p_payment_id: payment.id,
-          p_provider_reference: payment.provider_reference,
+          p_provider_reference: String(response.id ?? payment.provider_reference),
           p_provider_data: response,
         });
         if (creditError) throw creditError;

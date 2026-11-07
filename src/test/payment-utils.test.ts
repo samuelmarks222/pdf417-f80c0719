@@ -1,6 +1,7 @@
 import { createHmac, webcrypto } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
+  matchesPlisioInvoiceReference,
   normalizeSasapayBaseUrl,
   sasapayApiUrl,
   verifyNowPaymentsIpn,
@@ -23,6 +24,12 @@ function signPlisioCallback(payload: Record<string, unknown>) {
     sortedCallbackData.tx_urls = decodeURIComponent(sortedCallbackData.tx_urls);
   }
   return createHmac("sha1", plisioApiKey).update(JSON.stringify(sortedCallbackData)).digest("hex");
+}
+
+function signPlisioJsonCallback(payload: Record<string, unknown>) {
+  const callbackData = { ...payload };
+  delete callbackData.verify_hash;
+  return createHmac("sha1", plisioApiKey).update(JSON.stringify(callbackData)).digest("hex");
 }
 
 function sortNowPaymentsPayload(value: unknown): unknown {
@@ -72,11 +79,32 @@ describe("payment provider utilities", () => {
     expect(await verifyPlisioCallback({ ...signedPayload, status: "pending" }, plisioApiKey)).toBe(false);
   });
 
+  it("validates Plisio JSON callbacks in their received field order", async () => {
+    const payload = {
+      txn_id: "replacement-invoice",
+      status: "completed",
+      switch_id: "initial-invoice",
+      order_number: "payment-123",
+      tx_urls: ["https://example.test/transaction"],
+    };
+    const signedPayload = { ...payload, verify_hash: signPlisioJsonCallback(payload) };
+
+    expect(await verifyPlisioCallback(signedPayload, plisioApiKey)).toBe(true);
+    expect(await verifyPlisioCallback({ ...signedPayload, status: "pending" }, plisioApiKey)).toBe(false);
+  });
+
   it("rejects malformed encoded transaction URLs", async () => {
     const payload = { tx_urls: "%zz", status: "completed" };
     const signature = createHmac("sha1", plisioApiKey).update(JSON.stringify(payload)).digest("hex");
 
     expect(await verifyPlisioCallback({ ...payload, verify_hash: signature }, plisioApiKey)).toBe(false);
+  });
+
+  it("accepts a completed Plisio child invoice when it links to the original invoice", () => {
+    expect(matchesPlisioInvoiceReference("initial-invoice", "initial-invoice", null)).toBe(true);
+    expect(matchesPlisioInvoiceReference("initial-invoice", "replacement-invoice", "initial-invoice")).toBe(true);
+    expect(matchesPlisioInvoiceReference("initial-invoice", "replacement-invoice", "another-invoice")).toBe(false);
+    expect(matchesPlisioInvoiceReference("initial-invoice", null, "initial-invoice")).toBe(false);
   });
 
   it("verifies NOWPayments IPNs using the sorted payload and IPN secret", async () => {

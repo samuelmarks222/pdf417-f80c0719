@@ -19,31 +19,39 @@ function sortObjectKeys(value: unknown): unknown {
   return value;
 }
 
+function hexDigest(digest: ArrayBuffer) {
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function hmacMatches(expected: string, signature: string) {
+  if (expected.length !== signature.length) return false;
+
+  let mismatch = 0;
+  for (let index = 0; index < expected.length; index += 1) {
+    mismatch |= expected.charCodeAt(index) ^ signature.toLowerCase().charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+
+async function hmacHex(algorithm: "SHA-1" | "SHA-512", secret: string, payload: string) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: algorithm },
+    false,
+    ["sign"],
+  );
+  return hexDigest(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)));
+}
+
 export async function verifyNowPaymentsIpn(
   payload: Record<string, unknown>,
   signature: string | null,
   ipnSecret: string,
 ) {
   if (!signature || !/^[a-f\d]{128}$/i.test(signature)) return false;
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(ipnSecret),
-    { name: "HMAC", hash: "SHA-512" },
-    false,
-    ["sign"],
-  );
-  const digest = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(JSON.stringify(sortObjectKeys(payload))),
-  );
-  const expected = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  let mismatch = 0;
-  for (let index = 0; index < expected.length; index += 1) {
-    mismatch |= expected.charCodeAt(index) ^ signature.toLowerCase().charCodeAt(index);
-  }
-  return mismatch === 0;
+  const expected = await hmacHex("SHA-512", ipnSecret, JSON.stringify(sortObjectKeys(payload)));
+  return hmacMatches(expected, signature);
 }
 
 export async function verifyPlisioCallback(payload: Record<string, unknown>, apiKey: string) {
@@ -52,35 +60,44 @@ export async function verifyPlisioCallback(payload: Record<string, unknown>, api
 
   const callbackData = { ...payload };
   delete callbackData.verify_hash;
-
-  const sortedCallbackData = Object.fromEntries(
+  const legacyCallbackData = Object.fromEntries(
     Object.keys(callbackData).sort().map((key) => [key, callbackData[key]]),
   );
-  if ("expire_utc" in sortedCallbackData) {
-    sortedCallbackData.expire_utc = String(sortedCallbackData.expire_utc);
+  if ("expire_utc" in legacyCallbackData) {
+    legacyCallbackData.expire_utc = String(legacyCallbackData.expire_utc);
   }
-  if (typeof sortedCallbackData.tx_urls === "string") {
+  if (typeof legacyCallbackData.tx_urls === "string") {
     try {
-      sortedCallbackData.tx_urls = decodeURIComponent(sortedCallbackData.tx_urls);
+      legacyCallbackData.tx_urls = decodeURIComponent(legacyCallbackData.tx_urls);
     } catch {
       return false;
     }
   }
 
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(apiKey),
-    { name: "HMAC", hash: "SHA-1" },
-    false,
-    ["sign"],
-  );
-  const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(JSON.stringify(sortedCallbackData)));
-  const expected = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  if (expected.length !== signature.length) return false;
+  // `callback_url?...&json=true` makes Plisio send JSON. Its Node example
+  // signs the callback object in received field order. Keep the legacy sorted
+  // form for previously configured callbacks while evaluating both forms in
+  // constant-time comparisons.
+  const [receivedOrder, legacyOrder] = await Promise.all([
+    hmacHex("SHA-1", apiKey, JSON.stringify(callbackData)),
+    hmacHex("SHA-1", apiKey, JSON.stringify(legacyCallbackData)),
+  ]);
+  const receivedOrderMatches = hmacMatches(receivedOrder, signature);
+  const legacyOrderMatches = hmacMatches(legacyOrder, signature);
+  return receivedOrderMatches || legacyOrderMatches;
+}
 
-  let mismatch = 0;
-  for (let index = 0; index < expected.length; index += 1) {
-    mismatch |= expected.charCodeAt(index) ^ signature.charCodeAt(index);
-  }
-  return mismatch === 0;
+/**
+ * Plisio creates a child invoice when the buyer changes cryptocurrencies in its
+ * hosted checkout. A signed callback for the child retains the original
+ * invoice ID in `switch_id`; treating only `txn_id` as valid rejects an
+ * otherwise completed payment.
+ */
+export function matchesPlisioInvoiceReference(
+  storedReference: string | null,
+  transactionReference: string | null,
+  switchReference: string | null,
+) {
+  if (!storedReference || !transactionReference) return false;
+  return transactionReference === storedReference || switchReference === storedReference;
 }

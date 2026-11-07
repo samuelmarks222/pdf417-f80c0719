@@ -80,10 +80,10 @@ The existing Vite application uses Supabase for Google sign-in, user credit bala
    supabase secrets set SASAPAY_CLIENT_SECRET=<rotated-SasaPay-client-secret>
    supabase secrets set SASAPAY_MERCHANT_CODE=<merchant-code>
    supabase secrets set SASAPAY_KES_PER_USD=129
-   supabase secrets set PLISIO_API_KEY=<Plisio-API-key>
+   supabase secrets set PLISIO_API_KEY=<Plisio-API-secret-key>
    ```
 
-   The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using `SASAPAY_KES_PER_USD`; the configured rate above is 129 KES per USD. Set `SASAPAY_BASE_URL` to the production API host; the function adds `/api/v1` automatically if it is not already present. The default M-Pesa network code is `63902` (Safaricom); set optional `SASAPAY_NETWORK_CODE` if your merchant requires a different code. The default status path is `payments/transaction-status/`; if your merchant's active API documents a different path, set optional `SASAPAY_STATUS_PATH`. For cryptocurrency deposits, create a Plisio API key in your Plisio account and store it as the Supabase secret above. The app creates USD invoices through Plisio and supplies the Supabase webhook URL for each invoice; Plisio callbacks are authenticated with the API key.
+   The package catalog is priced in USD. M-Pesa amounts are rounded up to whole KES using `SASAPAY_KES_PER_USD`; the configured rate above is 129 KES per USD. Set `SASAPAY_BASE_URL` to the production API host; the function adds `/api/v1` automatically if it is not already present. The default M-Pesa network code is `63902` (Safaricom); set optional `SASAPAY_NETWORK_CODE` if your merchant requires a different code. The default status path is `payments/transaction-status/`; if your merchant's active API documents a different path, set optional `SASAPAY_STATUS_PATH`. For cryptocurrency deposits, create a Plisio API secret key in its API settings and store it as the Supabase secret above. Add the egress IP for your Supabase Edge Functions to Plisio's Request IP allowlist if you enable that restriction. The app creates USD invoices through Plisio and supplies the Supabase webhook URL for each invoice; Plisio callbacks are authenticated with the API key. Buyers may change currencies on the hosted invoice; the completed replacement invoice is verified and credited exactly once.
 5. Deploy the Edge Functions:
 
    ```sh

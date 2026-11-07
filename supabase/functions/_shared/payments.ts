@@ -1,6 +1,7 @@
 import { sasapayApiUrl } from "./payment-utils.ts";
 
 export {
+  matchesPlisioInvoiceReference,
   normalizeSasapayBaseUrl,
   verifyNowPaymentsIpn,
   verifyPlisioCallback,

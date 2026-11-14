@@ -12,6 +12,22 @@ const cryptoAssets: Record<CryptoAsset, { name: string; network: string; setting
   USDC_ERC20: { name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },
 };
 
+function redactProviderSecrets(message: string) {
+  let redacted = message.replace(/([?&]api_key=)[^&\s)]+/gi, "$1[redacted]");
+  const secrets = [
+    Deno.env.get("PLISIO_API_KEY"),
+    Deno.env.get("PLISIO_SECRET_KEY"),
+    Deno.env.get("SASAPAY_CLIENT_SECRET"),
+    Deno.env.get("SASAPAY_CONSUMER_SECRET"),
+  ].filter((secret): secret is string => Boolean(secret));
+
+  for (const secret of secrets) {
+    redacted = redacted.replaceAll(secret, "[redacted]");
+    redacted = redacted.replaceAll(encodeURIComponent(secret), "[redacted]");
+  }
+  return redacted;
+}
+
 Deno.serve(async (request: Request) => {
   const options = preflight(request);
   if (options) return options;
@@ -217,7 +233,8 @@ Deno.serve(async (request: Request) => {
       currency,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "The payment provider request failed.";
+    const rawMessage = error instanceof Error ? error.message : "The payment provider request failed.";
+    const message = redactProviderSecrets(rawMessage);
     await client.rpc("update_credit_payment_status", {
       p_payment_id: paymentId,
       p_status: "failed",
@@ -232,9 +249,11 @@ Deno.serve(async (request: Request) => {
       payload: {},
     });
     console.error(`${provider} checkout error:`, message);
-    const userMessage = provider === "sasapay" || provider === "manual_crypto"
-      ? "Could not start provider checkout. Please try again later."
-      : message;
+    const userMessage = provider === "sasapay"
+      ? "Could not start M-Pesa checkout. Please try again later."
+      : provider === "manual_crypto"
+      ? "Could not start crypto checkout. Please try again later."
+      : "Could not start cryptocurrency checkout. Please try again later.";
     return jsonResponse({ error: userMessage }, 502);
   }
 });

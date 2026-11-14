@@ -309,7 +309,7 @@ const Account = () => {
                 <div className="mb-5">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 2</p>
                   <h3 className="mt-2 text-xl font-bold tracking-tight sm:text-2xl">Choose how you’d like to pay</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">Select a payment option to see its checkout details.</p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">Choose a payment option. For crypto, choose the coin and its network below before requesting a payment address.</p>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-2">
@@ -403,7 +403,7 @@ const Account = () => {
                               {selectedPackageDetails.name} · {selectedPackageDetails.credits.toLocaleString()} credits · {currency(Number(selectedPackageDetails.price_usd))}
                             </p>
                           )}
-                          <label className="mb-2 mt-4 block text-xs font-semibold text-foreground" htmlFor="crypto-asset">Cryptocurrency and network</label>
+                          <label className="mb-2 mt-4 block text-xs font-semibold text-foreground" htmlFor="crypto-asset">Choose cryptocurrency and network</label>
                           <select
                             id="crypto-asset"
                             value={selectedCryptoAsset ?? ""}

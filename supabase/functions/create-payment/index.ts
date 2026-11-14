@@ -26,13 +26,18 @@ Deno.serve(async (request: Request) => {
   } catch {
     return jsonResponse({ error: "Invalid request body." }, 400);
   }
-  if (!body.packageId || !["sasapay", "plisio", "manual_crypto"].includes(body.provider ?? "")) {
-    return jsonResponse({ error: "Choose a valid package and payment provider." }, 400);
+  if (!body.packageId) return jsonResponse({ error: "Choose a credit package first." }, 400);
+  if (!["sasapay", "plisio", "manual_crypto"].includes(body.provider ?? "")) {
+    return jsonResponse({ error: "Choose M-Pesa or manual crypto as your payment method." }, 400);
   }
 
   const provider = body.provider as Provider;
   const cryptoAsset = body.cryptoAsset;
-  const cryptoOption = provider === "manual_crypto" && cryptoAsset ? cryptoAssets[cryptoAsset] : null;
+  const cryptoOption = provider === "manual_crypto"
+      && cryptoAsset
+      && Object.prototype.hasOwnProperty.call(cryptoAssets, cryptoAsset)
+    ? cryptoAssets[cryptoAsset]
+    : null;
   if (provider === "manual_crypto" && !cryptoOption) {
     return jsonResponse({ error: "Choose a supported cryptocurrency and network." }, 400);
   }

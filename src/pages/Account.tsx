@@ -344,12 +344,7 @@ const Account = () => {
                   >
                     {provider === "sasapay" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
                     <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-emerald-100 bg-emerald-50/60 p-2">
-                      <img
-                        src="https://raw.githubusercontent.com/shayan-deriv/quill-icons/main/svg/Logo/LogoPaymentMethodMpesaBrand.svg"
-                        alt="M-PESA logo"
-                        className="h-12 w-full object-contain"
-                        loading="lazy"
-                      />
+                      <span className="text-center text-sm font-extrabold tracking-wide text-emerald-700">M-PESA</span>
                     </span>
                     <span className="min-w-0 flex-1 pr-7">
                       <span className="block text-base font-bold">M-PESA</span>

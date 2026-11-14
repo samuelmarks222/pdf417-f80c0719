@@ -1,7 +1,15 @@
 import { authenticatedUser, jsonResponse, preflight, serviceClient } from "../_shared/http.ts";
 import { getSasapayToken, sasapayRequest } from "../_shared/payments.ts";
 
-type Provider = "sasapay" | "plisio";
+type Provider = "sasapay" | "plisio" | "manual_crypto";
+type CryptoAsset = "BTC" | "ETH" | "USDT_TRC20" | "USDC_ERC20";
+
+const cryptoAssets: Record<CryptoAsset, { name: string; network: string; setting: string }> = {
+  BTC: { name: "Bitcoin", network: "Bitcoin", setting: "crypto_btc_address" },
+  ETH: { name: "Ethereum", network: "Ethereum (ERC-20)", setting: "crypto_eth_address" },
+  USDT_TRC20: { name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address" },
+  USDC_ERC20: { name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },
+};
 
 Deno.serve(async (request: Request) => {
   const options = preflight(request);
@@ -11,19 +19,38 @@ Deno.serve(async (request: Request) => {
   const user = await authenticatedUser(request);
   if (!user) return jsonResponse({ error: "Sign in to purchase credits." }, 401);
 
-  let body: { packageId?: string; provider?: Provider; phoneNumber?: string };
+  let body: { packageId?: string; provider?: Provider; phoneNumber?: string; cryptoAsset?: CryptoAsset };
   try {
     body = await request.json();
   } catch {
     return jsonResponse({ error: "Invalid request body." }, 400);
   }
-  if (!body.packageId || !["sasapay", "plisio"].includes(body.provider ?? "")) {
+  if (!body.packageId || !["sasapay", "plisio", "manual_crypto"].includes(body.provider ?? "")) {
     return jsonResponse({ error: "Choose a valid package and payment provider." }, 400);
   }
 
   const provider = body.provider as Provider;
+  const cryptoAsset = body.cryptoAsset;
+  const cryptoOption = provider === "manual_crypto" && cryptoAsset ? cryptoAssets[cryptoAsset] : null;
+  if (provider === "manual_crypto" && !cryptoOption) {
+    return jsonResponse({ error: "Choose a supported cryptocurrency and network." }, 400);
+  }
   const appOrigin = Deno.env.get("APP_ORIGIN")?.replace(/\/$/, "");
   const client = serviceClient();
+  let cryptoAddress: string | null = null;
+  if (provider === "manual_crypto" && cryptoOption) {
+    const { data: settings, error: settingsError } = await client
+      .from("site_settings")
+      .select(cryptoOption.setting)
+      .eq("id", 1)
+      .maybeSingle();
+    if (settingsError) return jsonResponse({ error: "Could not load the configured crypto wallet." }, 500);
+    const configuredAddress = settings?.[cryptoOption.setting];
+    cryptoAddress = typeof configuredAddress === "string" ? configuredAddress.trim() : null;
+    if (!cryptoAddress) {
+      return jsonResponse({ error: `Manual ${cryptoOption.name} payments are not configured yet. Contact an administrator.` }, 503);
+    }
+  }
   const { data: pkg, error: packageError } = await client
     .from("credit_packages")
     .select("id,name,credits,price_usd,active")
@@ -55,7 +82,7 @@ Deno.serve(async (request: Request) => {
     }
     amountDue = Math.ceil(Number(pkg.price_usd) * exchangeRate);
     currency = "KES";
-  } else {
+  } else if (provider === "plisio") {
     if (!Deno.env.get("PLISIO_API_KEY") && !Deno.env.get("PLISIO_SECRET_KEY")) {
       return jsonResponse({ error: "Plisio is not configured for this deployment." }, 503);
     }
@@ -73,6 +100,14 @@ Deno.serve(async (request: Request) => {
     amount_due: amountDue,
     currency,
     phone_number: normalizedPhone,
+    provider_data: provider === "manual_crypto" && cryptoOption
+      ? {
+        crypto_asset: cryptoAsset,
+        asset_name: cryptoOption.name,
+        network: cryptoOption.network,
+        wallet_address: cryptoAddress,
+      }
+      : {},
     status: "pending",
   });
   if (insertError) {
@@ -120,6 +155,20 @@ Deno.serve(async (request: Request) => {
         provider,
         status: "pending",
         checkoutUrl: invoice.invoice_url,
+        amount: Number(pkg.price_usd).toFixed(2),
+        currency: "USD",
+      });
+    }
+
+    if (provider === "manual_crypto" && cryptoOption && cryptoAddress) {
+      return jsonResponse({
+        paymentId,
+        provider,
+        status: "pending",
+        asset: cryptoAsset,
+        assetName: cryptoOption.name,
+        network: cryptoOption.network,
+        walletAddress: cryptoAddress,
         amount: Number(pkg.price_usd).toFixed(2),
         currency: "USD",
       });
@@ -177,7 +226,7 @@ Deno.serve(async (request: Request) => {
       payload: {},
     });
     console.error(`${provider} checkout error:`, message);
-    const userMessage = provider === "sasapay"
+    const userMessage = provider === "sasapay" || provider === "manual_crypto"
       ? "Could not start provider checkout. Please try again later."
       : message;
     return jsonResponse({ error: userMessage }, 502);

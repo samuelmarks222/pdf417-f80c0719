@@ -35,6 +35,7 @@ interface PaymentRow {
   package_id: string;
   provider: string;
   provider_reference: string | null;
+  provider_data: Record<string, unknown>;
   amount_usd: number;
   amount_due: number;
   currency: string;
@@ -94,7 +95,7 @@ const Admin = () => {
     const [packageResult, userResult, paymentResult, eventResult, statsResult] = await Promise.all([
       supabase.from("credit_packages").select("id,name,credits,price_usd,active,recommended").order("sort_order"),
       supabase.rpc("admin_list_users"),
-      supabase.from("credit_payments").select("id,user_id,package_id,provider,provider_reference,amount_usd,amount_due,currency,status,verification_error,created_at").order("created_at", { ascending: false }).limit(1000),
+      supabase.from("credit_payments").select("id,user_id,package_id,provider,provider_reference,provider_data,amount_usd,amount_due,currency,status,verification_error,created_at").order("created_at", { ascending: false }).limit(1000),
       supabase.from("payment_events").select("id,payment_id,provider,event_type,message,payload,created_at").order("created_at", { ascending: false }).limit(500),
       supabase.rpc("admin_credit_dashboard_stats"),
     ]);
@@ -236,7 +237,7 @@ const Admin = () => {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Control center</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Credits &amp; payments</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Manage packages, review account activity, and verify provider transactions.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Manage packages, review account activity, verify provider transactions, and confirm crypto payments after on-chain checks.</p>
         </div>
 
         {!user ? (
@@ -325,10 +326,11 @@ const Admin = () => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Transactions</p>
                   <h2 className="mt-1 text-xl font-bold">Payments &amp; reconciliation</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">Confirming a manual crypto payment immediately approves and adds the package credits. Confirm only after verifying receipt.</p>
                 </div>
                 <div className="flex gap-2">
                   <select value={providerFilter} onChange={(event) => setProviderFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
-                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="plisio">Plisio</option><option value="legacy">Legacy provider</option>
+                    <option value="">All providers</option><option value="sasapay">SasaPay</option><option value="manual_crypto">Manual crypto</option><option value="plisio">Plisio (legacy)</option><option value="legacy">Legacy provider</option>
                   </select>
                   <select value={paymentFilter} onChange={(event) => setPaymentFilter(event.target.value)} className="h-10 rounded border border-input bg-white px-3 text-sm">
                     <option value="">All statuses</option>
@@ -344,10 +346,10 @@ const Admin = () => {
                       <tr key={item.id} className="border-b border-border/60">
                         <td className="py-2 pr-3">{new Date(item.created_at).toLocaleString()}</td>
                         <td className="max-w-36 truncate py-2 pr-3">{users.find((candidate) => candidate.id === item.user_id)?.email ?? item.user_id}</td>
-                        <td className="py-2 pr-3">{item.provider}</td><td className="max-w-40 truncate py-2 pr-3 font-mono">{item.provider_reference ?? item.id}</td>
+                        <td className="py-2 pr-3">{item.provider === "manual_crypto" ? `Manual crypto · ${String(item.provider_data.asset_name ?? item.provider_data.crypto_asset ?? "")} (${String(item.provider_data.network ?? "network")})` : item.provider}</td><td className="max-w-40 truncate py-2 pr-3 font-mono">{item.provider_reference ?? item.id}</td>
                         <td className="py-2 pr-3">{item.currency === "USD" ? `$${Number(item.amount_usd).toFixed(2)}` : `${item.amount_due} ${item.currency}`}</td>
                         <td className="py-2 pr-3">{item.status}</td><td className="max-w-48 truncate py-2 pr-3 text-destructive">{item.verification_error ?? "—"}</td>
-                        <td className="py-2"><Button size="sm" variant="outline" disabled={saving || item.status === "successful"} onClick={() => reconcile(item.id)}>Reconcile</Button></td>
+                        <td className="py-2"><Button size="sm" variant="outline" disabled={saving || item.status === "successful"} onClick={() => reconcile(item.id)}>{item.provider === "manual_crypto" ? "Approve & credit" : "Reconcile"}</Button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -407,6 +409,7 @@ function SiteSettingsPanel() {
   const { user } = useAuth();
   const [draft, setDraft] = useState(settings);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [savingCryptoWallets, setSavingCryptoWallets] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const [uploadingSocialImage, setUploadingSocialImage] = useState(false);
@@ -420,6 +423,28 @@ function SiteSettingsPanel() {
 
   const update = (key: keyof SiteSettings, value: string) => {
     setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const saveCryptoWallets = async () => {
+    if (!supabase) return;
+    setSavingCryptoWallets(true);
+    const { error } = await supabase.rpc("admin_update_crypto_wallet_addresses", {
+      p_btc_address: draft.crypto_btc_address,
+      p_eth_address: draft.crypto_eth_address,
+      p_usdt_trc20_address: draft.crypto_usdt_trc20_address,
+      p_usdc_erc20_address: draft.crypto_usdc_erc20_address,
+    });
+    setSavingCryptoWallets(false);
+    if (error) {
+      toast.error(`Could not save crypto wallet addresses: ${error.message}`);
+      return;
+    }
+    const refreshed = await refresh();
+    if (!refreshed) {
+      toast.error("Wallet addresses were saved, but settings could not refresh. Reload the page to retry.");
+      return;
+    }
+    toast.success("Crypto wallet addresses saved.");
   };
 
   const uploadBrandImage = async (
@@ -595,6 +620,25 @@ function SiteSettingsPanel() {
       </div>
 
       <div>
+        <h3 className="mb-1 text-sm font-semibold">Crypto payment wallets</h3>
+        <p className="mb-3 text-xs text-muted-foreground">Set or change the receiving address for each network. These addresses are visible to users; leaving one blank disables that payment option. Changes apply to new orders; existing orders retain their original address.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SettingsInput label="Bitcoin (BTC) address" value={draft.crypto_btc_address} onChange={(value) => update("crypto_btc_address", value)} />
+          <SettingsInput label="Ethereum (ETH · ERC-20) address" value={draft.crypto_eth_address} onChange={(value) => update("crypto_eth_address", value)} />
+          <SettingsInput label="Tether (USDT · TRC-20) address" value={draft.crypto_usdt_trc20_address} onChange={(value) => update("crypto_usdt_trc20_address", value)} />
+          <SettingsInput label="USD Coin (USDC · ERC-20) address" value={draft.crypto_usdc_erc20_address} onChange={(value) => update("crypto_usdc_erc20_address", value)} />
+        </div>
+        <Button
+          type="button"
+          onClick={() => void saveCryptoWallets()}
+          disabled={savingCryptoWallets || loading || Boolean(settingsError)}
+          className="mt-4"
+        >
+          {savingCryptoWallets ? "Saving wallets…" : "Save crypto wallet addresses"}
+        </Button>
+      </div>
+
+      <div>
         <h3 className="mb-3 text-sm font-semibold">Homepage content</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <SettingsInput label="Main heading" value={draft.hero_title} onChange={(value) => update("hero_title", value)} />
@@ -654,7 +698,7 @@ function SiteSettingsPanel() {
 
       <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-2xl text-xs leading-5 text-muted-foreground">
-          Payment API keys remain protected as Supabase Edge Function secrets and are intentionally not editable or visible here.
+          Payment API keys remain protected as Supabase Edge Function secrets. Crypto receiving addresses can be changed above.
         </p>
         <Button onClick={save} disabled={savingSettings || loading || Boolean(settingsError)} className="shrink-0">
           {savingSettings ? "Publishing…" : loading ? "Loading settings…" : "Save and publish"}

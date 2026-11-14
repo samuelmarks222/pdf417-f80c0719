@@ -74,7 +74,7 @@ Deno.serve(async (request: Request) => {
 
   const { data: payment, error } = await client
     .from("credit_payments")
-    .select("id,provider,provider_reference,amount_usd,amount_due,currency,status")
+    .select("id,provider,provider_reference,provider_data,amount_usd,amount_due,currency,status")
     .eq("id", body.paymentId)
     .maybeSingle();
   if (error || !payment) return jsonResponse({ error: "Payment was not found." }, 404);
@@ -143,6 +143,32 @@ Deno.serve(async (request: Request) => {
         await recordPaymentEvent(client, payment.id, "plisio", "admin_reconciled_status", `Reconciled by ${user.email ?? user.id}: ${paymentStatus}.`, response);
         return jsonResponse({ status: paymentStatus, credited: false });
       }
+    } else if (payment.provider === "manual_crypto") {
+      if (payment.status !== "pending" && payment.status !== "underpaid") {
+        return jsonResponse({ error: "Only pending crypto payments can be confirmed." }, 409);
+      }
+      response = {
+        ...asObject(payment.provider_data),
+        ...(payment.provider_reference ? { transaction_hash: payment.provider_reference } : {}),
+        verification_method: payment.provider_reference ? "transaction_hash" : "admin_confirmed_receipt",
+        confirmed_by: user.email ?? user.id,
+        confirmed_at: new Date().toISOString(),
+      };
+      const { data: credited, error: creditError } = await client.rpc("confirm_credit_payment", {
+        p_payment_id: payment.id,
+        p_provider_reference: payment.provider_reference,
+        p_provider_data: response,
+      });
+      if (creditError) throw creditError;
+      await recordPaymentEvent(
+        client,
+        payment.id,
+        "manual_crypto",
+        "admin_confirmed_received",
+        `Payment receipt manually confirmed by ${user.email ?? user.id}; credits were approved.`,
+        response,
+      );
+      return jsonResponse({ status: "successful", credited: Boolean(credited) });
     } else {
       return jsonResponse({ error: "This payment was processed by a retired provider and cannot be reconciled." }, 409);
     }

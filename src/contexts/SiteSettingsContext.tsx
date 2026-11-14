@@ -67,7 +67,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     const { data, error } = await supabase
       .from("site_settings")
-      .select("site_name,site_tagline,logo_url,favicon_url,meta_title,meta_description,meta_keywords,canonical_url,meta_robots,og_image_url,twitter_handle,hero_badge,hero_title,hero_highlight,hero_description,footer_notice")
+      .select("site_name,site_tagline,logo_url,favicon_url,meta_title,meta_description,meta_keywords,canonical_url,meta_robots,og_image_url,twitter_handle,hero_badge,hero_title,hero_highlight,hero_description,footer_notice,crypto_btc_address,crypto_eth_address,crypto_usdt_trc20_address,crypto_usdc_erc20_address")
       .eq("id", 1)
       .maybeSingle();
     if (error) {

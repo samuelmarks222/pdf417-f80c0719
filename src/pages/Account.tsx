@@ -48,6 +48,7 @@ const currency = (amount: number) => new Intl.NumberFormat("en-US", {
 
 const cryptoAssets = [
   { value: "BTC", name: "Bitcoin (BTC)", network: "Bitcoin", setting: "crypto_btc_address" },
+  { value: "LTC", name: "Litecoin (LTC)", network: "Litecoin", setting: "crypto_ltc_address" },
   { value: "ETH", name: "Ethereum (ETH)", network: "Ethereum (ERC-20)", setting: "crypto_eth_address" },
   { value: "USDT_TRC20", name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address" },
   { value: "USDC_ERC20", name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },

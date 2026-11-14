@@ -18,6 +18,7 @@ export interface SiteSettings {
   hero_description: string;
   footer_notice: string;
   crypto_btc_address: string;
+  crypto_ltc_address: string;
   crypto_eth_address: string;
   crypto_usdt_trc20_address: string;
   crypto_usdc_erc20_address: string;
@@ -41,6 +42,7 @@ export const defaultSiteSettings: SiteSettings = {
   hero_description: "Create PDF417 barcode previews for AAMVA and U.S. state formats. Review your fields, explore state-specific formats, and export a PNG for educational and testing use.",
   footer_notice: "For educational and testing use only.",
   crypto_btc_address: "",
+  crypto_ltc_address: "",
   crypto_eth_address: "",
   crypto_usdt_trc20_address: "",
   crypto_usdc_erc20_address: "",

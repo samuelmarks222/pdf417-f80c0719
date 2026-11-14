@@ -428,8 +428,9 @@ function SiteSettingsPanel() {
   const saveCryptoWallets = async () => {
     if (!supabase) return;
     setSavingCryptoWallets(true);
-    const { error } = await supabase.rpc("admin_update_crypto_wallet_addresses", {
+    const { error } = await supabase.rpc("admin_update_crypto_wallets", {
       p_btc_address: draft.crypto_btc_address,
+      p_ltc_address: draft.crypto_ltc_address,
       p_eth_address: draft.crypto_eth_address,
       p_usdt_trc20_address: draft.crypto_usdt_trc20_address,
       p_usdc_erc20_address: draft.crypto_usdc_erc20_address,
@@ -624,6 +625,7 @@ function SiteSettingsPanel() {
         <p className="mb-3 text-xs text-muted-foreground">Set or change the receiving address for each network. These addresses are visible to users; leaving one blank disables that payment option. Changes apply to new orders; existing orders retain their original address.</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <SettingsInput label="Bitcoin (BTC) address" value={draft.crypto_btc_address} onChange={(value) => update("crypto_btc_address", value)} />
+          <SettingsInput label="Litecoin (LTC) address" value={draft.crypto_ltc_address} onChange={(value) => update("crypto_ltc_address", value)} />
           <SettingsInput label="Ethereum (ETH · ERC-20) address" value={draft.crypto_eth_address} onChange={(value) => update("crypto_eth_address", value)} />
           <SettingsInput label="Tether (USDT · TRC-20) address" value={draft.crypto_usdt_trc20_address} onChange={(value) => update("crypto_usdt_trc20_address", value)} />
           <SettingsInput label="USD Coin (USDC · ERC-20) address" value={draft.crypto_usdc_erc20_address} onChange={(value) => update("crypto_usdc_erc20_address", value)} />

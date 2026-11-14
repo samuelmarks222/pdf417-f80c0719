@@ -2,10 +2,11 @@ import { authenticatedUser, jsonResponse, preflight, serviceClient } from "../_s
 import { getSasapayToken, sasapayRequest } from "../_shared/payments.ts";
 
 type Provider = "sasapay" | "plisio" | "manual_crypto";
-type CryptoAsset = "BTC" | "ETH" | "USDT_TRC20" | "USDC_ERC20";
+type CryptoAsset = "BTC" | "LTC" | "ETH" | "USDT_TRC20" | "USDC_ERC20";
 
 const cryptoAssets: Record<CryptoAsset, { name: string; network: string; setting: string }> = {
   BTC: { name: "Bitcoin", network: "Bitcoin", setting: "crypto_btc_address" },
+  LTC: { name: "Litecoin", network: "Litecoin", setting: "crypto_ltc_address" },
   ETH: { name: "Ethereum", network: "Ethereum (ERC-20)", setting: "crypto_eth_address" },
   USDT_TRC20: { name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address" },
   USDC_ERC20: { name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },

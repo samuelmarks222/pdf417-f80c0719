@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { ArrowRight, Check, ChevronRight, ShieldCheck, Smartphone } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface CreditPackage {
@@ -67,10 +67,9 @@ const Account = () => {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [transactions, setTransactions] = useState<CreditRow[]>([]);
   const [selectedPackage, setSelectedPackage] = useState("");
-  const [provider, setProvider] = useState<"sasapay" | "manual_crypto">("manual_crypto");
+  const provider = "manual_crypto";
   const [cryptoAsset, setCryptoAsset] = useState<(typeof cryptoAssets)[number]["value"]>("BTC");
   const [cryptoTransactionHashes, setCryptoTransactionHashes] = useState<Record<string, string>>({});
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const paymentStatuses = useRef(new Map<string, string>());
 
@@ -143,11 +142,7 @@ const Account = () => {
       toast.error("Choose an available credit package.");
       return;
     }
-    if (provider === "sasapay" && !phoneNumber.trim()) {
-      toast.error("Enter the M-Pesa phone number for the payment.");
-      return;
-    }
-    if (provider === "manual_crypto" && !selectedCryptoAsset) {
+    if (!selectedCryptoAsset) {
       toast.error("No crypto wallet is configured yet. Contact site support.");
       return;
     }
@@ -155,7 +150,7 @@ const Account = () => {
     setSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: { packageId: selectedPackage, provider, phoneNumber, cryptoAsset: selectedCryptoAsset },
+        body: { packageId: selectedPackage, provider, cryptoAsset: selectedCryptoAsset },
       });
       if (error instanceof FunctionsHttpError) {
         const responseBody: unknown = await error.context.json().catch(() => null);
@@ -171,9 +166,7 @@ const Account = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      toast.success(provider === "manual_crypto"
-        ? `Crypto payment created for ${currency(Number(data.amount))}. Send the payment to the address shown below.`
-        : `${data.message ?? "M-Pesa payment request sent."} Amount: ${data.amount} ${data.currency}.`);
+      toast.success(`Crypto payment created for ${currency(Number(data.amount))}. Send the payment to the address shown below.`);
       await refreshAccount();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not start payment.");
@@ -309,84 +302,21 @@ const Account = () => {
                 <div className="mb-5">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 2</p>
                   <h3 className="mt-2 text-xl font-bold tracking-tight sm:text-2xl">Choose how you’d like to pay</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">Choose a payment option. For crypto, choose the coin and its network below before requesting a payment address.</p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">Manual crypto is currently available. Choose the coin and network below before requesting a payment address.</p>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <button
-                    type="button"
-                    aria-pressed={provider === "manual_crypto"}
-                    onClick={() => setProvider("manual_crypto")}
-                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
-                      provider === "manual_crypto"
-                        ? "border-violet-500 ring-2 ring-violet-500/15 shadow-md shadow-violet-900/5"
-                        : "border-border hover:border-violet-300 hover:shadow-md"
-                    }`}
-                  >
-                    {provider === "manual_crypto" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-violet-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
+                <div className="rounded-2xl border border-violet-500 bg-card p-4 shadow-md shadow-violet-900/5 sm:p-5">
+                  <div className="flex min-h-28 items-center gap-4">
                     <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-violet-100 bg-violet-50/70 text-2xl font-bold text-violet-700">₿</span>
-                    <span className="min-w-0 flex-1 pr-7">
+                    <span className="min-w-0 flex-1">
                       <span className="block text-base font-bold">Manual cryptocurrency</span>
-                      <span className="mt-1 block text-sm text-muted-foreground">BTC, ETH, USDT, or USDC</span>
+                      <span className="mt-1 block text-sm text-muted-foreground">BTC, LTC, ETH, USDT, or USDC</span>
                       <span className="mt-2 block text-xs font-semibold text-violet-700">Send directly to our wallet; admin verifies payment</span>
                     </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-pressed={provider === "sasapay"}
-                    onClick={() => setProvider("sasapay")}
-                    className={`group relative flex min-h-28 w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 sm:p-5 ${
-                      provider === "sasapay"
-                        ? "border-emerald-500 ring-2 ring-emerald-500/15 shadow-md shadow-emerald-900/5"
-                        : "border-border hover:border-emerald-300 hover:shadow-md"
-                    }`}
-                  >
-                    {provider === "sasapay" && <span className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white"><Check className="h-3.5 w-3.5" /></span>}
-                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-emerald-100 bg-emerald-50/60 p-2">
-                      <span className="text-center text-sm font-extrabold tracking-wide text-emerald-700">M-PESA</span>
-                    </span>
-                    <span className="min-w-0 flex-1 pr-7">
-                      <span className="block text-base font-bold">M-PESA</span>
-                      <span className="mt-1 block text-sm text-muted-foreground">Mobile money · KES</span>
-                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">Secure prompt by SasaPay <ChevronRight className="h-3.5 w-3.5" /></span>
-                    </span>
-                  </button>
+                  </div>
                 </div>
 
-                {provider === "sasapay" ? (
-                  <div className="mt-4 grid gap-5 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_1.1fr_auto] lg:items-end">
-                    <div className="flex items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-800"><Smartphone className="h-5 w-5" /></span>
-                      <div>
-                        <h4 className="font-bold">Pay with M-PESA</h4>
-                        <p className="mt-1 text-sm leading-5 text-muted-foreground">Enter your Safaricom number. You’ll receive a secure payment prompt on your phone.</p>
-                        {selectedPackageDetails && (
-                          <p className="mt-3 text-xs font-semibold text-foreground">
-                            {selectedPackageDetails.name} · {selectedPackageDetails.credits.toLocaleString()} credits · {currency(Number(selectedPackageDetails.price_usd))}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-xs font-semibold text-foreground" htmlFor="mpesa-phone">M-PESA phone number</label>
-                      <Input
-                        id="mpesa-phone"
-                        value={phoneNumber}
-                        onChange={(event) => setPhoneNumber(event.target.value)}
-                        placeholder="0712 345 678"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        className="h-11 rounded-xl border-emerald-200 bg-white"
-                      />
-                      <p className="mt-2 text-xs text-muted-foreground">The payable amount is calculated in KES for the selected package.</p>
-                    </div>
-                    <Button disabled={!selectedPackage || submitting} onClick={startCheckout} className="h-11 w-full rounded-xl bg-emerald-700 px-5 text-white hover:bg-emerald-800 lg:w-auto">
-                      {submitting ? "Sending request…" : "Request payment"} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="mt-4 grid gap-5 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div className="mt-4 grid gap-5 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-end">
                     <div>
                       <div className="flex items-start gap-3">
                         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700"><ShieldCheck className="h-5 w-5" /></span>
@@ -418,8 +348,7 @@ const Account = () => {
                     <Button disabled={!selectedPackage || submitting || settingsLoading || !selectedCryptoAsset} onClick={startCheckout} className="h-11 w-full rounded-xl bg-violet-700 px-5 text-white hover:bg-violet-800 lg:w-auto">
                       {submitting ? "Preparing payment…" : "Show payment address"} <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                  </div>
-                )}
+                </div>
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
                   <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700" />

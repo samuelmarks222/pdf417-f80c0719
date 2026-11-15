@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface CreditPackage {
@@ -53,6 +53,14 @@ const cryptoAssets = [
   { value: "USDT_TRC20", name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address" },
   { value: "USDC_ERC20", name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },
 ] as const;
+
+const cryptoSymbols: Record<(typeof cryptoAssets)[number]["value"], string> = {
+  BTC: "₿",
+  LTC: "Ł",
+  ETH: "Ξ",
+  USDT_TRC20: "₮",
+  USDC_ERC20: "$",
+};
 
 const statusClass = (status: string) => {
   if (status === "successful") return "text-green-700 bg-green-50 border-green-200";
@@ -130,6 +138,8 @@ const Account = () => {
   const configuredCryptoAssets = cryptoAssets.filter((asset) => siteSettings[asset.setting].trim());
   const selectedCryptoAsset = configuredCryptoAssets.find((asset) => asset.value === cryptoAsset)?.value
     ?? configuredCryptoAssets[0]?.value;
+  const selectedCryptoAssetDetails = cryptoAssets.find((asset) => asset.value === selectedCryptoAsset);
+  const pendingCryptoPayment = payments.find((payment) => payment.provider === "manual_crypto" && payment.status === "pending");
 
   useEffect(() => {
     if (!user || !hasPendingPayments) return;
@@ -298,61 +308,129 @@ const Account = () => {
                 )}
               </div>
 
-              <div className="border-t border-border/70 bg-muted/35 p-5 sm:p-7">
-                <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Credit wallet · Step 2</p>
-                  <h3 className="mt-2 text-xl font-bold tracking-tight sm:text-2xl">Choose how you’d like to pay</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">Manual crypto is currently available. Choose the coin and network below before requesting a payment address.</p>
-                </div>
+              <div className="border-t border-border/70 bg-slate-50 p-4 sm:p-7">
+                <div className="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[0.85fr_1.15fr]">
+                  <aside className="relative overflow-hidden bg-blue-600 p-6 text-white sm:p-8">
+                    <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+                    <div className="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-blue-400/40 blur-3xl" />
+                    <div className="relative flex h-full flex-col">
+                      <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.16em] text-blue-100">
+                        <span>Crypto checkout</span>
+                        <span>Step 2 of 3</span>
+                      </div>
+                      <h3 className="mt-8 text-3xl font-bold tracking-tight">Pay with crypto</h3>
+                      <p className="mt-3 max-w-sm text-sm leading-6 text-blue-100">
+                        Choose your coin and network, then send the exact amount to the address provided.
+                      </p>
 
-                <div className="rounded-2xl border border-violet-500 bg-card p-4 shadow-md shadow-violet-900/5 sm:p-5">
-                  <div className="flex min-h-28 items-center gap-4">
-                    <span className="grid h-16 w-20 shrink-0 place-items-center rounded-xl border border-violet-100 bg-violet-50/70 text-2xl font-bold text-violet-700">₿</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-base font-bold">Manual cryptocurrency</span>
-                      <span className="mt-1 block text-sm text-muted-foreground">BTC, LTC, ETH, USDT, or USDC</span>
-                      <span className="mt-2 block text-xs font-semibold text-violet-700">Send directly to our wallet; admin verifies payment</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-5 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/70 to-card p-4 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-end">
-                    <div>
-                      <div className="flex items-start gap-3">
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700"><ShieldCheck className="h-5 w-5" /></span>
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-bold">Pay with crypto directly</h4>
-                          <p className="mt-1 max-w-xl text-sm leading-5 text-muted-foreground">Choose the coin and network carefully. Send the exact USD equivalent shown to the wallet address provided; credits are added after manual verification.</p>
-                          {selectedPackageDetails && (
-                            <p className="mt-3 text-xs font-semibold text-foreground">
-                              {selectedPackageDetails.name} · {selectedPackageDetails.credits.toLocaleString()} credits · {currency(Number(selectedPackageDetails.price_usd))}
-                            </p>
-                          )}
-                          <label className="mb-2 mt-4 block text-xs font-semibold text-foreground" htmlFor="crypto-asset">Choose cryptocurrency and network</label>
-                          <select
-                            id="crypto-asset"
-                            value={selectedCryptoAsset ?? ""}
-                            onChange={(event) => setCryptoAsset(event.target.value as typeof cryptoAsset)}
-                            className="h-11 w-full rounded-xl border border-violet-200 bg-white px-3 text-sm sm:max-w-sm"
-                          >
-                            {configuredCryptoAssets.length
-                              ? configuredCryptoAssets.map((asset) => <option key={asset.value} value={asset.value}>{asset.name} · {asset.network}</option>)
-                              : <option value="" disabled>No crypto wallets configured yet</option>}
-                          </select>
-                          {!settingsLoading && configuredCryptoAssets.length === 0 && (
-                            <p role="status" className="mt-2 text-xs text-amber-800">Crypto payments are not available until an admin adds a wallet address.</p>
-                          )}
+                      <div className="mt-8 rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
+                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-100">Order summary</p>
+                        {selectedPackageDetails ? (
+                          <>
+                            <p className="mt-4 text-xl font-bold">{selectedPackageDetails.name}</p>
+                            <p className="mt-1 text-sm text-blue-100">{selectedPackageDetails.credits.toLocaleString()} credits</p>
+                          </>
+                        ) : (
+                          <p className="mt-4 text-sm text-blue-100">Choose a credit package above.</p>
+                        )}
+                        <div className="mt-5 flex items-end justify-between border-t border-white/20 pt-4">
+                          <span className="text-sm text-blue-100">Amount due</span>
+                          <span className="text-2xl font-bold">{selectedPackageDetails ? currency(Number(selectedPackageDetails.price_usd)) : "—"}</span>
                         </div>
                       </div>
+
+                      <div className="mt-auto flex items-center gap-3 pt-8 text-sm text-blue-50">
+                        <ShieldCheck className="h-5 w-5 shrink-0" />
+                        <span>Credits are added after your payment is verified.</span>
+                      </div>
                     </div>
-                    <Button disabled={!selectedPackage || submitting || settingsLoading || !selectedCryptoAsset} onClick={startCheckout} className="h-11 w-full rounded-xl bg-violet-700 px-5 text-white hover:bg-violet-800 lg:w-auto">
+                  </aside>
+
+                  <div className="p-5 sm:p-8">
+                    <div className="mb-8 flex items-center gap-2 sm:gap-4">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 sm:text-sm">
+                        <span className="grid h-7 w-7 place-items-center rounded-full bg-blue-600 text-white"><Check className="h-4 w-4" /></span>
+                        <span>Package</span>
+                      </div>
+                      <span className="h-px flex-1 bg-slate-200" />
+                      <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 sm:text-sm">
+                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-blue-600 bg-white">2</span>
+                        <span>Crypto</span>
+                      </div>
+                      <span className="h-px flex-1 bg-slate-200" />
+                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 sm:text-sm">
+                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-slate-200 bg-white">3</span>
+                        <span>Complete</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Payment</p>
+                      <h4 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Select coin and network</h4>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Make your payment with crypto. Check the network carefully before sending.
+                      </p>
+                    </div>
+
+                    <label className="mb-2 mt-7 block text-sm font-semibold text-slate-700" htmlFor="crypto-asset">
+                      Cryptocurrency and network
+                    </label>
+                    <div className="flex items-center gap-3 rounded-2xl border-2 border-blue-500 bg-white px-4 py-3 shadow-sm focus-within:ring-4 focus-within:ring-blue-100">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-lg font-bold text-blue-700">
+                        {selectedCryptoAssetDetails ? cryptoSymbols[selectedCryptoAssetDetails.value] : "₿"}
+                      </span>
+                      <select
+                        id="crypto-asset"
+                        value={selectedCryptoAsset ?? ""}
+                        onChange={(event) => setCryptoAsset(event.target.value as typeof cryptoAsset)}
+                        className="h-10 min-w-0 flex-1 cursor-pointer appearance-none bg-transparent text-sm font-semibold text-slate-900 outline-none"
+                      >
+                        {configuredCryptoAssets.length
+                          ? configuredCryptoAssets.map((asset) => <option key={asset.value} value={asset.value}>{asset.name} · {asset.network}</option>)
+                          : <option value="" disabled>No crypto wallets configured yet</option>}
+                      </select>
+                      <span aria-hidden="true" className="text-xl text-slate-400">⌄</span>
+                    </div>
+                    {!settingsLoading && configuredCryptoAssets.length === 0 && (
+                      <p role="status" className="mt-2 text-sm text-amber-700">Crypto payments are not available until an admin adds a wallet address.</p>
+                    )}
+
+                    {pendingCryptoPayment && (
+                      <div id="crypto-payment-address" className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">Payment address ready</p>
+                            <p className="mt-1 text-xs text-slate-600">
+                              {String(pendingCryptoPayment.provider_data.asset_name ?? pendingCryptoPayment.provider_data.crypto_asset ?? "Crypto")}
+                              {" · "}{String(pendingCryptoPayment.provider_data.network ?? "Network")}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Pending verification</span>
+                        </div>
+                        <p className="mt-4 text-sm font-semibold text-slate-800">
+                          Send {currency(Number(pendingCryptoPayment.amount_usd))} equivalent
+                        </p>
+                        <code className="mt-2 block break-all rounded-xl border border-blue-100 bg-white p-3 text-sm text-slate-900">
+                          {String(pendingCryptoPayment.provider_data.wallet_address ?? "Wallet address unavailable")}
+                        </code>
+                        <p className="mt-3 text-xs leading-5 text-slate-600">
+                          After sending, contact{" "}
+                          <a href="https://t.me/PDF417_PRO" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700 underline">
+                            admin support chat
+                          </a>{" "}
+                          and share payment ID <code className="break-all">{pendingCryptoPayment.id}</code>.
+                        </p>
+                      </div>
+                    )}
+
+                    <Button
+                      disabled={!selectedPackage || submitting || settingsLoading || !selectedCryptoAsset}
+                      onClick={startCheckout}
+                      className="mt-6 h-12 w-full rounded-xl bg-blue-600 text-base font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
+                    >
                       {submitting ? "Preparing payment…" : "Show payment address"} <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
-                </div>
-
-                <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
-                  <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700" />
-                  Crypto payments are manually verified before credits are added to your balance.
+                  </div>
                 </div>
               </div>
             </section>
@@ -375,7 +453,7 @@ const Account = () => {
                             <td className="py-3 pr-3">{new Date(payment.created_at).toLocaleString()}</td>
                             <td className="py-3 pr-3">
                               {payment.provider === "sasapay" ? "SasaPay / M-Pesa"
-                                : payment.provider === "manual_crypto" ? `Manual crypto · ${String(payment.provider_data.asset_name ?? payment.provider_data.crypto_asset ?? "")}`
+                                : payment.provider === "manual_crypto" ? `Crypto · ${String(payment.provider_data.asset_name ?? payment.provider_data.crypto_asset ?? "")}`
                                 : payment.provider === "legacy" ? "Legacy provider" : "Plisio"}
                             </td>
                             <td className="py-3 pr-3">{payment.currency === "USD" ? currency(Number(payment.amount_usd)) : `${payment.amount_due} ${payment.currency}`}</td>

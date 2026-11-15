@@ -8,8 +8,13 @@ import { useAuth } from "@/contexts/useAuth";
 import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { ArrowRight, Check, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, ShieldCheck } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
+import bitcoinLogo from "cryptocurrency-icons/svg/color/btc.svg";
+import litecoinLogo from "cryptocurrency-icons/svg/color/ltc.svg";
+import ethereumLogo from "cryptocurrency-icons/svg/color/eth.svg";
+import tetherLogo from "cryptocurrency-icons/svg/color/usdt.svg";
+import usdCoinLogo from "cryptocurrency-icons/svg/color/usdc.svg";
 
 interface CreditPackage {
   id: string;
@@ -21,6 +26,7 @@ interface CreditPackage {
 
 interface PaymentRow {
   id: string;
+  package_id: string;
   provider: string;
   amount_usd: number;
   amount_due: number;
@@ -47,20 +53,12 @@ const currency = (amount: number) => new Intl.NumberFormat("en-US", {
 }).format(amount);
 
 const cryptoAssets = [
-  { value: "BTC", name: "Bitcoin (BTC)", network: "Bitcoin", setting: "crypto_btc_address" },
-  { value: "LTC", name: "Litecoin (LTC)", network: "Litecoin", setting: "crypto_ltc_address" },
-  { value: "ETH", name: "Ethereum (ETH)", network: "Ethereum (ERC-20)", setting: "crypto_eth_address" },
-  { value: "USDT_TRC20", name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address" },
-  { value: "USDC_ERC20", name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address" },
+  { value: "BTC", name: "Bitcoin (BTC)", network: "Bitcoin", setting: "crypto_btc_address", logo: bitcoinLogo },
+  { value: "LTC", name: "Litecoin (LTC)", network: "Litecoin", setting: "crypto_ltc_address", logo: litecoinLogo },
+  { value: "ETH", name: "Ethereum (ETH)", network: "Ethereum (ERC-20)", setting: "crypto_eth_address", logo: ethereumLogo },
+  { value: "USDT_TRC20", name: "Tether (USDT)", network: "Tron (TRC-20)", setting: "crypto_usdt_trc20_address", logo: tetherLogo },
+  { value: "USDC_ERC20", name: "USD Coin (USDC)", network: "Ethereum (ERC-20)", setting: "crypto_usdc_erc20_address", logo: usdCoinLogo },
 ] as const;
-
-const cryptoSymbols: Record<(typeof cryptoAssets)[number]["value"], string> = {
-  BTC: "₿",
-  LTC: "Ł",
-  ETH: "Ξ",
-  USDT_TRC20: "₮",
-  USDC_ERC20: "$",
-};
 
 const statusClass = (status: string) => {
   if (status === "successful") return "text-green-700 bg-green-50 border-green-200";
@@ -77,6 +75,8 @@ const Account = () => {
   const [selectedPackage, setSelectedPackage] = useState("");
   const provider = "manual_crypto";
   const [cryptoAsset, setCryptoAsset] = useState<(typeof cryptoAssets)[number]["value"]>("BTC");
+  const [revealedCryptoPaymentIds, setRevealedCryptoPaymentIds] = useState<Set<string>>(() => new Set());
+  const [paidCryptoPaymentIds, setPaidCryptoPaymentIds] = useState<Set<string>>(() => new Set());
   const [cryptoTransactionHashes, setCryptoTransactionHashes] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const paymentStatuses = useRef(new Map<string, string>());
@@ -102,7 +102,7 @@ const Account = () => {
   const refreshAccount = useCallback(async () => {
     if (!supabase || !user) return;
     const [paymentResult, transactionResult] = await Promise.all([
-      supabase.from("credit_payments").select("id,provider,provider_reference,provider_data,amount_usd,amount_due,currency,status,checkout_url,created_at").order("created_at", { ascending: false }).limit(50),
+      supabase.from("credit_payments").select("id,package_id,provider,provider_reference,provider_data,amount_usd,amount_due,currency,status,checkout_url,created_at").order("created_at", { ascending: false }).limit(50),
       supabase.from("credit_transactions").select("id,transaction_type,delta,balance_after,reason,created_at").order("created_at", { ascending: false }).limit(50),
     ]);
 
@@ -138,8 +138,12 @@ const Account = () => {
   const configuredCryptoAssets = cryptoAssets.filter((asset) => siteSettings[asset.setting].trim());
   const selectedCryptoAsset = configuredCryptoAssets.find((asset) => asset.value === cryptoAsset)?.value
     ?? configuredCryptoAssets[0]?.value;
-  const selectedCryptoAssetDetails = cryptoAssets.find((asset) => asset.value === selectedCryptoAsset);
-  const pendingCryptoPayment = payments.find((payment) => payment.provider === "manual_crypto" && payment.status === "pending");
+  const pendingCryptoPayment = payments.find((payment) =>
+    payment.provider === "manual_crypto"
+      && payment.status === "pending"
+      && payment.package_id === selectedPackage
+      && payment.provider_data.crypto_asset === selectedCryptoAsset
+  );
 
   useEffect(() => {
     if (!user || !hasPendingPayments) return;
@@ -154,6 +158,10 @@ const Account = () => {
     }
     if (!selectedCryptoAsset) {
       toast.error("No crypto wallet is configured yet. Contact site support.");
+      return;
+    }
+    if (pendingCryptoPayment && !revealedCryptoPaymentIds.has(pendingCryptoPayment.id)) {
+      setRevealedCryptoPaymentIds((current) => new Set(current).add(pendingCryptoPayment.id));
       return;
     }
 
@@ -175,7 +183,11 @@ const Account = () => {
       }
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      if (typeof data?.paymentId !== "string") {
+        throw new Error("Payment was created, but its address could not be loaded. Check your payment history.");
+      }
 
+      setRevealedCryptoPaymentIds((current) => new Set(current).add(data.paymentId));
       toast.success(`Crypto payment created for ${currency(Number(data.amount))}. Send the payment to the address shown below.`);
       await refreshAccount();
     } catch (error) {
@@ -183,6 +195,11 @@ const Account = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const markCryptoPaymentPaid = (paymentId: string) => {
+    setPaidCryptoPaymentIds((current) => new Set(current).add(paymentId));
+    toast.success("Contact support to confirm your payment. Credits are added after admin verification.");
   };
 
   const submitCryptoHash = async (paymentId: string) => {
@@ -372,30 +389,36 @@ const Account = () => {
                       </p>
                     </div>
 
-                    <label className="mb-2 mt-7 block text-sm font-semibold text-slate-700" htmlFor="crypto-asset">
-                      Cryptocurrency and network
-                    </label>
-                    <div className="flex items-center gap-3 rounded-2xl border-2 border-blue-500 bg-white px-4 py-3 shadow-sm focus-within:ring-4 focus-within:ring-blue-100">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-lg font-bold text-blue-700">
-                        {selectedCryptoAssetDetails ? cryptoSymbols[selectedCryptoAssetDetails.value] : "₿"}
-                      </span>
-                      <select
-                        id="crypto-asset"
-                        value={selectedCryptoAsset ?? ""}
-                        onChange={(event) => setCryptoAsset(event.target.value as typeof cryptoAsset)}
-                        className="h-10 min-w-0 flex-1 cursor-pointer appearance-none bg-transparent text-sm font-semibold text-slate-900 outline-none"
-                      >
-                        {configuredCryptoAssets.length
-                          ? configuredCryptoAssets.map((asset) => <option key={asset.value} value={asset.value}>{asset.name} · {asset.network}</option>)
-                          : <option value="" disabled>No crypto wallets configured yet</option>}
-                      </select>
-                      <span aria-hidden="true" className="text-xl text-slate-400">⌄</span>
+                    <p id="crypto-asset-label" className="mb-2 mt-7 block text-sm font-semibold text-slate-700">
+                      Crypto and network
+                    </p>
+                    <div role="group" aria-labelledby="crypto-asset-label" className="grid gap-3 sm:grid-cols-2">
+                      {configuredCryptoAssets.map((asset) => (
+                        <button
+                          key={asset.value}
+                          type="button"
+                          aria-pressed={selectedCryptoAsset === asset.value}
+                          onClick={() => setCryptoAsset(asset.value)}
+                          className={`flex min-h-16 items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
+                            selectedCryptoAsset === asset.value
+                              ? "border-blue-600 bg-blue-50 shadow-sm"
+                              : "border-slate-200 bg-white hover:border-blue-300"
+                          }`}
+                        >
+                          <img src={asset.logo} alt="" className="h-9 w-9 shrink-0" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-bold text-slate-900">{asset.name}</span>
+                            <span className="mt-0.5 block truncate text-xs text-slate-500">{asset.network}</span>
+                          </span>
+                          {selectedCryptoAsset === asset.value && <Check className="h-4 w-4 shrink-0 text-blue-700" />}
+                        </button>
+                      ))}
                     </div>
                     {!settingsLoading && configuredCryptoAssets.length === 0 && (
                       <p role="status" className="mt-2 text-sm text-amber-700">Crypto payments are not available until an admin adds a wallet address.</p>
                     )}
 
-                    {pendingCryptoPayment && (
+                    {pendingCryptoPayment && revealedCryptoPaymentIds.has(pendingCryptoPayment.id) && (
                       <div id="crypto-payment-address" className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
@@ -410,16 +433,14 @@ const Account = () => {
                         <p className="mt-4 text-sm font-semibold text-slate-800">
                           Send {currency(Number(pendingCryptoPayment.amount_usd))} equivalent
                         </p>
-                        <code className="mt-2 block break-all rounded-xl border border-blue-100 bg-white p-3 text-sm text-slate-900">
+                        <code className="mt-2 block break-all rounded-xl border border-blue-100 bg-white p-4 text-base font-bold text-slate-900 sm:text-lg">
                           {String(pendingCryptoPayment.provider_data.wallet_address ?? "Wallet address unavailable")}
                         </code>
-                        <p className="mt-3 text-xs leading-5 text-slate-600">
-                          After sending, contact{" "}
-                          <a href="https://t.me/PDF417_PRO" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700 underline">
-                            admin support chat
-                          </a>{" "}
-                          and share payment ID <code className="break-all">{pendingCryptoPayment.id}</code>.
-                        </p>
+                        <CryptoPaidConfirmation
+                          paymentId={pendingCryptoPayment.id}
+                          paid={paidCryptoPaymentIds.has(pendingCryptoPayment.id)}
+                          onPaid={markCryptoPaymentPaid}
+                        />
                       </div>
                     )}
 
@@ -428,7 +449,11 @@ const Account = () => {
                       onClick={startCheckout}
                       className="mt-6 h-12 w-full rounded-xl bg-blue-600 text-base font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700"
                     >
-                      {submitting ? "Preparing payment…" : "Show payment address"} <ArrowRight className="ml-2 h-4 w-4" />
+                      {submitting
+                        ? "Preparing payment…"
+                        : pendingCryptoPayment && revealedCryptoPaymentIds.has(pendingCryptoPayment.id)
+                        ? "Create another payment address"
+                        : "Show payment address"} <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -471,29 +496,40 @@ const Account = () => {
                             <tr className="border-b border-border/60 bg-violet-50/40">
                               <td colSpan={5} className="px-3 py-4">
                                 <p className="font-semibold">{String(payment.provider_data.asset_name ?? payment.provider_data.crypto_asset ?? "Crypto")} · {String(payment.provider_data.network ?? "Network")} · Pay {currency(Number(payment.amount_usd))} equivalent</p>
-                                <p className="mt-1 text-muted-foreground">Send only on this network to the address below. Transfers on the wrong network may be permanently lost.</p>
-                                <code className="mt-2 block break-all rounded bg-white p-2 text-[11px]">{String(payment.provider_data.wallet_address ?? "Wallet address unavailable")}</code>
-                                <p className="mt-2 text-muted-foreground">
-                                  After paying, contact admin in the{" "}
-                                  <a href="https://t.me/PDF417_PRO" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">
-                                    Site support chat
-                                  </a>{" "}
-                                  and share payment ID <code className="break-all">{payment.id}</code> and your transaction hash if available.
-                                </p>
-                                {payment.provider_reference ? (
-                                  <p className="mt-2 break-all text-muted-foreground">Transaction hash submitted; awaiting admin verification: <span className="font-mono">{payment.provider_reference}</span></p>
-                                ) : (
-                                  <div className="mt-3 flex flex-wrap gap-2">
-                                    <Input
-                                      id={`crypto-hash-${payment.id}`}
-                                      value={cryptoTransactionHashes[payment.id] ?? ""}
-                                      onChange={(event) => setCryptoTransactionHashes((current) => ({ ...current, [payment.id]: event.target.value }))}
-                                      placeholder="Blockchain transaction hash"
-                                      autoComplete="off"
-                                      className="h-10 min-w-56 flex-1 bg-white"
+                                <p className="mt-1 text-muted-foreground">Reveal the address before sending. Transfers on the wrong network may be permanently lost.</p>
+                                {revealedCryptoPaymentIds.has(payment.id) ? (
+                                  <>
+                                    <code className="mt-3 block break-all rounded-xl border border-blue-100 bg-white p-4 text-base font-bold text-slate-900 sm:text-lg">{String(payment.provider_data.wallet_address ?? "Wallet address unavailable")}</code>
+                                    <CryptoPaidConfirmation
+                                      paymentId={payment.id}
+                                      paid={paidCryptoPaymentIds.has(payment.id)}
+                                      onPaid={markCryptoPaymentPaid}
                                     />
-                                    <Button disabled={submitting} onClick={() => submitCryptoHash(payment.id)}>
-                                      {submitting ? "Submitting…" : "Submit transaction hash"}
+                                    {payment.provider_reference ? (
+                                      <p className="mt-3 break-all text-muted-foreground">Transaction hash submitted; awaiting admin verification: <span className="font-mono">{payment.provider_reference}</span></p>
+                                    ) : (
+                                      <div className="mt-3 flex flex-wrap gap-2">
+                                        <Input
+                                          id={`crypto-hash-${payment.id}`}
+                                          value={cryptoTransactionHashes[payment.id] ?? ""}
+                                          onChange={(event) => setCryptoTransactionHashes((current) => ({ ...current, [payment.id]: event.target.value }))}
+                                          placeholder="Blockchain transaction hash"
+                                          autoComplete="off"
+                                          className="h-10 min-w-56 flex-1 bg-white"
+                                        />
+                                        <Button disabled={submitting} onClick={() => submitCryptoHash(payment.id)}>
+                                          {submitting ? "Submitting…" : "Submit transaction hash"}
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <div className="mt-3">
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setRevealedCryptoPaymentIds((current) => new Set(current).add(payment.id))}
+                                    >
+                                      Show payment address
                                     </Button>
                                   </div>
                                 )}
@@ -540,6 +576,49 @@ const Account = () => {
     </PageShell>
   );
 };
+
+function CryptoPaidConfirmation({
+  paymentId,
+  paid,
+  onPaid,
+}: {
+  paymentId: string;
+  paid: boolean;
+  onPaid: (paymentId: string) => void;
+}) {
+  if (!paid) {
+    return (
+      <Button
+        onClick={() => onPaid(paymentId)}
+        className="mt-4 h-12 w-full rounded-xl bg-blue-600 text-base font-bold text-white hover:bg-blue-700"
+      >
+        <Check className="mr-2 h-5 w-5" />
+        PAID
+      </Button>
+    );
+  }
+
+  return (
+    <div role="status" className="mt-4 rounded-2xl border-2 border-blue-200 bg-white p-5 text-center shadow-sm">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-blue-100 text-blue-700">
+        <MessageCircle className="h-10 w-10" />
+      </div>
+      <h4 className="mt-3 text-lg font-bold text-slate-900">Chat with support to confirm</h4>
+      <p className="mt-1 text-sm leading-5 text-slate-600">
+        Share payment ID <code className="break-all font-semibold text-slate-900">{paymentId}</code>. Credits are added after an admin verifies your payment.
+      </p>
+      <a
+        href="https://t.me/PDF417_PRO"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+      >
+        <MessageCircle className="h-6 w-6" />
+        Open support chat
+      </a>
+    </div>
+  );
+}
 
 function PackageCard({
   item,

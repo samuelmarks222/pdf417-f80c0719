@@ -314,7 +314,7 @@ const Account = () => {
                 <h2 className="mt-1 text-xl font-bold">Credit packages</h2>
               </div>
               {packages.length === 0 ? <p className="text-sm text-muted-foreground">Package pricing appears here after the Supabase migration is applied.</p> : (
-                <div id="credit-package-selection" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div id="credit-package-selection" className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
                   {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                 </div>
               )}
@@ -343,7 +343,7 @@ const Account = () => {
                 {packages.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No active packages are available right now.</p>
                 ) : (
-                  <div id="credit-package-selection" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <div id="credit-package-selection" className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
                     {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                   </div>
                 )}
@@ -701,7 +701,7 @@ function PackageCard({
       type="button"
       aria-pressed={selected}
       onClick={() => onSelect(item.id)}
-      className={`group relative flex min-h-52 flex-col overflow-hidden rounded-2xl border p-4 text-left transition-all hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:p-5 ${
+      className={`group relative flex min-h-44 flex-col overflow-hidden rounded-2xl border p-3 text-left transition-all hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:min-h-52 sm:p-5 ${
         selected
           ? "border-primary bg-gradient-to-br from-primary/[0.08] via-card to-card ring-2 ring-primary/15 shadow-lg shadow-primary/10"
           : "border-border/80 bg-card hover:border-primary/35 hover:shadow-lg hover:shadow-slate-900/5"
@@ -718,14 +718,14 @@ function PackageCard({
         </span>
       </span>
 
-      <span className="mt-5 block text-3xl font-bold leading-none tracking-tight text-foreground sm:text-[2rem]">
+      <span className="mt-3 block text-2xl font-bold leading-none tracking-tight text-foreground sm:mt-5 sm:text-[2rem]">
         {credits.toLocaleString()}
       </span>
       <span className="mt-1 text-xs font-medium text-muted-foreground">barcode credits</span>
 
-      <span className="mt-auto flex items-end justify-between gap-2 border-t border-border/70 pt-4">
+      <span className="mt-auto flex flex-wrap items-end justify-between gap-2 border-t border-border/70 pt-3 sm:flex-nowrap sm:pt-4">
         <span>
-          <span className="block text-lg font-bold tracking-tight">{currency(price)}</span>
+          <span className="block text-base font-bold tracking-tight sm:text-lg">{currency(price)}</span>
           <span className="mt-0.5 block text-[11px] text-muted-foreground">{currency(unitPrice)} / barcode</span>
         </span>
         {savings > 0 && (

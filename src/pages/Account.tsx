@@ -73,6 +73,7 @@ const Account = () => {
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [transactions, setTransactions] = useState<CreditRow[]>([]);
   const [selectedPackage, setSelectedPackage] = useState("");
+  const [activeCryptoPaymentId, setActiveCryptoPaymentId] = useState<string | null>(null);
   const provider = "manual_crypto";
   const [cryptoAsset, setCryptoAsset] = useState<(typeof cryptoAssets)[number]["value"]>("BTC");
   const [revealedCryptoPaymentIds, setRevealedCryptoPaymentIds] = useState<Set<string>>(() => new Set());
@@ -138,12 +139,31 @@ const Account = () => {
   const configuredCryptoAssets = cryptoAssets.filter((asset) => siteSettings[asset.setting].trim());
   const selectedCryptoAsset = configuredCryptoAssets.find((asset) => asset.value === cryptoAsset)?.value
     ?? configuredCryptoAssets[0]?.value;
+  const activeCryptoPayment = payments.find((payment) => payment.id === activeCryptoPaymentId && payment.provider === "manual_crypto");
+  const checkoutComplete = activeCryptoPayment?.status === "successful";
+  const currentCheckoutStep = !selectedPackageDetails ? 1 : checkoutComplete ? 3 : 2;
   const pendingCryptoPayment = payments.find((payment) =>
     payment.provider === "manual_crypto"
       && payment.status === "pending"
       && payment.package_id === selectedPackage
       && payment.provider_data.crypto_asset === selectedCryptoAsset
   );
+  const displayedCryptoPayment = activeCryptoPayment
+    ?? (pendingCryptoPayment && revealedCryptoPaymentIds.has(pendingCryptoPayment.id) ? pendingCryptoPayment : null);
+
+  const selectPackage = (packageId: string) => {
+    setSelectedPackage(packageId);
+    setActiveCryptoPaymentId(null);
+  };
+
+  const navigateCheckoutStep = (step: 1 | 2 | 3) => {
+    const targetId = step === 1
+      ? "credit-package-selection"
+      : step === 2
+      ? "crypto-checkout"
+      : "crypto-payment-complete";
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   useEffect(() => {
     if (!user || !hasPendingPayments) return;
@@ -161,6 +181,7 @@ const Account = () => {
       return;
     }
     if (pendingCryptoPayment && !revealedCryptoPaymentIds.has(pendingCryptoPayment.id)) {
+      setActiveCryptoPaymentId(pendingCryptoPayment.id);
       setRevealedCryptoPaymentIds((current) => new Set(current).add(pendingCryptoPayment.id));
       return;
     }
@@ -187,6 +208,7 @@ const Account = () => {
         throw new Error("Payment was created, but its address could not be loaded. Check your payment history.");
       }
 
+      setActiveCryptoPaymentId(data.paymentId);
       setRevealedCryptoPaymentIds((current) => new Set(current).add(data.paymentId));
       toast.success(`Crypto payment created for ${currency(Number(data.amount))}. Send the payment to the address shown below.`);
       await refreshAccount();
@@ -198,12 +220,14 @@ const Account = () => {
   };
 
   const markCryptoPaymentPaid = (paymentId: string) => {
+    setActiveCryptoPaymentId(paymentId);
     setPaidCryptoPaymentIds((current) => new Set(current).add(paymentId));
     toast.success("Contact support to confirm your payment. Credits are added after admin verification.");
   };
 
   const submitCryptoHash = async (paymentId: string) => {
     if (!supabase) return;
+    setActiveCryptoPaymentId(paymentId);
     const transactionHash = cryptoTransactionHashes[paymentId]?.trim();
     if (!transactionHash) {
       toast.error("Enter the blockchain transaction hash.");
@@ -290,8 +314,8 @@ const Account = () => {
                 <h2 className="mt-1 text-xl font-bold">Credit packages</h2>
               </div>
               {packages.length === 0 ? <p className="text-sm text-muted-foreground">Package pricing appears here after the Supabase migration is applied.</p> : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={setSelectedPackage} />)}
+                <div id="credit-package-selection" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                 </div>
               )}
             </section>
@@ -319,21 +343,21 @@ const Account = () => {
                 {packages.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No active packages are available right now.</p>
                 ) : (
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={setSelectedPackage} />)}
+                  <div id="credit-package-selection" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                   </div>
                 )}
               </div>
 
               <div className="border-t border-border/70 bg-slate-50 p-4 sm:p-7">
-                <div className="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[0.85fr_1.15fr]">
+                <div id="crypto-checkout" className="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[0.85fr_1.15fr]">
                   <aside className="relative overflow-hidden bg-blue-600 p-6 text-white sm:p-8">
                     <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
                     <div className="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-blue-400/40 blur-3xl" />
                     <div className="relative flex h-full flex-col">
                       <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.16em] text-blue-100">
                         <span>Crypto checkout</span>
-                        <span>Step 2 of 3</span>
+                        <span>Step {currentCheckoutStep} of 3</span>
                       </div>
                       <h3 className="mt-8 text-3xl font-bold tracking-tight">Pay with crypto</h3>
                       <p className="mt-3 max-w-sm text-sm leading-6 text-blue-100">
@@ -365,20 +389,42 @@ const Account = () => {
 
                   <div className="p-5 sm:p-8">
                     <div className="mb-8 flex items-center gap-2 sm:gap-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 sm:text-sm">
-                        <span className="grid h-7 w-7 place-items-center rounded-full bg-blue-600 text-white"><Check className="h-4 w-4" /></span>
+                      <button
+                        type="button"
+                        aria-current={currentCheckoutStep === 1 ? "step" : undefined}
+                        onClick={() => navigateCheckoutStep(1)}
+                        className={`flex items-center gap-2 text-xs font-semibold sm:text-sm ${selectedPackageDetails ? "text-blue-700" : "text-slate-400"}`}
+                      >
+                        <span className={`grid h-7 w-7 place-items-center rounded-full ${selectedPackageDetails ? "bg-blue-600 text-white" : "border-2 border-slate-200 bg-white"}`}>
+                          {selectedPackageDetails ? <Check className="h-4 w-4" /> : "1"}
+                        </span>
                         <span>Package</span>
-                      </div>
-                      <span className="h-px flex-1 bg-slate-200" />
-                      <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 sm:text-sm">
-                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-blue-600 bg-white">2</span>
+                      </button>
+                      <span className={`h-px flex-1 ${selectedPackageDetails ? "bg-blue-300" : "bg-slate-200"}`} />
+                      <button
+                        type="button"
+                        aria-current={currentCheckoutStep === 2 ? "step" : undefined}
+                        onClick={() => navigateCheckoutStep(2)}
+                        className={`flex items-center gap-2 text-xs font-semibold sm:text-sm ${currentCheckoutStep >= 2 ? "text-blue-700" : "text-slate-400"}`}
+                      >
+                        <span className={`grid h-7 w-7 place-items-center rounded-full border-2 ${checkoutComplete ? "border-blue-600 bg-blue-600 text-white" : currentCheckoutStep === 2 ? "border-blue-600 bg-white text-blue-700" : "border-slate-200 bg-white text-slate-400"}`}>
+                          {checkoutComplete ? <Check className="h-4 w-4" /> : "2"}
+                        </span>
                         <span>Crypto</span>
-                      </div>
-                      <span className="h-px flex-1 bg-slate-200" />
-                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 sm:text-sm">
-                        <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-slate-200 bg-white">3</span>
+                      </button>
+                      <span className={`h-px flex-1 ${checkoutComplete ? "bg-blue-300" : "bg-slate-200"}`} />
+                      <button
+                        type="button"
+                        aria-current={currentCheckoutStep === 3 ? "step" : undefined}
+                        disabled={!checkoutComplete}
+                        onClick={() => navigateCheckoutStep(3)}
+                        className={`flex items-center gap-2 text-xs font-semibold sm:text-sm ${checkoutComplete ? "text-blue-700" : "cursor-not-allowed text-slate-400"}`}
+                      >
+                        <span className={`grid h-7 w-7 place-items-center rounded-full border-2 ${checkoutComplete ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 bg-white"}`}>
+                          {checkoutComplete ? <Check className="h-4 w-4" /> : "3"}
+                        </span>
                         <span>Complete</span>
-                      </div>
+                      </button>
                     </div>
 
                     <div>
@@ -398,7 +444,10 @@ const Account = () => {
                           key={asset.value}
                           type="button"
                           aria-pressed={selectedCryptoAsset === asset.value}
-                          onClick={() => setCryptoAsset(asset.value)}
+                          onClick={() => {
+                            setCryptoAsset(asset.value);
+                            setActiveCryptoPaymentId(null);
+                          }}
                           className={`flex min-h-16 items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
                             selectedCryptoAsset === asset.value
                               ? "border-blue-600 bg-blue-50 shadow-sm"
@@ -418,29 +467,35 @@ const Account = () => {
                       <p role="status" className="mt-2 text-sm text-amber-700">Crypto payments are not available until an admin adds a wallet address.</p>
                     )}
 
-                    {pendingCryptoPayment && revealedCryptoPaymentIds.has(pendingCryptoPayment.id) && (
-                      <div id="crypto-payment-address" className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
+                    {displayedCryptoPayment && revealedCryptoPaymentIds.has(displayedCryptoPayment.id) && (
+                      <div id={checkoutComplete ? "crypto-payment-complete" : "crypto-payment-address"} className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:p-5">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <p className="text-sm font-bold text-slate-900">Payment address ready</p>
+                            <p className="text-sm font-bold text-slate-900">{checkoutComplete ? "Payment confirmed" : "Payment address ready"}</p>
                             <p className="mt-1 text-xs text-slate-600">
-                              {String(pendingCryptoPayment.provider_data.asset_name ?? pendingCryptoPayment.provider_data.crypto_asset ?? "Crypto")}
-                              {" · "}{String(pendingCryptoPayment.provider_data.network ?? "Network")}
+                              {String(displayedCryptoPayment.provider_data.asset_name ?? displayedCryptoPayment.provider_data.crypto_asset ?? "Crypto")}
+                              {" · "}{String(displayedCryptoPayment.provider_data.network ?? "Network")}
                             </p>
                           </div>
-                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Pending verification</span>
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${checkoutComplete ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
+                            {checkoutComplete ? "Complete" : "Pending verification"}
+                          </span>
                         </div>
                         <p className="mt-4 text-sm font-semibold text-slate-800">
-                          Send {currency(Number(pendingCryptoPayment.amount_usd))} equivalent
+                          {checkoutComplete ? "Verified payment" : "Send"} {currency(Number(displayedCryptoPayment.amount_usd))} equivalent
                         </p>
                         <code className="mt-2 block break-all rounded-xl border border-blue-100 bg-white p-4 text-base font-bold text-slate-900 sm:text-lg">
-                          {String(pendingCryptoPayment.provider_data.wallet_address ?? "Wallet address unavailable")}
+                          {String(displayedCryptoPayment.provider_data.wallet_address ?? "Wallet address unavailable")}
                         </code>
-                        <CryptoPaidConfirmation
-                          paymentId={pendingCryptoPayment.id}
-                          paid={paidCryptoPaymentIds.has(pendingCryptoPayment.id)}
-                          onPaid={markCryptoPaymentPaid}
-                        />
+                        {checkoutComplete ? (
+                          <p className="mt-4 text-sm font-semibold text-green-800">Credits have been added to your balance.</p>
+                        ) : (
+                          <CryptoPaidConfirmation
+                            paymentId={displayedCryptoPayment.id}
+                            paid={paidCryptoPaymentIds.has(displayedCryptoPayment.id)}
+                            onPaid={markCryptoPaymentPaid}
+                          />
+                        )}
                       </div>
                     )}
 
@@ -527,7 +582,10 @@ const Account = () => {
                                   <div className="mt-3">
                                     <Button
                                       variant="outline"
-                                      onClick={() => setRevealedCryptoPaymentIds((current) => new Set(current).add(payment.id))}
+                                      onClick={() => {
+                                        setActiveCryptoPaymentId(payment.id);
+                                        setRevealedCryptoPaymentIds((current) => new Set(current).add(payment.id));
+                                      }}
                                     >
                                       Show payment address
                                     </Button>

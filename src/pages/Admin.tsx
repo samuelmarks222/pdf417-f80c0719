@@ -9,6 +9,7 @@ import type { SiteSettings } from "@/contexts/site-settings-context";
 import { useSiteSettings } from "@/contexts/useSiteSettings";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 
 interface PackageRow {
   id: string;
@@ -218,6 +219,17 @@ const Admin = () => {
       const { data, error } = await supabase.functions.invoke("admin-reconcile-payment", {
         body: { paymentId },
       });
+      if (error instanceof FunctionsHttpError) {
+        const responseBody: unknown = await error.context.json().catch(() => null);
+        if (
+          responseBody !== null
+          && typeof responseBody === "object"
+          && "error" in responseBody
+          && typeof responseBody.error === "string"
+        ) {
+          throw new Error(responseBody.error);
+        }
+      }
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       toast.success(`Provider status: ${data.status}${data.credited ? " — credits added" : ""}.`);

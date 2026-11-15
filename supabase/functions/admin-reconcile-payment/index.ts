@@ -178,12 +178,15 @@ Deno.serve(async (request: Request) => {
     return jsonResponse({ status: "pending", credited: false });
   } catch (verificationError) {
     const message = verificationError instanceof Error ? verificationError.message : "Provider verification failed.";
+    const userMessage = payment.provider === "manual_crypto"
+      ? `Crypto approval failed: ${message.slice(0, 300)}`
+      : "Provider verification failed. No credits were added.";
     await client.from("credit_payments").update({
       verification_error: message,
       updated_at: new Date().toISOString(),
     }).eq("id", payment.id);
     await recordPaymentEvent(client, payment.id, payment.provider, "admin_verification_error", message);
     console.error("Payment reconciliation error:", message);
-    return jsonResponse({ error: "Provider verification failed. No credits were added." }, 502);
+    return jsonResponse({ error: userMessage }, 502);
   }
 });

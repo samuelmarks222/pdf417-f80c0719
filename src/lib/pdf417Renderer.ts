@@ -3,8 +3,7 @@ import * as bwipjs from "bwip-js";
 const PDF417_OPTIONS = {
   bcid: "pdf417",
   scaleX: 2,
-  scaleY: 3,
-  height: 9,
+  scaleY: 2,
   includetext: false,
   columns: 16,
   rowmult: 3,

@@ -350,8 +350,8 @@ const Account = () => {
               </div>
 
               <div className="border-t border-border/70 bg-slate-50 p-4 sm:p-7">
-                <div id="crypto-checkout" className="grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[0.85fr_1.15fr]">
-                  <aside className="relative overflow-hidden bg-blue-600 p-6 text-white sm:p-8">
+                <div id="crypto-checkout" className="grid min-w-0 grid-cols-1 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+                  <aside className="relative min-w-0 overflow-hidden bg-blue-600 p-6 text-white sm:p-8">
                     <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
                     <div className="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-blue-400/40 blur-3xl" />
                     <div className="relative flex h-full flex-col">
@@ -387,7 +387,7 @@ const Account = () => {
                     </div>
                   </aside>
 
-                  <div className="p-5 sm:p-8">
+                  <div className="min-w-0 p-4 sm:p-8">
                     <div className="mb-8 flex items-center gap-2 sm:gap-4">
                       <button
                         type="button"
@@ -438,7 +438,7 @@ const Account = () => {
                     <p id="crypto-asset-label" className="mb-2 mt-7 block text-sm font-semibold text-slate-700">
                       Crypto and network
                     </p>
-                    <div role="group" aria-labelledby="crypto-asset-label" className="grid gap-3 sm:grid-cols-2">
+                    <div role="group" aria-labelledby="crypto-asset-label" className="grid min-w-0 gap-3 sm:grid-cols-2">
                       {configuredCryptoAssets.map((asset) => (
                         <button
                           key={asset.value}
@@ -448,7 +448,7 @@ const Account = () => {
                             setCryptoAsset(asset.value);
                             setActiveCryptoPaymentId(null);
                           }}
-                          className={`flex min-h-16 items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
+                          className={`flex min-h-16 w-full min-w-0 items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
                             selectedCryptoAsset === asset.value
                               ? "border-blue-600 bg-blue-50 shadow-sm"
                               : "border-slate-200 bg-white hover:border-blue-300"

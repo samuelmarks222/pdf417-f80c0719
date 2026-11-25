@@ -46,7 +46,7 @@ export function generateDLNumber(stateCode: string): string {
     case "AL": return `${randomNum(1000000, 9999999)}`;
     case "AK": return `${randomNum(1000000, 9999999)}`;
     case "AZ": return `D${randomNum(10000000, 99999999)}`;
-    case "AR": return `${randomNum(100000000, 999999999)}`;
+    case "AR": return `9${randomNum(10000000, 99999999)}`;
     case "CA": return `${String.fromCharCode(65 + randomNum(0, 25))}${randomNum(1000000, 9999999)}`;
     case "CO": return `${randomNum(10, 99)}-${randomNum(100, 999)}-${randomNum(1000, 9999)}`;
     case "CT": return `${randomNum(100000000, 999999999)}`;

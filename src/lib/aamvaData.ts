@@ -242,6 +242,8 @@ export function generateRandomData(stateCode: string): Partial<AAMVAData> {
         return `D${randomNum(1000000, 9999999)}`;
       case "AZ":
         return `D${randomNum(10000000, 99999999)}`;
+      case "AR":
+        return `9${randomNum(10000000, 99999999)}`;
       case "AB":
         return `1${randomNum(10000, 99999)}-${randomNum(100, 999)}`;
       case "LA":

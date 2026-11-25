@@ -48,3 +48,25 @@ describe("Arizona DL number", () => {
     expect(generateDLNumber("AZ")).toMatch(/^D\d{8}$/);
   });
 });
+
+describe("Arkansas identifiers", () => {
+  it("uses a fixed 9 prefix followed by eight random digits", () => {
+    expect(generateRandomData("AR").licenseNumber).toMatch(/^9\d{8}$/);
+    expect(generateDLNumber("AR")).toMatch(/^9\d{8}$/);
+  });
+
+  it("uses the Arkansas DD and ICN formats when randomizing form data", () => {
+    const data = generateRandomData("AR");
+
+    expect(data.documentDiscriminator).toMatch(/^\d{9,10} \d{4}$/);
+    expect(data.inventoryControlNumber).toMatch(/^02101\d{11}$/);
+  });
+
+  it("generates a DD with 9 or 10 digits, a space, and four digits", () => {
+    expect(generateDD("AR", "08262020")).toMatch(/^\d{9,10} \d{4}$/);
+  });
+
+  it("uses the 02101 prefix followed by eleven random digits for ICN", () => {
+    expect(generateICN("AR", "935713596", "08262020")).toMatch(/^02101\d{11}$/);
+  });
+});

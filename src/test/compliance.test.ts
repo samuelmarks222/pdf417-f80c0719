@@ -61,4 +61,15 @@ describe("DDA compliance type", () => {
 
     expect(encoded).toContain("DCF8475992 460200826PNV-1");
   });
+
+  it("preserves the Arkansas DD space in the encoded payload", () => {
+    const encoded = encodeAAMVA(
+      { ...base, stateCode: "AR", documentDiscriminator: "138344282 2958" },
+      "636021",
+      "09",
+      "00",
+    );
+
+    expect(encoded).toContain("DCF138344282 2958");
+  });
 });

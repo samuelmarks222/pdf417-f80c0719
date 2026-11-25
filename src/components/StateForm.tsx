@@ -145,10 +145,17 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
       ? "0100 + 12 random digits"
       : data.stateCode === "AK"
         ? "10 digits: 1000 + 6 random digits"
-      : "Inventory Control Number";
+        : data.stateCode === "AR"
+          ? "02101 + 11 random digits"
+          : "Inventory Control Number";
+  const dlNumberDescription = data.stateCode === "AR"
+    ? "9 followed by 8 random digits"
+    : "State-specific format";
   const ddDescription = data.stateCode === "AK"
     ? "7 digits + space + 3 digits + issue date (YYMMDD) + 3 letters + -0 or -1"
-    : "Document Discriminator";
+    : data.stateCode === "AR"
+      ? "9 or 10 digits + space + 4 digits"
+      : "Document Discriminator";
   const formatAlbertaLicense = (value: string) => {
     const enteredDigits = value.replace(/\D/g, "");
     const digits = (enteredDigits.startsWith("1") ? enteredDigits : `1${enteredDigits}`).slice(0, 9);
@@ -263,12 +270,12 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Label className="text-xs flex items-center">
-              DL Number <InfoIcon text="State-specific format" /> <CalcIcon onClick={handleCalcDLNumber} />
+              DL Number <InfoIcon text={dlNumberDescription} /> <CalcIcon onClick={handleCalcDLNumber} />
             </Label>
             <Input
               value={data.licenseNumber}
               onChange={(e) => updateField("licenseNumber", data.stateCode === "AB" ? formatAlbertaLicense(e.target.value) : e.target.value.toUpperCase())}
-              placeholder={data.stateCode === "AB" ? "165785-754" : "D1234567"}
+              placeholder={data.stateCode === "AB" ? "165785-754" : data.stateCode === "AR" ? "935713596" : "D1234567"}
               className="h-9 text-sm mt-1"
             />
           </div>

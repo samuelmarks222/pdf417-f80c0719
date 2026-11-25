@@ -75,9 +75,9 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "AZ":
       return `${randomLetters(2)}${randomDigits(9)}`;
 
-    // Arkansas: 9 digits
+    // Arkansas: 9 or 10 digits, a space, then 4 digits
     case "AR":
-      return randomDigits(9);
+      return `${randomDigits(randomNum(9, 10))} ${randomDigits(4)}`;
 
     // California: MM/DD/YYYYnnnnn/AAFD/YY
     case "CA":
@@ -320,9 +320,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "AZ":
       return `${randomLetters(2)}${randomDigits(12)}`;
 
-    // Arkansas: 18 digits
+    // Arkansas: fixed 02101 prefix followed by 11 random digits
     case "AR":
-      return randomDigits(18);
+      return `02101${randomDigits(11)}`;
 
     // California: YYDOYLdlnumber+suffix (embeds DL#, year, day-of-year)
     // Example: 21237D12345670401

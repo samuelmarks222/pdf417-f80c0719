@@ -8,7 +8,7 @@ const PDF417_OPTIONS = {
   columns: 8,
   rowmult: 3,
   eclevel: 5,
-  paddingwidth: 6,
+  paddingwidth: 2,
   paddingheight: 12,
   backgroundcolor: "FFFFFF",
   barcolor: "000000",

@@ -9,7 +9,7 @@ const PDF417_OPTIONS = {
   rowmult: 3,
   eclevel: 5,
   paddingwidth: 2,
-  paddingheight: 12,
+  paddingheight: 2,
   barcolor: "000000",
 } as const;
 

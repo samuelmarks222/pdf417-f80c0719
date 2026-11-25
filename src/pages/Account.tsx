@@ -322,7 +322,7 @@ const Account = () => {
           </>
         ) : (
           <>
-            <section className="surface-panel mb-8 overflow-hidden">
+            <section className="surface-panel mb-8 overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="relative overflow-hidden border-b border-border/70 bg-gradient-to-br from-primary/[0.08] via-card to-amber-400/[0.06] px-5 py-6 sm:px-7 sm:py-7">
                 <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-primary/[0.07] blur-3xl" />
                 <div className="relative flex flex-wrap items-end justify-between gap-4">
@@ -349,8 +349,8 @@ const Account = () => {
                 )}
               </div>
 
-              <div className="border-t border-border/70 bg-slate-50 p-4 sm:p-7">
-                <div id="crypto-checkout" className="grid min-w-0 grid-cols-1 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+              <div className="-mx-5 border-t border-border/70 bg-slate-50 p-0 sm:mx-0 sm:p-7">
+                <div id="crypto-checkout" className="grid min-w-0 grid-cols-1 overflow-hidden border-y border-slate-200 bg-white shadow-xl sm:rounded-3xl sm:border lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
                   <aside className="relative min-w-0 overflow-hidden bg-blue-600 p-6 text-white sm:p-8">
                     <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
                     <div className="absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-blue-400/40 blur-3xl" />

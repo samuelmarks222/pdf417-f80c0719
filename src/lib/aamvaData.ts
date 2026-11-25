@@ -99,7 +99,7 @@ export const COMPLIANCE_TYPES = [
 ] as const;
 
 const DEFAULT_DL_CLASSES: Record<string, string> = {
-  AL: "D", AK: "D", AZ: "D", AR: "D", CA: "C", CO: "R", CT: "D", DE: "D", DC: "D",
+  AL: "NONE", AK: "D", AZ: "D", AR: "D", CA: "C", CO: "R", CT: "D", DE: "D", DC: "D",
   FL: "E", GA: "C", HI: "3", ID: "D", IL: "D", IN: "C", IA: "C", KS: "C", KY: "D",
   LA: "E", ME: "C", MD: "C", MA: "D", MI: "O", MN: "D", MS: "R", MO: "F", MT: "D",
   NE: "O", NV: "C", NH: "D", NJ: "D", NM: "D", NY: "D", NC: "C", ND: "D", OH: "D",

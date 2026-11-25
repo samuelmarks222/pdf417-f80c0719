@@ -17,13 +17,27 @@ function parseDateParts(issueDate?: string) {
   let day = padZero(now.getDate());
   let year = now.getFullYear().toString();
   let shortYear = year.substring(2);
-  const dayOfYear = padZero(Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000), 3);
+  let dayOfYear = padZero(Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0)) / 86400000), 3);
 
   if (issueDate && issueDate.length === 8) {
     month = issueDate.substring(0, 2);
     day = issueDate.substring(2, 4);
     year = issueDate.substring(4, 8);
     shortYear = year.substring(2);
+    const issueYear = Number(year);
+    const issueMonth = Number(month);
+    const issueDay = Number(day);
+    const issueTimestamp = Date.UTC(issueYear, issueMonth - 1, issueDay);
+    const parsedDate = new Date(issueTimestamp);
+
+    if (
+      Number.isFinite(issueTimestamp) &&
+      parsedDate.getUTCFullYear() === issueYear &&
+      parsedDate.getUTCMonth() === issueMonth - 1 &&
+      parsedDate.getUTCDate() === issueDay
+    ) {
+      dayOfYear = padZero(Math.floor((issueTimestamp - Date.UTC(issueYear, 0, 0)) / 86400000), 3);
+    }
   }
 
   return { month, day, year, shortYear, dayOfYear };
@@ -274,9 +288,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
   const cleanDL = (dlNumber || "").replace(/[^A-Z0-9]/gi, "");
 
   switch (stateCode) {
-    // Alabama: 10 fixed zeroes followed by 10 random digits
+    // Alabama: document number + random digits + issue year + day of year + fixed 01 suffix
     case "AL":
-      return `0000000000${randomDigits(10)}`;
+      return `${cleanDL}${randomDigits(5)}${shortYear}${dayOfYear}01`;
 
     // Louisiana: fixed 00700 prefix followed by 11 random digits
     case "LA":

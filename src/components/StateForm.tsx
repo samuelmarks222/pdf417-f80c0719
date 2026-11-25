@@ -411,7 +411,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           {fields?.hasICN && (
             <div>
               <Label className="text-xs flex items-center">
-                ICN <InfoIcon text="Inventory Control Number" /> <CalcIcon onClick={handleGenerateICN} />
+                ICN <InfoIcon text={data.stateCode === "AL" ? "Document number + 5 random digits + 2-digit issue year + 3-digit day of year + 01" : "Inventory Control Number"} /> <CalcIcon onClick={handleGenerateICN} />
               </Label>
               <Input value={data.inventoryControlNumber} onChange={(e) => updateField("inventoryControlNumber", e.target.value)} placeholder="Click calculator" className="h-9 text-[11px] mt-1" />
             </div>

@@ -6,7 +6,7 @@ const PDF417_OPTIONS = {
   scaleY: 3,
   height: 9,
   includetext: false,
-  columns: 11,
+  columns: 16,
   rowmult: 3,
   eclevel: 5,
   paddingwidth: 2,

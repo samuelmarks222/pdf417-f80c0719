@@ -74,3 +74,20 @@ describe("Arkansas identifiers", () => {
     expect(generateICN("AR", "935713596", "08262020")).toMatch(/^02101\d{11}$/);
   });
 });
+
+describe("Ohio identifiers", () => {
+  it("uses nine random digits for DD", () => {
+    expect(generateDD("OH")).toMatch(/^\d{9}$/);
+  });
+
+  it("uses one random letter followed by eight digits for ICN", () => {
+    expect(generateICN("OH")).toMatch(/^[A-Z]\d{8}$/);
+  });
+
+  it("uses the Ohio DD and ICN formats when randomizing form data", () => {
+    const data = generateRandomData("OH");
+
+    expect(data.documentDiscriminator).toMatch(/^\d{9}$/);
+    expect(data.inventoryControlNumber).toMatch(/^[A-Z]\d{8}$/);
+  });
+});

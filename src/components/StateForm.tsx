@@ -149,7 +149,9 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           ? "02101 + 11 random digits"
           : data.stateCode === "CA"
             ? "2-digit issue year + 3-digit day of year + DL number + 0401"
-            : "Inventory Control Number";
+            : data.stateCode === "OH"
+              ? "1 random letter + 8 random digits"
+              : "Inventory Control Number";
   const dlNumberDescription = data.stateCode === "AR"
     ? "9 followed by 8 random digits"
     : "State-specific format";
@@ -157,7 +159,9 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
     ? "7 digits + space + 3 digits + issue date (YYMMDD) + 3 letters + -0 or -1"
     : data.stateCode === "AR"
       ? "9 or 10 digits + space + 4 digits"
-      : "Document Discriminator";
+      : data.stateCode === "OH"
+        ? "9 random digits"
+        : "Document Discriminator";
   const formatAlbertaLicense = (value: string) => {
     const enteredDigits = value.replace(/\D/g, "");
     const digits = (enteredDigits.startsWith("1") ? enteredDigits : `1${enteredDigits}`).slice(0, 9);

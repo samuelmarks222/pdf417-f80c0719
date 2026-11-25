@@ -207,9 +207,9 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "ND":
       return `${randomLetters(3)}${randomDigits(6)}`;
 
-    // Ohio: 2 letters + 10 digits
+    // Ohio: 9 digits
     case "OH":
-      return `${randomLetters(2)}${randomDigits(10)}`;
+      return randomDigits(9);
 
     // Oklahoma: 10 digits
     case "OK":
@@ -445,9 +445,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "ND":
       return `${randomLetters(3)}${randomDigits(15)}`;
 
-    // Ohio: 18 alphanumeric
+    // Ohio: one letter followed by eight digits
     case "OH":
-      return `${randomLetters(2)}${randomDigits(16)}`;
+      return `${randomLetter()}${randomDigits(8)}`;
 
     // Oklahoma: 18 digits
     case "OK":

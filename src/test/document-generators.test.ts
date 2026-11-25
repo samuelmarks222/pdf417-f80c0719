@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateDD, generateICN } from "@/lib/documentGenerators";
 import { generateRandomData } from "@/lib/aamvaData";
+import { generateDLNumber } from "@/lib/calculators";
 
 describe("California document discriminator", () => {
   it("uses the issue date, five random digits, fixed AAFD code, and expiry year", () => {
@@ -35,5 +36,15 @@ describe("Alaska DD and ICN", () => {
 
   it("uses a 1000 prefix followed by six random digits in the ICN", () => {
     expect(generateICN("AK")).toMatch(/^1000\d{6}$/);
+  });
+});
+
+describe("Arizona DL number", () => {
+  it("uses a fixed D prefix in generated form data", () => {
+    expect(generateRandomData("AZ").licenseNumber).toMatch(/^D\d{8}$/);
+  });
+
+  it("uses a fixed D prefix when recalculated", () => {
+    expect(generateDLNumber("AZ")).toMatch(/^D\d{8}$/);
   });
 });

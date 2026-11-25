@@ -147,7 +147,9 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
         ? "10 digits: 1000 + 6 random digits"
         : data.stateCode === "AR"
           ? "02101 + 11 random digits"
-          : "Inventory Control Number";
+          : data.stateCode === "CA"
+            ? "2-digit issue year + 3-digit day of year + DL number + 0401"
+            : "Inventory Control Number";
   const dlNumberDescription = data.stateCode === "AR"
     ? "9 followed by 8 random digits"
     : "State-specific format";

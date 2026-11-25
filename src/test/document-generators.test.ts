@@ -9,6 +9,10 @@ describe("California document discriminator", () => {
 
     expect(dd).toMatch(/^01\/09\/2025\d{5}\/AAFD\/28$/);
   });
+
+  it("uses the issue year, day of year, DL number, and fixed 0401 ICN suffix", () => {
+    expect(generateICN("CA", "D1234567", "08252021")).toBe("21237D12345670401");
+  });
 });
 
 describe("Alabama ICN and DL class", () => {

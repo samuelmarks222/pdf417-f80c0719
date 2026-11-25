@@ -324,10 +324,10 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "AR":
       return `02101${randomDigits(11)}`;
 
-    // California: YYDOYLdlnumber+suffix (embeds DL#, year, day-of-year)
+    // California: issue year + day of year + DL number + fixed 0401 suffix
     // Example: 21237D12345670401
     case "CA":
-      return `${shortYear}${dayOfYear}${randomLetter()}${cleanDL.padEnd(8, "0").substring(0, 8)}${randomDigits(4)}`;
+      return `${shortYear}${dayOfYear}${cleanDL.padEnd(8, "0").substring(0, 8)}0401`;
 
     // Colorado: 20 digits
     case "CO":

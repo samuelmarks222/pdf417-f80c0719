@@ -67,9 +67,9 @@ export function generateDD(stateCode: string, issueDate?: string, expirationDate
     case "AL":
       return `${randomLetters(2)}${randomDigits(8)}`;
 
-    // Alaska: 2 letters + 8 digits
+    // Alaska: 7 digits, space, 3 digits, issue date (YYMMDD), 3 letters, and -0 or -1
     case "AK":
-      return `${randomLetters(2)}${randomDigits(8)}`;
+      return `${randomDigits(7)} ${randomDigits(3)}${shortYear}${month}${day}${randomLetters(3)}-${randomNum(0, 1)}`;
 
     // Arizona: 2 letters + 9 digits (e.g., YB123456789)
     case "AZ":
@@ -312,9 +312,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "SK":
       return `${randomLetter()}${randomDigits(8)}`;
 
-    // Alaska: 15 alphanumeric
+    // Alaska: fixed 1000 prefix followed by six random digits
     case "AK":
-      return `${randomLetters(2)}${randomDigits(13)}`;
+      return `1000${randomDigits(6)}`;
 
     // Arizona: 14 alphanumeric
     case "AZ":

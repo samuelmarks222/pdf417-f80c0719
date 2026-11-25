@@ -27,3 +27,13 @@ describe("Florida ICN", () => {
     expect(generateICN("FL", "H655435851100", "04112020")).toMatch(/^0100\d{12}$/);
   });
 });
+
+describe("Alaska DD and ICN", () => {
+  it("embeds the issue date in YYMMDD format in the DD", () => {
+    expect(generateDD("AK", "08262020")).toMatch(/^\d{7} \d{3}200826[A-Z]{3}-[01]$/);
+  });
+
+  it("uses a 1000 prefix followed by six random digits in the ICN", () => {
+    expect(generateICN("AK")).toMatch(/^1000\d{6}$/);
+  });
+});

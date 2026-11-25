@@ -143,7 +143,12 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
     ? "Document number + 5 random digits + 2-digit issue year + 3-digit day of year + 01"
     : data.stateCode === "FL"
       ? "0100 + 12 random digits"
+      : data.stateCode === "AK"
+        ? "10 digits: 1000 + 6 random digits"
       : "Inventory Control Number";
+  const ddDescription = data.stateCode === "AK"
+    ? "7 digits + space + 3 digits + issue date (YYMMDD) + 3 letters + -0 or -1"
+    : "Document Discriminator";
   const formatAlbertaLicense = (value: string) => {
     const enteredDigits = value.replace(/\D/g, "");
     const digits = (enteredDigits.startsWith("1") ? enteredDigits : `1${enteredDigits}`).slice(0, 9);
@@ -408,7 +413,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           {fields?.hasDD && !fields?.ddInDetailsRow && (
             <div>
               <Label className="text-xs flex items-center">
-                DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} />
+                DD <InfoIcon text={ddDescription} /> <CalcIcon onClick={handleGenerateDD} />
               </Label>
               <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder={data.stateCode === "AB" ? "0571-54946" : "Click calculator"} className="h-9 text-[11px] mt-1" />
             </div>
@@ -433,7 +438,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {fields?.hasDD && fields?.ddInDetailsRow && (
             <div>
-              <Label className="text-xs flex items-center">DD <InfoIcon text="Document Discriminator" /> <CalcIcon onClick={handleGenerateDD} /></Label>
+              <Label className="text-xs flex items-center">DD <InfoIcon text={ddDescription} /> <CalcIcon onClick={handleGenerateDD} /></Label>
               <Input value={data.documentDiscriminator} onChange={(e) => updateField("documentDiscriminator", data.stateCode === "AB" ? formatAlbertaDD(e.target.value) : e.target.value)} placeholder="0571-54946" className="h-9 text-[11px] mt-1" />
             </div>
           )}

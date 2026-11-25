@@ -90,7 +90,7 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 bg-white py-8 sm:py-10">
-        <div className="container max-w-7xl">
+        <div className="container max-w-7xl max-sm:!px-0">
           <div className="hidden">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Barcode workspace</p>

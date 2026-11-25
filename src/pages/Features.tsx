@@ -63,13 +63,13 @@ const Features = () => {
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-sm:-mx-4">
             {featuresList.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card 
                   key={index}
-                  className="rounded-2xl border-border/80 bg-white p-6 shadow-[0_8px_28px_rgba(39,70,61,0.04)] transition-all group-hover:-translate-y-0.5 group-hover:border-primary/40"
+                  className="rounded-2xl border-border/80 bg-white p-6 shadow-[0_8px_28px_rgba(39,70,61,0.04)] transition-all group-hover:-translate-y-0.5 group-hover:border-primary/40 max-sm:rounded-none"
                 >
                   <Icon className="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="mb-2 text-lg font-bold">{feature.title}</h3>
@@ -88,8 +88,8 @@ const Features = () => {
               <div className="section-divider max-w-md mx-auto" />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              <Card className="rounded-2xl border-border/80 bg-white p-6">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto max-sm:-mx-4">
+              <Card className="rounded-2xl border-border/80 bg-white p-6 max-sm:rounded-none">
                 <h4 className="mb-4 font-semibold">AAMVA Field Support</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• DAQ - Customer ID Number (License Number)</li>
@@ -110,7 +110,7 @@ const Features = () => {
                 </ul>
               </Card>
 
-              <Card className="rounded-2xl border-border/80 bg-white p-6">
+              <Card className="rounded-2xl border-border/80 bg-white p-6 max-sm:rounded-none">
                 <h4 className="mb-4 font-semibold">Barcode Specifications</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• Format: PDF417</li>

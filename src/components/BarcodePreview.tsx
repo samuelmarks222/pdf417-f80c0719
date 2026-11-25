@@ -144,13 +144,13 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
   return (
     <div className="grid items-stretch gap-5 lg:grid-cols-2">
       <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
+        <div className="flex flex-col items-start gap-3 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
               <Barcode className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-base font-bold">PDF417 barcode</h2>
+              <h2 className="text-base font-bold">PDF417 barcode</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">2.25 × 0.65 in · 675 × 195 px at 300 DPI</p>
             </div>
           </div>
@@ -187,13 +187,13 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
       </section>
 
       <section className="surface-panel flex min-w-0 flex-col overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
+        <div className="flex flex-col items-start gap-3 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
               <Barcode className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-base font-bold">Code 128 barcode</h2>
+              <h2 className="text-base font-bold">Code 128 barcode</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">Custom text format · no credits required</p>
             </div>
           </div>

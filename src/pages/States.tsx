@@ -51,10 +51,10 @@ const States = () => {
           </div>
 
           <h2 className="mb-3 text-xl font-bold">USA state formats</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-0 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4 max-sm:-mx-4">
             {columns.map((column, colIndex) => (
               <div key={colIndex}>
-                <ul className="surface-panel divide-y divide-border/70 overflow-hidden">
+                <ul className="surface-panel divide-y divide-border/70 overflow-hidden max-sm:rounded-none">
                   {column.map((state) => (
                     <li key={state.code} className="bg-card">
                       {state.revisions.length === 1 ? (
@@ -120,10 +120,10 @@ const States = () => {
 
           <h2 className="mb-3 mt-10 text-xl font-bold">Canada</h2>
           <p className="mb-4 text-sm text-muted-foreground">Province and territory-specific Canadian driver licence forms.</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-0 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 max-sm:-mx-4">
             {canadaColumns.map((column, colIndex) => (
               <div key={colIndex}>
-                <ul className="surface-panel divide-y divide-border/70 overflow-hidden">
+                <ul className="surface-panel divide-y divide-border/70 overflow-hidden max-sm:rounded-none">
                   {column.map((state) => (
                     <li key={state.code} className="bg-card">
                       {state.comingSoon ? (

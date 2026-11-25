@@ -202,7 +202,7 @@ const Home = () => {
         </section>
 
         <section className="border-y border-[#e8e9e2] bg-white">
-          <div className="container grid max-w-7xl divide-y divide-[#e8e9e2] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="container grid max-w-7xl divide-y divide-[#e8e9e2] sm:grid-cols-3 sm:divide-x sm:divide-y-0 max-sm:!px-0">
             <Metric icon={MapPinned} value="USA" label="State and DC formats" />
             <Metric icon={Barcode} value="PDF417 + Code 128" label="Two barcode formats" />
             <Metric icon={CreditCard} value="Free Code 128" label="PDF417 uses credits" />
@@ -222,11 +222,11 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-3 max-sm:-mx-4">
             {features.map(({ icon: Icon, title, description, label }, index) => (
               <article
                 key={title}
-                className="group relative overflow-hidden rounded-2xl border border-[#e7e9e3] bg-white p-6 shadow-[0_8px_28px_rgba(39,70,61,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#b7d6ca] hover:shadow-xl hover:shadow-[#30574c]/[0.08] sm:p-7"
+                className="group relative overflow-hidden rounded-2xl border border-[#e7e9e3] bg-white p-6 shadow-[0_8px_28px_rgba(39,70,61,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#b7d6ca] hover:shadow-xl hover:shadow-[#30574c]/[0.08] sm:p-7 max-sm:rounded-none"
               >
                 <span className="absolute right-5 top-5 text-xs font-semibold tracking-widest text-[#c5ccc7]">0{index + 1}</span>
                 <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#eaf4ee] text-[#087260] transition-colors group-hover:bg-[#07584e] group-hover:text-white">
@@ -241,7 +241,7 @@ const Home = () => {
         </section>
 
         <section className="container max-w-7xl pb-20 sm:pb-28">
-          <div className="relative overflow-hidden rounded-[2rem] bg-[#07584e] px-6 py-10 text-white shadow-xl shadow-[#07584e]/10 sm:px-10 sm:py-12 lg:px-14">
+          <div className="relative max-sm:-mx-4 overflow-hidden rounded-[2rem] bg-[#07584e] px-6 py-10 text-white shadow-xl shadow-[#07584e]/10 sm:px-10 sm:py-12 lg:px-14 max-sm:rounded-none">
             <div className="pointer-events-none absolute -right-20 -top-32 h-80 w-80 rounded-full bg-[#f1ad52]/20 blur-[80px]" aria-hidden="true" />
             <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
               <div className="max-w-2xl">
@@ -300,7 +300,7 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="mt-8 grid gap-4 md:grid-cols-3 max-sm:-mx-4">
               <Faq title="How do I create a PDF417?" text="Choose an available U.S. state format, fill out its fields, generate a preview, and download the image when it is ready." link="/generator" linkText="Open generator" />
               <Faq title="Can I use Code 128?" text="Yes. Code 128 generation is free. PDF417 generations use credits, which you can review in your account." link="/account" linkText="View credits" />
               <Faq title="Which U.S. formats are available?" text="Browse the available state formats and revisions before opening the barcode generator." link="/states" linkText="Browse U.S. formats" />
@@ -342,7 +342,7 @@ function Metric({
 
 function Faq({ title, text, link, linkText }: { title: string; text: string; link: string; linkText: string }) {
   return (
-    <article className="group rounded-2xl border border-[#e7e9e3] bg-[#fbfaf6] p-5 transition-colors hover:border-[#b7d6ca] hover:bg-[#f5faf6] sm:p-6">
+    <article className="group rounded-2xl border border-[#e7e9e3] bg-[#fbfaf6] p-5 transition-colors hover:border-[#b7d6ca] hover:bg-[#f5faf6] sm:p-6 max-sm:rounded-none">
       <h3 className="font-bold tracking-tight text-[#1d2724]">{title}</h3>
       <p className="mt-2 min-h-[4.5rem] text-sm leading-6 text-[#6b7771]">{text}</p>
       <Link to={link} className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-[#087260] group-hover:gap-2.5">

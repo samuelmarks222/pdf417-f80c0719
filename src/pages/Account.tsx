@@ -295,7 +295,7 @@ const Account = () => {
           <SetupNotice />
         ) : !user ? (
           <>
-            <section className="surface-panel relative overflow-hidden p-8 text-center sm:p-12">
+            <section className="surface-panel relative overflow-hidden p-8 text-center sm:p-12 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/20 via-primary to-cyan-400" />
               <h2 className="text-2xl font-bold">Sign in to manage credits</h2>
               <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
@@ -308,13 +308,13 @@ const Account = () => {
                 Continue with Google
               </Button>
             </section>
-            <section className="surface-panel mt-8 p-5 sm:p-6">
+            <section className="surface-panel mt-8 p-5 sm:p-6 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="mb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Choose a package</p>
                 <h2 className="mt-1 text-xl font-bold">Credit packages</h2>
               </div>
               {packages.length === 0 ? <p className="text-sm text-muted-foreground">Package pricing appears here after the Supabase migration is applied.</p> : (
-                <div id="credit-package-selection" className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+                <div id="credit-package-selection" className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                 </div>
               )}
@@ -343,7 +343,7 @@ const Account = () => {
                 {packages.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No active packages are available right now.</p>
                 ) : (
-                  <div id="credit-package-selection" className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+                  <div id="credit-package-selection" className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {packages.map((item) => <PackageCard key={item.id} item={item} selected={selectedPackage === item.id} referencePrice={singleCreditPrice} onSelect={selectPackage} />)}
                   </div>
                 )}
@@ -515,7 +515,7 @@ const Account = () => {
               </div>
             </section>
 
-            <section className="surface-panel mb-8 p-5 sm:p-6">
+            <section className="surface-panel mb-8 p-5 sm:p-6 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="mb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Recent activity</p>
                 <h2 className="mt-1 text-xl font-bold">Payment history</h2>
@@ -602,7 +602,7 @@ const Account = () => {
               )}
             </section>
 
-            <section className="surface-panel p-5 sm:p-6">
+            <section className="surface-panel p-5 sm:p-6 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="mb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Account ledger</p>
                 <h2 className="mt-1 text-xl font-bold">Credit history</h2>

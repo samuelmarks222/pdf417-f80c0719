@@ -59,7 +59,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
       setGenerated(true);
     } catch (err) {
       console.error("Barcode generation error:", err);
-      setError("Failed to generate barcode. Please check your data.");
+      setError(err instanceof Error ? err.message : "Failed to generate barcode. Please check your data.");
     } finally {
       setIsGenerating(false);
     }
@@ -151,7 +151,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
             </span>
             <div className="min-w-0">
               <h2 className="truncate text-base font-bold">PDF417 barcode</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">State-specific format</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">2.25 × 0.65 in · 675 × 195 px at 300 DPI</p>
             </div>
           </div>
           <span className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold ${isAdmin ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}`}>

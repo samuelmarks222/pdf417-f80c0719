@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as bwipjs from "bwip-js";
 import { Button } from "@/components/ui/button";
 import { Barcode, Download, Sparkles } from "lucide-react";
+import { renderPdf417 } from "@/lib/pdf417Renderer";
 
 interface BarcodePreviewProps {
   data: string;
@@ -44,19 +45,7 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
     try {
       const output = document.createElement("canvas");
-      await bwipjs.toCanvas(output, {
-        bcid: "pdf417",
-        text: data,
-        scale: 3,
-        height: 9,
-        includetext: false,
-        columns: 8,
-        rowmult: 3,
-        eclevel: 5,
-        paddingwidth: 6,
-        paddingheight: 12,
-        barcolor: "000000",
-      });
+      renderPdf417(output, data);
 
       if (!canvasRef.current.getContext("2d")) throw new Error("Could not display generated barcode.");
       const canPublish = await chargeForGeneration("pdf417", data);

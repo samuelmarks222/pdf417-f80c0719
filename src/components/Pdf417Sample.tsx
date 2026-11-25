@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import * as bwipjs from "bwip-js";
+import { renderPdf417 } from "@/lib/pdf417Renderer";
 
 const demoText = "PDF417 DEMO - NORTH AMERICA";
 
@@ -13,17 +13,7 @@ export function Pdf417Sample() {
     if (!canvas) return;
 
     try {
-      bwipjs.toCanvas(canvas, {
-        bcid: "pdf417",
-        text: demoText,
-        scale: 3,
-        columns: 4,
-        rowmult: 3,
-        eclevel: 3,
-        padding: 2,
-        backgroundcolor: "FFFFFF",
-        barcolor: "1D2925",
-      });
+      renderPdf417(canvas, demoText);
       setError(false);
     } catch (renderError) {
       console.error("Could not render homepage PDF417 sample:", renderError);

@@ -345,9 +345,9 @@ export function generateICN(stateCode: string, dlNumber?: string, issueDate?: st
     case "DC":
       return randomDigits(18);
 
-    // Florida: 16 digits (per FL calibration sheet: 0110009295000261)
+    // Florida: fixed 0100 prefix followed by 12 random digits
     case "FL":
-      return `${randomDigits(16)}`;
+      return `0100${randomDigits(12)}`;
 
     // Georgia: 18 digits
     case "GA":

@@ -21,3 +21,9 @@ describe("Alabama ICN and DL class", () => {
     expect(generateRandomData("AL").dlClass).toBe("NONE");
   });
 });
+
+describe("Florida ICN", () => {
+  it("uses the fixed 0100 prefix followed by 12 random digits", () => {
+    expect(generateICN("FL", "H655435851100", "04112020")).toMatch(/^0100\d{12}$/);
+  });
+});

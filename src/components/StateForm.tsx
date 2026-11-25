@@ -139,6 +139,11 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
 
   const fields = revision?.fields;
   const isCanadian = stateConfig?.country === "Canada";
+  const icnDescription = data.stateCode === "AL"
+    ? "Document number + 5 random digits + 2-digit issue year + 3-digit day of year + 01"
+    : data.stateCode === "FL"
+      ? "0100 + 12 random digits"
+      : "Inventory Control Number";
   const formatAlbertaLicense = (value: string) => {
     const enteredDigits = value.replace(/\D/g, "");
     const digits = (enteredDigits.startsWith("1") ? enteredDigits : `1${enteredDigits}`).slice(0, 9);
@@ -411,7 +416,7 @@ export function StateForm({ data, onChange, onCreate }: StateFormProps) {
           {fields?.hasICN && (
             <div>
               <Label className="text-xs flex items-center">
-                ICN <InfoIcon text={data.stateCode === "AL" ? "Document number + 5 random digits + 2-digit issue year + 3-digit day of year + 01" : "Inventory Control Number"} /> <CalcIcon onClick={handleGenerateICN} />
+                ICN <InfoIcon text={icnDescription} /> <CalcIcon onClick={handleGenerateICN} />
               </Label>
               <Input value={data.inventoryControlNumber} onChange={(e) => updateField("inventoryControlNumber", e.target.value)} placeholder="Click calculator" className="h-9 text-[11px] mt-1" />
             </div>

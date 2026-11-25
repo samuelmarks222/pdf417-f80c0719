@@ -34,12 +34,16 @@ export function Pdf417Sample() {
   }
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
       role="img"
       aria-label={`Actual PDF417 barcode sample: ${demoText}`}
-      className="h-28 w-full rounded-lg bg-[#fbfcfa] object-contain"
-      style={{ imageRendering: "pixelated" }}
-    />
+      className="aspect-[53/10] w-full overflow-hidden rounded-lg bg-[#fbfcfa]"
+    >
+      <canvas
+        ref={canvasRef}
+        className="block h-full w-full object-contain"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
   );
 }

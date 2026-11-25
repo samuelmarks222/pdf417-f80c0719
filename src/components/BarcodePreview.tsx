@@ -161,13 +161,15 @@ export function BarcodePreview({ data, code128Text = "", onCode128TextChange, on
 
         <div className="flex flex-1 flex-col p-4 sm:p-5">
           <div className="relative flex min-h-[220px] w-full flex-1 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted/45 p-5 sm:min-h-[240px]">
-            <canvas
-              ref={canvasRef}
-              className={generated ? "block h-auto max-h-40 w-full max-w-none rounded-lg bg-white object-contain" : "hidden"}
-              width={600}
-              height={200}
-              style={{ imageRendering: "pixelated" }}
-            />
+            <div className={generated ? "aspect-[53/10] w-full overflow-hidden rounded-lg bg-white" : "hidden"}>
+              <canvas
+                ref={canvasRef}
+                className="block h-full w-full object-contain"
+                width={600}
+                height={200}
+                style={{ imageRendering: "pixelated" }}
+              />
+            </div>
             {!generated && (
               <div className="max-w-xs text-center">
                 <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white text-primary shadow-sm ring-1 ring-border/70">

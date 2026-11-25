@@ -50,4 +50,15 @@ describe("DDA compliance type", () => {
   it("encodes a non-compliant type when explicitly selected", () => {
     expect(encodeAAMVA({ ...base, complianceType: "A" }, IIN, "09", "01")).toContain("DDAA");
   });
+
+  it("preserves the Alaska DD space in the encoded payload", () => {
+    const encoded = encodeAAMVA(
+      { ...base, stateCode: "AK", documentDiscriminator: "8475992 460200826PNV-1" },
+      "636059",
+      "09",
+      "00",
+    );
+
+    expect(encoded).toContain("DCF8475992 460200826PNV-1");
+  });
 });

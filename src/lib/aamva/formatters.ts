@@ -54,7 +54,9 @@ export function normalizeAlphanumeric(value: string, minLen: number, maxLen: num
 
 export function sanitizeAamvaCode(value: string, maxLen: number): string {
   return (value || "")
-    .replace(/[\r\n\x1e\s]+/g, "")
+    .replace(/\s/g, (whitespace) => whitespace === " " ? whitespace : "")
+    .split(String.fromCharCode(30))
+    .join("")
     .toUpperCase()
     .substring(0, maxLen);
 }

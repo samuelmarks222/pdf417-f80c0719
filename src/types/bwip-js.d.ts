@@ -3,6 +3,8 @@ declare module 'bwip-js' {
     bcid: string;
     text: string;
     scale?: number;
+    scaleX?: number;
+    scaleY?: number;
     height?: number;
     width?: number;
     includetext?: boolean;

@@ -87,7 +87,7 @@ export const STATE_CONFIGS: StateConfig[] = [
         aamvaVersion: "04",
         jurisdictionVersion: "01",
         realIdCompliant: true,
-        fields: { ...defaultFields, hasDD: false },
+        fields: { ...defaultFields, hasDD: false, hasHairColor: true },
       },
       {
         id: "AL_2022",
@@ -97,7 +97,7 @@ export const STATE_CONFIGS: StateConfig[] = [
         aamvaVersion: "04",
         jurisdictionVersion: "03",
         realIdCompliant: true,
-        fields: { ...defaultFields, hasDD: false },
+        fields: { ...defaultFields, hasDD: false, hasHairColor: true },
       },
     ],
   },

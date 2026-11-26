@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generateDD, generateICN } from "@/lib/documentGenerators";
 import { generateRandomData } from "@/lib/aamvaData";
 import { generateDLNumber } from "@/lib/calculators";
+import { STATE_CONFIGS } from "@/lib/stateConfigs";
 
 describe("California document discriminator", () => {
   it("uses the issue date, five random digits, fixed AAFD code, and expiry year", () => {
@@ -24,6 +25,14 @@ describe("Alabama ICN and DL class", () => {
 
   it("sets the generated DL class to NONE", () => {
     expect(generateRandomData("AL").dlClass).toBe("NONE");
+  });
+});
+
+describe("Alabama hair color field", () => {
+  it("shows the ANSI hair color field for both revisions", () => {
+    const alabama = STATE_CONFIGS.find((state) => state.code === "AL");
+
+    expect(alabama?.revisions.map((revision) => revision.fields.hasHairColor)).toEqual([true, true]);
   });
 });
 

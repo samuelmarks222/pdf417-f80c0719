@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StateForm } from "@/components/StateForm";
@@ -7,37 +7,88 @@ import { AAMVAData, DEFAULT_AAMVA_DATA, generateRandomData } from "@/lib/aamvaDa
 import { encodeAAMVA } from "@/lib/aamvaEncoder";
 import { getStateConfig, getRevision } from "@/lib/stateConfigs";
 import { useSearchParams } from "react-router-dom";
+import { loadSavedGeneratorFormData, saveGeneratorFormData } from "@/lib/generatorFormStorage";
 import { useAuth } from "@/contexts/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
+function createInitialFormData(stateCode: string, requestedRevision: string | null): AAMVAData {
+  const config = getStateConfig(stateCode);
+  if (!config) return DEFAULT_AAMVA_DATA;
+
+  const revision = config.revisions.find((item) => item.id === requestedRevision) || config.revisions[0];
+  const revisionDate = revision.revisionDate.replace(/\//g, "");
+  return {
+    ...DEFAULT_AAMVA_DATA,
+    ...generateRandomData(stateCode),
+    stateCode,
+    revisionId: revision.id,
+    revisionDate: revision.fields.hasRevisionDate && revision.fields.revisionDates ? "" : revisionDate,
+  };
+}
+
+function initializeFormData(
+  requestedState: string | null,
+  requestedRevision: string | null,
+): { data: AAMVAData; restoreError?: unknown } {
+  const initialState = requestedState || "CA";
+
+  try {
+    const saved = loadSavedGeneratorFormData();
+    if (saved) {
+      const savedRevision = getRevision(saved.revisionId);
+      if (!savedRevision || savedRevision.state.code !== saved.stateCode) {
+        throw new Error("Saved generator form data refers to an unavailable state revision.");
+      }
+
+      const matchesRequestedRoute =
+        (!requestedState || saved.stateCode === requestedState) &&
+        (!requestedRevision || saved.revisionId === requestedRevision);
+      if (matchesRequestedRoute) return { data: saved };
+    }
+  } catch (restoreError) {
+    return { data: createInitialFormData(initialState, requestedRevision), restoreError };
+  }
+
+  return { data: createInitialFormData(initialState, requestedRevision) };
+}
+
 const Index = () => {
   const { user, profile, refreshProfile } = useAuth();
-  const [searchParams] = useSearchParams();
-  const initialState = searchParams.get("state") || "CA";
-  
-  const [formData, setFormData] = useState<AAMVAData>(() => {
-    const config = getStateConfig(initialState);
-    if (config) {
-      const rev = config.revisions[0];
-      const revDateClean = rev.revisionDate.replace(/\//g, "");
-      return {
-        ...DEFAULT_AAMVA_DATA,
-        ...generateRandomData(initialState),
-        stateCode: initialState,
-        revisionId: rev.id,
-        revisionDate: rev.fields.hasRevisionDate && rev.fields.revisionDates ? "" : revDateClean,
-      };
-    }
-    return DEFAULT_AAMVA_DATA;
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedState = searchParams.get("state");
+  const requestedRevision = searchParams.get("revision");
+  const [initialFormState] = useState(() => initializeFormData(requestedState, requestedRevision));
+  const [formData, setFormData] = useState<AAMVAData>(initialFormState.data);
+  const restoreErrorShown = useRef(false);
+  const saveErrorShown = useRef(false);
   
   const [encodedData, setEncodedData] = useState<string>("");
   const [code128Text, setCode128Text] = useState<string>("");
   const [showRawData, setShowRawData] = useState(false);
   const [createRequest, setCreateRequest] = useState(0);
+
+  useEffect(() => {
+    if (!initialFormState.restoreError || restoreErrorShown.current) return;
+    console.error("Could not restore saved generator form data.", initialFormState.restoreError);
+    toast.error("Saved details could not be restored. A fresh form has been loaded.");
+    restoreErrorShown.current = true;
+  }, [initialFormState.restoreError]);
+
+  useEffect(() => {
+    try {
+      saveGeneratorFormData(formData);
+      saveErrorShown.current = false;
+    } catch (error) {
+      console.error("Could not save generator form data in this browser.", error);
+      if (!saveErrorShown.current) {
+        toast.error("Your details could not be saved in this browser.");
+        saveErrorShown.current = true;
+      }
+    }
+  }, [formData]);
 
   useEffect(() => {
     const revisionData = getRevision(formData.revisionId);
@@ -49,6 +100,14 @@ const Index = () => {
   }, [formData]);
 
   const handleFormChange = (data: AAMVAData) => {
+    if (data.stateCode !== formData.stateCode || data.revisionId !== formData.revisionId) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.set("state", data.stateCode);
+        next.set("revision", data.revisionId);
+        return next;
+      }, { replace: true });
+    }
     setFormData(data);
   };
 
@@ -121,6 +180,9 @@ const Index = () => {
             </div>
           )}
           {/* Form */}
+          <p className="mb-2 text-center text-xs text-muted-foreground sm:text-right">
+            Form details are saved in this browser and restored after refresh.
+          </p>
           <StateForm data={formData} onChange={handleFormChange} onCreate={handleCreate} />
 
           {/* Barcode Preview - below form like pdf417.pro */}
